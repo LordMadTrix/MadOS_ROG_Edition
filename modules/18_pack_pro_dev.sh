@@ -48,5 +48,23 @@ echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https:/
 sudo apt-get update -q >/dev/null 2>&1
 sudo apt-get install -y codium >/dev/null 2>&1 || true
 
-echo -e "    ${CYAN}✅ Environnement Docker, Virtualisation KVM et Éditeur Code prêts.${NC}"
+# Antigravity (Google AI Assistant)
+echo -e "    ${GRAY}├─ Déploiement de l'assistant IA Google Antigravity...${NC}"
+ANTIGRAVITY_TEMP_DIR=\$(mktemp -d)
+wget -qO "\$ANTIGRAVITY_TEMP_DIR/antigravity.deb" https://antigravity.google/download/linux || true
+
+if [ -f "\$ANTIGRAVITY_TEMP_DIR/antigravity.deb" ]; then
+    sudo apt-get install -y "\$ANTIGRAVITY_TEMP_DIR/antigravity.deb" >/dev/null 2>&1 || true
+    rm -rf "\$ANTIGRAVITY_TEMP_DIR"
+else
+    # Fallback if it's not a generic .deb but an executable binary
+    wget -qO "\$ANTIGRAVITY_TEMP_DIR/antigravity" https://antigravity.google/download/linux || true
+    if [ -f "\$ANTIGRAVITY_TEMP_DIR/antigravity" ]; then
+        sudo mv "\$ANTIGRAVITY_TEMP_DIR/antigravity" /usr/local/bin/antigravity
+        sudo chmod +x /usr/local/bin/antigravity
+    fi
+    rm -rf "\$ANTIGRAVITY_TEMP_DIR"
+fi
+
+echo -e "    ${CYAN}✅ Environnement Docker, Virtualisation KVM, Éditeur Code et Antigravity prêts.${NC}"
 echo -e "    ${WHITE}✅ Phase 18 Terminée.${NC}"
