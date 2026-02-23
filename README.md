@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/ROG_logo.png/600px-ROG_logo.png" alt="MadOS ROG Logo" width="200" />
+  <img src="assets/logo.png" alt="MadOS ROG Logo" width="300" />
 
   # MadOS ROG Edition — Framework Post-Install
   
@@ -29,7 +29,7 @@
 - 💻 **Noyau XanMod EDGE** : Compilation automatique du kernel orienté gaming avec support des instructions AVX2 / AVX512 (selon votre CPU).
 - ⚙️ **Contrôle Hardware ASUS** : Intégration CLI native de `asusctl` et `supergfxctl` (compilés via Rust) pour la gestion du MUX Switch, des ventilateurs et du clavier RGB.
 - 🎨 **Esthétique ROG Immersive** : Thème sombre, accents rouges, SDDM Wallpaper animé, Neofetch exclusif, et terminal ZSH (Powerlevel10k).
-- 🤖 **Assistant IA (OpenClaw)** : (Optionnel) Installation intégrée d'un agent IA local directement utilisable sur votre bureau.
+- 🤖 **Assistant IA ([OpenClaw](https://openclaw.ai/))** : (Optionnel) Installation intégrée d'un agent IA local directement utilisable sur votre bureau.
 - 🧹 **Purge Anti-Bloatware** : Suppression radicale de Snapd, GNOME, et de la télémétrie Ubuntu.
 
 ---
