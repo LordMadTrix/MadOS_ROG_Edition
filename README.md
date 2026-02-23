@@ -79,7 +79,11 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `03_integration_rog.sh`  | Détection du modèle via `dmidecode`, compilation de contrôle de carte mère. |
 | `04_arsenal_logiciel.sh` | Steam, Chrome, Lutris, MangoHud, et l'injecteur IA OpenClaw. |
 | `05_bureau_kde_plasma.sh`| Interface graphique KDE Plasma 6 via Backports. |
-| `06_thematique_mados.sh` | Paramétrage Visuel: GRUB interactif, Splash Plymouth, curseurs, couleurs de fenêtres. |
+| `06_thematique_mados.sh` | Paramétrage Visuel: GRUB interactif, Splash Plymouth. |
+| `07_snapshots_systeme.sh`| 🛡️ Configuration de sauvegardes systèmes fiables via Timeshift. |
+| `08_proton_gamescope.sh` | 🎮 Compilation de Proton-GE (Steam) et GameScope pour l'upscaling. |
+| `09_montage_ntfs.sh`     | 💾 Détection et ajout (fstab) de vos disques de jeu Windows (NTFS). |
+| `10_son_demarrage.sh`    | 🔊 Injection du son au démarrage KDE (Ambiance ROG). |
 
 ---
 

@@ -1,14 +1,12 @@
 #!/bin/bash
 # ==========================================
-# MadOS ROG V2 - Menu Principal d'Installation
+# MadOS ROG V2.1 - Menu Principal d'Installation
 # ==========================================
 # Script de Post-Installation Interactif
-# Détection GPU intelligente & Options Fun !
 # ==========================================
 
 set -euo pipefail
 
-# Vérification des privilèges Root
 if [ "$EUID" -ne 0 ]; then
     echo -e "\033[0;31m❌ ERREUR: La matrice refuse votre accès.\033[0m"
     echo -e "Veuillez lancer le script avec les privilèges administrateur (sudo) :"
@@ -21,7 +19,6 @@ export MODULES_DIR="$SCRIPT_DIR/modules"
 
 if [ ! -d "$MODULES_DIR" ]; then
     echo -e "\033[0;31m❌ ERREUR FATALE: Le dossier 'modules/' est introuvable.\033[0m"
-    echo -e "\033[0;90mAvez-vous extrait l'archive MadOS correctement ?\033[0m"
     exit 1
 fi
 
@@ -29,15 +26,13 @@ chmod +x "$MODULES_DIR"/*.sh 2>/dev/null || true
 
 # ---- Couleurs & Styles ----
 RED='\033[0;31m'
-DARK_RED='\033[38;5;88m'
 WHITE='\033[1;37m'
 GRAY='\033[0;90m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 BOLD='\033[1m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Effet Machine à écrire pour l'intro
 type_text() {
     local text="$1"
     local delay="${2:-0.03}"
@@ -48,7 +43,6 @@ type_text() {
     echo ""
 }
 
-# ASCII Art dynamique
 afficher_logo() {
     clear
     echo -e "${RED}${BOLD}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗${NC}"
@@ -58,8 +52,8 @@ afficher_logo() {
     echo -e "${RED}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║${NC}"
     echo -e "${RED}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝${NC}"
     echo ""
-    echo -e "${WHITE}${BOLD}       REPUBLIC OF GAMERS - SCRIPT POST-INSTALL V2${NC}"
-    echo -e "${GRAY}       -------------------------------------------${NC}"
+    echo -e "${WHITE}${BOLD}       REPUBLIC OF GAMERS - SCRIPT POST-INSTALL V2.1${NC}"
+    echo -e "${GRAY}       ---------------------------------------------${NC}"
     echo ""
 }
 
@@ -72,7 +66,7 @@ intro_fun() {
     sleep 1
     type_text "Follow the red rabbit. 🐇" 0.05
     echo -e "${NC}"
-    sleep 2
+    sleep 1
     afficher_logo
 }
 
@@ -101,7 +95,7 @@ menu_principal() {
     echo -e "${WHITE}${BOLD}Que souhaitez-vous faire ?${NC}\n"
     echo -e " ${RED}[1]${NC} ${BOLD}Déploiement Total (Recommandé)${NC} - Fait tout automatiquement."
     echo -e " ${RED}[2]${NC} ${BOLD}Déploiement Personnalisé${NC} - Choisir chaque étape (Experts)."
-    echo -e " ${RED}[3]${NC} ${BOLD}Mode Destruction 🔥${NC} - Purger Ubuntu de tous ses bloatwares (Snap, Cloud-Init)."
+    echo -e " ${RED}[3]${NC} ${BOLD}Mode Destruction 🔥${NC} - Purger Ubuntu de tous ses bloatwares."
     echo -e " ${GRAY}[0]${NC} Sortir de la Matrice.\n"
     
     read -p "$(echo -e ${WHITE}👉 Votre choix : ${NC})" CHOIX_MENU
@@ -118,17 +112,31 @@ menu_principal() {
 installation_totale() {
     clear
     afficher_logo
-    echo -e "${RED}${BOLD}⚠️  DÉPLOIEMENT TOTAL ENGAGÉ ⚠️${NC}"
-    echo -e "${GRAY}Le système va configurer automatiquement votre ROG sans autre intervention.${NC}\n"
+    
+    echo -e "${CYAN}${BOLD}--- OPTIONS AVANCÉES (V2.1) ---${NC}"
+    echo -e "${GRAY}Appuyez sur Entrée pour accepter le choix par défaut [Majuscule = Défaut].${NC}\n"
+    
+    read -p "Activer les Snapshots Système Timeshift ? [Y/n]: " r_snap
+    read -p "Activer Ultra Gaming (Proton-GE & GameScope) ? [Y/n]: " r_proton
+    read -p "Scanner et configurer l'auto-montage des disques Windows (NTFS) ? [y/N]: " r_ntfs
+    read -p "Activer le son d'épée ROG au démarrage Windows ? [Y/n]: " r_sound
+
+    echo -e "\n${RED}${BOLD}⚠️  DÉPLOIEMENT TOTAL ENGAGÉ ⚠️${NC}"
+    echo -e "${GRAY}Le système va configurer automatiquement votre ROG...${NC}\n"
     sleep 2
 
     run_module "00_nettoyage_ubuntu.sh" "Purification du système & Dépôts"
     run_module "01_noyau_xanmod.sh"     "Injection du Noyau XanMod EDGE"
-    run_module "02_pilotes_gpu_auto.sh" "Détection et Installation des Pilotes Graphiques (NVIDIA/AMD/Intel)"
-    run_module "03_integration_rog.sh"  "Couplage Hardware ROG (asusctl, audio, WIFI)"
-    run_module "04_arsenal_logiciel.sh" "Logiciels Gamers & IA (Steam, Chrome, Lutris...)"
-    run_module "05_bureau_kde_plasma.sh" "Interface Graphique Wayland (KDE Plasma 6)"
-    run_module "06_thematique_mados.sh" "Esthétique ROG absolue (GRUB, ZSH, Plymouth)"
+    run_module "02_pilotes_gpu_auto.sh" "Détection Pilotes Graphiques"
+    run_module "03_integration_rog.sh"  "Couplage Hardware ROG (asusctl)"
+    run_module "04_arsenal_logiciel.sh" "Logiciels Gamers & IA"
+    run_module "05_bureau_kde_plasma.sh" "Interface Graphique Wayland (KDE 6)"
+    run_module "06_thematique_mados.sh" "Esthétique ROG (GRUB, ZSH)"
+    
+    [[ "$r_snap" =~ ^[nN]$ ]] || run_module "07_snapshots_systeme.sh" "Bouclier Système (Timeshift)"
+    [[ "$r_proton" =~ ^[nN]$ ]] || run_module "08_proton_gamescope.sh" "Options Ultra Gaming"
+    [[ "$r_ntfs" =~ ^[yYoO]$ ]] && run_module "09_montage_ntfs.sh" "Montage NTFS Windows"
+    [[ "$r_sound" =~ ^[nN]$ ]] || run_module "10_son_demarrage.sh" "Son de démarrage ROG"
 
     cloture_installation
 }
@@ -138,13 +146,18 @@ installation_custom() {
     afficher_logo
     echo -e "${WHITE}${BOLD}Mode Personnalisé - Répondez (o/N) pour chaque module :${NC}\n"
     
-    read -p "Voulez-vous nettoyer le système (Bloatwares/Snap) ? [o/N]: " r_clean
-    read -p "Voulez-vous installer le noyau Gaming XanMod EDGE ? [o/N]: " r_kern
-    read -p "Voulez-vous configurer les pilotes GPU auto ? [o/N]: " r_gpu
-    read -p "Voulez-vous intégrer les pilotes spécifiques ASUS ROG ? [o/N]: " r_rog
-    read -p "Voulez-vous compiler l'arsenal logiciel (Steam, Discord...) ? [o/N]: " r_soft
-    read -p "Voulez-vous injecter KDE Plasma 6 Wayland ? [o/N]: " r_kde
-    read -p "Voulez-vous appliquer le thème visuel intégral MadOS ROG ? [o/N]: " r_theme
+    read -p "Nettoyer système (Bloatwares) ? [o/N]: " r_clean
+    read -p "Noyau Gaming XanMod EDGE ? [o/N]: " r_kern
+    read -p "Pilotes GPU auto (Nvidia/AMD) ? [o/N]: " r_gpu
+    read -p "Intégration Hardware ASUS ROG ? [o/N]: " r_rog
+    read -p "Arsenal logiciel (Steam, Discord...) ? [o/N]: " r_soft
+    read -p "Injecter KDE Plasma 6 Wayland ? [o/N]: " r_kde
+    read -p "Thème visuel MadOS ROG ? [o/N]: " r_theme
+    echo -e "\n--- Bonus v2.1 ---"
+    read -p "Bouclier Snapshots Timeshift ? [o/N]: " r_snap
+    read -p "Performances Proton-GE / GameScope ? [o/N]: " r_prot
+    read -p "Auto-montage disques NTFS ? [o/N]: " r_ntfs
+    read -p "Son de démarrage ROG ? [o/N]: " r_snd
 
     echo -e "\n${GREEN}Début du protocole custom...${NC}"
     sleep 2
@@ -156,6 +169,10 @@ installation_custom() {
     [[ "$r_soft" =~ ^[oO]$ ]] && run_module "04_arsenal_logiciel.sh" "Logiciels Gamers"
     [[ "$r_kde"  =~ ^[oO]$ ]] && run_module "05_bureau_kde_plasma.sh" "KDE Plasma 6"
     [[ "$r_theme" =~ ^[oO]$ ]] && run_module "06_thematique_mados.sh" "Esthétique ROG"
+    [[ "$r_snap" =~ ^[oO]$ ]] && run_module "07_snapshots_systeme.sh" "Snapshots"
+    [[ "$r_prot" =~ ^[oO]$ ]] && run_module "08_proton_gamescope.sh" "Proton-GE"
+    [[ "$r_ntfs" =~ ^[oO]$ ]] && run_module "09_montage_ntfs.sh" "Montage NTFS"
+    [[ "$r_snd"  =~ ^[oO]$ ]] && run_module "10_son_demarrage.sh" "Son de démarrage"
 
     cloture_installation
 }
@@ -172,7 +189,7 @@ mode_destruction() {
           '--'
 EOF
     echo -e "MODES DESTRUCTION: PURGE DE CANONICAL${NC}"
-    echo -e "${GRAY}Attention: Ceci va détruire les services serveurs par défaut et Snap sans retour !${NC}\n"
+    echo -e "${GRAY}Attention: Ceci va détruire les services serveurs par défaut et Snap !${NC}\n"
     read -p "Continuer ? (o/N): " conf
     if [[ "$conf" =~ ^[oO]$ ]]; then
         run_module "00_nettoyage_ubuntu.sh" "Purification Extrême de l'Hôte"
@@ -202,6 +219,5 @@ cloture_installation() {
     fi
 }
 
-# Lancement script
 intro_fun
 menu_principal
