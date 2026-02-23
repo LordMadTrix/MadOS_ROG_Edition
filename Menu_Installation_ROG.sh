@@ -27,13 +27,17 @@ fi
 
 chmod +x "$MODULES_DIR"/*.sh 2>/dev/null || true
 
+export LOG_FILE="/var/log/mados_install.log"
+echo "=== Début de l'installation MadOS ROG ===" > "$LOG_FILE"
+echo "Date: $(date)" >> "$LOG_FILE"
+
 # ---- Couleurs & Styles Shell ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-CYAN='\033[0;36m'
-GRAY='\033[0;90m'
-NC='\033[0m'
-BOLD='\033[1m'
+export RED='\033[0;31m'
+export WHITE='\033[1;37m'
+export CYAN='\033[0;36m'
+export GRAY='\033[0;90m'
+export NC='\033[0m'
+export BOLD='\033[1m'
 
 # ---- Thème Visuel ROG pour Whiptail (GUI) ----
 # Remplace le bleu classique par un thème Sombre/Rouge ASUS ROG
@@ -65,8 +69,9 @@ run_module() {
     echo -e "${CYAN}│${NC} 📌 ${GRAY}${DESCRIPTION}${NC}"
     echo -e "${CYAN}╰──────────────────────────────────────────────────────────────╯${NC}\n"
     
-    if ! bash "$MODULES_DIR/$SCRIPT"; then
-        if ! whiptail --title "ERREUR MODULE" --yesno "Le module $SCRIPT a signalé une erreur.\nVoulez-vous l'ignorer et continuer ?" 10 50; then
+    echo -e "\n--- Exécution: $SCRIPT ---" >> "$LOG_FILE"
+    if ! bash "$MODULES_DIR/$SCRIPT" 2>&1 | tee -a "$LOG_FILE"; then
+        if ! whiptail --title "ERREUR MODULE" --yesno "Le module $SCRIPT a signalé une erreur.\n\nVous pouvez consulter le log d'erreur dans : /var/log/mados_install.log\n\nVoulez-vous l'ignorer et continuer ?" 12 60; then
             echo -e "${RED}Arrêt du déploiement.${NC}"
             exit 1
         fi
