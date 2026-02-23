@@ -30,10 +30,10 @@ echo -e "${RED}╚════════════════════�
 echo -e "${RED}>>> ${WHITE}[1/5] ${BOLD}Configuration de l'identité système...${NC}"
 cat > /etc/os-release <<'OSRELEASE'
 NAME="MadOS ROG Edition"
-VERSION="2.2 (Noble)"
+VERSION="2.3 (Noble)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="MadOS ROG Edition 2.2"
+PRETTY_NAME="MadOS ROG Edition 2.3"
 VERSION_ID="24.04"
 HOME_URL="https://github.com/mados-rog"
 OSRELEASE

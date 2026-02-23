@@ -1,16 +1,19 @@
 #!/bin/bash
 # ==========================================
-# MadOS ROG V2.1 - Menu Principal d'Installation
+# MadOS ROG V2.3 - Menu Principal TUI (Whiptail)
 # ==========================================
-# Script de Post-Installation Interactif
+# Script de Post-Installation - Interface Graphique
 # ==========================================
 
 set -euo pipefail
 
+# S'assurer que whiptail est installé
+if ! command -v whiptail >/dev/null 2>&1; then
+    sudo apt-get update && sudo apt-get install -y whiptail dialog
+fi
+
 if [ "$EUID" -ne 0 ]; then
-    echo -e "\033[0;31m❌ ERREUR: La matrice refuse votre accès.\033[0m"
-    echo -e "Veuillez lancer le script avec les privilèges administrateur (sudo) :"
-    echo -e "   sudo bash Menu_Installation_ROG.sh"
+    whiptail --title "ERREUR DE PRIVILÈGES" --msgbox "La matrice refuse votre accès.\n\nVeuillez lancer le script avec sudo :\n\nsudo bash Menu_Installation_ROG.sh" 10 60
     exit 1
 fi
 
@@ -18,113 +21,78 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export MODULES_DIR="$SCRIPT_DIR/modules"
 
 if [ ! -d "$MODULES_DIR" ]; then
-    echo -e "\033[0;31m❌ ERREUR FATALE: Le dossier 'modules/' est introuvable.\033[0m"
+    whiptail --title "ERREUR FATALE" --msgbox "Le dossier 'modules/' est introuvable." 8 45
     exit 1
 fi
 
 chmod +x "$MODULES_DIR"/*.sh 2>/dev/null || true
 
-# ---- Couleurs & Styles ----
+# ---- Couleurs Terminal Classique ----
 RED='\033[0;31m'
 WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-BOLD='\033[1m'
+GRAY='\033[0;90m'
 NC='\033[0m'
-
-type_text() {
-    local text="$1"
-    local delay="${2:-0.03}"
-    for (( i=0; i<${#text}; i++ )); do
-        echo -n "${text:$i:1}"
-        sleep $delay
-    done
-    echo ""
-}
-
-afficher_logo() {
-    clear
-    echo -e "${RED}${BOLD}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗${NC}"
-    echo -e "${RED}${BOLD}  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝${NC}"
-    echo -e "${RED}${BOLD}  ██╔████╔██║███████║██║  ██║██║   ██║███████╗${NC}"
-    echo -e "${RED}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║${NC}"
-    echo -e "${RED}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║${NC}"
-    echo -e "${RED}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝${NC}"
-    echo ""
-    echo -e "${WHITE}${BOLD}       REPUBLIC OF GAMERS - SCRIPT POST-INSTALL V2.1${NC}"
-    echo -e "${GRAY}       ---------------------------------------------${NC}"
-    echo ""
-}
-
-intro_fun() {
-    clear
-    echo -e "${GREEN}"
-    type_text "Wake up, Neo..." 0.05
-    sleep 1
-    type_text "The MadOS Matrix has you..." 0.05
-    sleep 1
-    type_text "Follow the red rabbit. 🐇" 0.05
-    echo -e "${NC}"
-    sleep 1
-    afficher_logo
-}
 
 run_module() {
     local SCRIPT="$1"
     local DESCRIPTION="${2:-}"
     
     echo -e "\n${CYAN}╭──────────────────────────────────────────────────────────────╮${NC}"
-    echo -e "${CYAN}│${NC} 🚀 ${WHITE}${BOLD}Exécution : ${SCRIPT}${NC}"
+    echo -e "${CYAN}│${NC} 🚀 ${WHITE}Exécution : ${SCRIPT}${NC}"
     echo -e "${CYAN}│${NC} 📌 ${GRAY}${DESCRIPTION}${NC}"
     echo -e "${CYAN}╰──────────────────────────────────────────────────────────────╯${NC}\n"
     
     if ! bash "$MODULES_DIR/$SCRIPT"; then
-        echo -e "\n${RED}${BOLD}❌ [ERREUR] Le module $SCRIPT a signalé une anomalie.${NC}"
-        echo -e "${RED}Voulez-vous ignorer l'erreur et continuer ? (o/N)${NC}"
-        read -r choix
-        if [[ ! "$choix" =~ ^[oO]$ ]]; then
-            echo -e "${RED}Arrêt du déploiement. Rapportez l'erreur sur le registre GitHub.${NC}"
+        if ! whiptail --title "ERREUR MODULE" --yesno "Le module $SCRIPT a signalé une erreur.\nVoulez-vous l'ignorer et continuer ?" 10 50; then
+            echo -e "${RED}Arrêt du déploiement.${NC}"
             exit 1
         fi
     fi
 }
 
 menu_principal() {
-    afficher_logo
-    echo -e "${WHITE}${BOLD}Que souhaitez-vous faire ?${NC}\n"
-    echo -e " ${RED}[1]${NC} ${BOLD}Déploiement Total (Recommandé)${NC} - Fait tout automatiquement."
-    echo -e " ${RED}[2]${NC} ${BOLD}Déploiement Personnalisé${NC} - Choisir chaque étape (Experts)."
-    echo -e " ${RED}[3]${NC} ${BOLD}Mode Destruction 🔥${NC} - Purger Ubuntu de tous ses bloatwares."
-    echo -e " ${GRAY}[0]${NC} Sortir de la Matrice.\n"
+    local CHOIX
+    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.3) - Menu Principal" \
+        --cancel-button "Quitter" \
+        --menu "Choisissez votre mode d'installation :" 15 65 4 \
+        "1" "Déploiement Total (Recommandé)" \
+        "2" "Déploiement Personnalisé (Experts)" \
+        "3" "Mode Destruction (Purge Ubuntu)" 3>&1 1>&2 2>&3)
     
-    read -p "$(echo -e ${WHITE}👉 Votre choix : ${NC})" CHOIX_MENU
-    
-    case $CHOIX_MENU in
-        1) installation_totale ;;
-        2) installation_custom ;;
-        3) mode_destruction ;;
-        0) echo -e "${GRAY}Désengagement... Au revoir.${NC}"; exit 0 ;;
-        *) echo -e "${RED}Choix invalide.${NC}"; sleep 1; menu_principal ;;
-    esac
+    if [ $? -eq 0 ]; then
+        case $CHOIX in
+            1) installation_totale ;;
+            2) installation_custom ;;
+            3) mode_destruction ;;
+        esac
+    else
+        echo -e "${GRAY}Désengagement de la matrice... Au revoir.${NC}"
+        exit 0
+    fi
 }
 
 installation_totale() {
-    clear
-    afficher_logo
+    local CHOIX_BONUS
+    # Affichage des options facultatives auto-sélectionnées ou non
+    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.3)" \
+        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 20 75 7 \
+        "SNAP" "Bouclier Système Timeshift" ON \
+        "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
+        "NTFS" "Montage NTFS des jeux Windows" OFF \
+        "SOND" "Son d'épée ROG au démarrage" ON \
+        "BATT" "Gestion de Batterie Extrême (auto-cpufreq)" ON \
+        "MANG" "Profil dynamique MangoHud Rouge ROG" ON \
+        "STRM" "Pack Streamer (OBS + NoiseTorch)" OFF 3>&1 1>&2 2>&3)
     
-    echo -e "${CYAN}${BOLD}--- OPTIONS AVANCÉES (V2.1) ---${NC}"
-    echo -e "${GRAY}Appuyez sur Entrée pour accepter le choix par défaut [Majuscule = Défaut].${NC}\n"
-    
-    read -p "Activer les Snapshots Système Timeshift ? [Y/n]: " r_snap
-    read -p "Activer Ultra Gaming (Proton-GE & GameScope) ? [Y/n]: " r_proton
-    read -p "Scanner et configurer l'auto-montage des disques Windows (NTFS) ? [y/N]: " r_ntfs
-    read -p "Activer le son d'épée ROG au démarrage Windows ? [Y/n]: " r_sound
+    if [ $? -ne 0 ]; then menu_principal; return; fi
 
-    echo -e "\n${RED}${BOLD}⚠️  DÉPLOIEMENT TOTAL ENGAGÉ ⚠️${NC}"
+    clear
+    echo -e "${RED}⚠️  DÉPLOIEMENT TOTAL ENGAGÉ ⚠️${NC}"
     echo -e "${GRAY}Le système va configurer automatiquement votre ROG...${NC}\n"
     sleep 2
 
+    # Modules obligatoires
     run_module "00_nettoyage_ubuntu.sh" "Purification du système & Dépôts"
     run_module "01_noyau_xanmod.sh"     "Injection du Noyau XanMod EDGE"
     run_module "02_pilotes_gpu_auto.sh" "Détection Pilotes Graphiques"
@@ -133,91 +101,82 @@ installation_totale() {
     run_module "05_bureau_kde_plasma.sh" "Interface Graphique Wayland (KDE 6)"
     run_module "06_thematique_mados.sh" "Esthétique ROG (GRUB, ZSH)"
     
-    [[ "$r_snap" =~ ^[nN]$ ]] || run_module "07_snapshots_systeme.sh" "Bouclier Système (Timeshift)"
-    [[ "$r_proton" =~ ^[nN]$ ]] || run_module "08_proton_gamescope.sh" "Options Ultra Gaming"
-    [[ "$r_ntfs" =~ ^[yYoO]$ ]] && run_module "09_montage_ntfs.sh" "Montage NTFS Windows"
-    [[ "$r_sound" =~ ^[nN]$ ]] || run_module "10_son_demarrage.sh" "Son de démarrage ROG"
+    # Modules Bonus selon checklist
+    [[ "$CHOIX_BONUS" == *"SNAP"* ]] && run_module "07_snapshots_systeme.sh" "Bouclier Système"
+    [[ "$CHOIX_BONUS" == *"PROT"* ]] && run_module "08_proton_gamescope.sh" "Options Ultra Gaming"
+    [[ "$CHOIX_BONUS" == *"NTFS"* ]] && run_module "09_montage_ntfs.sh" "Montage NTFS Windows"
+    [[ "$CHOIX_BONUS" == *"SOND"* ]] && run_module "10_son_demarrage.sh" "Son ROG"
+    [[ "$CHOIX_BONUS" == *"BATT"* ]] && run_module "11_batterie_extreme.sh" "Auto-cpufreq"
+    [[ "$CHOIX_BONUS" == *"MANG"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
+    [[ "$CHOIX_BONUS" == *"STRM"* ]] && run_module "13_pack_streamer.sh" "OBS Streamer Pack"
 
     cloture_installation
 }
 
 installation_custom() {
-    clear
-    afficher_logo
-    echo -e "${WHITE}${BOLD}Mode Personnalisé - Répondez (o/N) pour chaque module :${NC}\n"
+    local CHOIX_ALL
+    CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
+        --checklist "Sélectionnez les modules individuels à exécuter :" 22 75 12 \
+        "00_clean" "Nettoyer système (Bloatwares)" OFF \
+        "01_kern" "Noyau Gaming XanMod EDGE" OFF \
+        "02_gpu" "Pilotes GPU auto (Nvidia/AMD)" OFF \
+        "03_rog" "Intégration Hardware ASUS ROG" OFF \
+        "04_soft" "Arsenal logiciel (Steam, Discord...)" OFF \
+        "05_kde" "Injecter KDE Plasma 6 Wayland" OFF \
+        "06_them" "Thème visuel MadOS ROG" OFF \
+        "07_snap" "Bouclier Snapshots Timeshift" OFF \
+        "08_prot" "Performances Proton-GE / GameScope" OFF \
+        "09_ntfs" "Auto-montage disques NTFS" OFF \
+        "10_snd" "Son de démarrage ROG" OFF \
+        "11_batt" "Auto-cpufreq Batterie" OFF \
+        "12_mang" "MangoHud ROG Edition" OFF \
+        "13_strm" "Pack OBS Stream" OFF 3>&1 1>&2 2>&3)
     
-    read -p "Nettoyer système (Bloatwares) ? [o/N]: " r_clean
-    read -p "Noyau Gaming XanMod EDGE ? [o/N]: " r_kern
-    read -p "Pilotes GPU auto (Nvidia/AMD) ? [o/N]: " r_gpu
-    read -p "Intégration Hardware ASUS ROG ? [o/N]: " r_rog
-    read -p "Arsenal logiciel (Steam, Discord...) ? [o/N]: " r_soft
-    read -p "Injecter KDE Plasma 6 Wayland ? [o/N]: " r_kde
-    read -p "Thème visuel MadOS ROG ? [o/N]: " r_theme
-    echo -e "\n--- Bonus v2.1 ---"
-    read -p "Bouclier Snapshots Timeshift ? [o/N]: " r_snap
-    read -p "Performances Proton-GE / GameScope ? [o/N]: " r_prot
-    read -p "Auto-montage disques NTFS ? [o/N]: " r_ntfs
-    read -p "Son de démarrage ROG ? [o/N]: " r_snd
+    if [ $? -ne 0 ]; then menu_principal; return; fi
 
-    echo -e "\n${GREEN}Début du protocole custom...${NC}"
+    clear
+    echo -e "${RED}Début du protocole custom...${NC}\n"
     sleep 2
 
-    [[ "$r_clean" =~ ^[oO]$ ]] && run_module "00_nettoyage_ubuntu.sh" "Purification du système"
-    [[ "$r_kern" =~ ^[oO]$ ]] && run_module "01_noyau_xanmod.sh" "Injection du Noyau"
-    [[ "$r_gpu"  =~ ^[oO]$ ]] && run_module "02_pilotes_gpu_auto.sh" "Détection Pilotes"
-    [[ "$r_rog"  =~ ^[oO]$ ]] && run_module "03_integration_rog.sh" "Couplage Hardware ROG"
-    [[ "$r_soft" =~ ^[oO]$ ]] && run_module "04_arsenal_logiciel.sh" "Logiciels Gamers"
-    [[ "$r_kde"  =~ ^[oO]$ ]] && run_module "05_bureau_kde_plasma.sh" "KDE Plasma 6"
-    [[ "$r_theme" =~ ^[oO]$ ]] && run_module "06_thematique_mados.sh" "Esthétique ROG"
-    [[ "$r_snap" =~ ^[oO]$ ]] && run_module "07_snapshots_systeme.sh" "Snapshots"
-    [[ "$r_prot" =~ ^[oO]$ ]] && run_module "08_proton_gamescope.sh" "Proton-GE"
-    [[ "$r_ntfs" =~ ^[oO]$ ]] && run_module "09_montage_ntfs.sh" "Montage NTFS"
-    [[ "$r_snd"  =~ ^[oO]$ ]] && run_module "10_son_demarrage.sh" "Son de démarrage"
+    [[ "$CHOIX_ALL" == *"00_clean"* ]] && run_module "00_nettoyage_ubuntu.sh" "Purification du système"
+    [[ "$CHOIX_ALL" == *"01_kern"* ]] && run_module "01_noyau_xanmod.sh" "Injection du Noyau"
+    [[ "$CHOIX_ALL" == *"02_gpu"* ]] && run_module "02_pilotes_gpu_auto.sh" "Détection Pilotes"
+    [[ "$CHOIX_ALL" == *"03_rog"* ]] && run_module "03_integration_rog.sh" "Couplage Hardware ROG"
+    [[ "$CHOIX_ALL" == *"04_soft"* ]] && run_module "04_arsenal_logiciel.sh" "Logiciels Gamers"
+    [[ "$CHOIX_ALL" == *"05_kde"* ]] && run_module "05_bureau_kde_plasma.sh" "KDE Plasma 6"
+    [[ "$CHOIX_ALL" == *"06_them"* ]] && run_module "06_thematique_mados.sh" "Esthétique ROG"
+    [[ "$CHOIX_ALL" == *"07_snap"* ]] && run_module "07_snapshots_systeme.sh" "Snapshots"
+    [[ "$CHOIX_ALL" == *"08_prot"* ]] && run_module "08_proton_gamescope.sh" "Proton-GE"
+    [[ "$CHOIX_ALL" == *"09_ntfs"* ]] && run_module "09_montage_ntfs.sh" "Montage NTFS"
+    [[ "$CHOIX_ALL" == *"10_snd"* ]] && run_module "10_son_demarrage.sh" "Son de dèmarrage"
+    [[ "$CHOIX_ALL" == *"11_batt"* ]] && run_module "11_batterie_extreme.sh" "Auto-cpufreq"
+    [[ "$CHOIX_ALL" == *"12_mang"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
+    [[ "$CHOIX_ALL" == *"13_strm"* ]] && run_module "13_pack_streamer.sh" "OBS et Capture"
 
     cloture_installation
 }
 
 mode_destruction() {
-    clear
-    echo -e "${RED}${BOLD}"
-    cat << "EOF"
-         .-""-.
-        / _  _ \
-        |(_)(_)|
-        \  __  /
-         \ \/ /
-          '--'
-EOF
-    echo -e "MODES DESTRUCTION: PURGE DE CANONICAL${NC}"
-    echo -e "${GRAY}Attention: Ceci va détruire les services serveurs par défaut et Snap !${NC}\n"
-    read -p "Continuer ? (o/N): " conf
-    if [[ "$conf" =~ ^[oO]$ ]]; then
+    if whiptail --title "⚠️ MODE DESTRUCTION ⚠️" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 60; then
+        clear
         run_module "00_nettoyage_ubuntu.sh" "Purification Extrême de l'Hôte"
+        sleep 2
     fi
-    sleep 2
     menu_principal
 }
 
 cloture_installation() {
-    echo -e "\n${RED}╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${RED}║${NC}   🎉 ${WHITE}${BOLD}DÉPLOIEMENT MADOS ROG TERMINÉ !${NC}                      ${RED}║${NC}"
-    echo -e "${RED}╠══════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${RED}║${NC} ${WHITE}Que va-t-il se passer au redémarrage ?${NC}                       ${RED}║${NC}"
-    echo -e "${RED}║${NC}  🔸 Chargement du Kernel XanMod EDGE (Optimisé AVX2)${NC}         ${RED}║${NC}"
-    echo -e "${RED}║${NC}  🔸 Activation de l'environnement matériel KDE/Wayland${NC}       ${RED}║${NC}"
-    echo -e "${RED}║${NC}  🔸 Prêt pour la Domination Mondiale 🌍${NC}                      ${RED}║${NC}"
-    echo -e "${RED}╚══════════════════════════════════════════════════════════════╝${NC}\n"
-    
-    read -p "Voulez-vous redémarrer le système maintenant pour savourer ? (O/n): " r_reboot
-    if [[ ! "$r_reboot" =~ ^[nN]$ ]]; then
+    whiptail --title "MAD OS ROG TERMINÉ 🎉" --msgbox "Déploiement Terminé avec Succès !\n\nAu prochain redémarrage, vous entrerez dans la Matrice :\n - Kernel XanMod EDGE\n - Interface Wayland / KDE\n - Modules Avancés Actifs" 12 55
+    if whiptail --title "REDÉMARRAGE" --yesno "Voulez-vous redémarrer le système maintenant pour savourer le fruit de votre travail ?" 10 50; then
+        clear
         echo -e "${RED}Initiation de la séquence de reboot...${NC}"
         sleep 2
-        reboot
+        sudo reboot
     else
+        clear
         echo -e "${GRAY}À bientôt dans la Matrice.${NC}"
         exit 0
     fi
 }
 
-intro_fun
 menu_principal

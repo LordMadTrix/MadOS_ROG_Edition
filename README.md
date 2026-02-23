@@ -58,10 +58,10 @@ chmod +x Menu_Installation_ROG.sh modules/*.sh
 sudo bash Menu_Installation_ROG.sh
 ```
 
-Une fois le menu lancé, vous aurez le choix entre :
-- `[1] Déploiement Total` : Installe tout d'un coup.
-- `[2] Déploiement Personnalisé` : Choisissez les modules étape par étape.
-- `[3] Mode Destruction 🔥` : Nettoie uniquement le système de base.
+Une fois le script lancé, une interface "BIOS" graphique (Whiptail) apparaîtra. Vous aurez le choix entre :
+- `[1] Déploiement Total` : Un sous-menu interactif vous permettra de cocher/décocher les modules bonus.
+- `[2] Déploiement Personnalisé` : Sélectionnez précisément les modules voulus avec la barre [ESPACE].
+- `[3] Mode Destruction 🔥` : Purge le système de Canonical (Snap, etc.).
 
 > **Note :** Il est déconseillé d'interrompre le script une fois lancé (notamment pendant la compilation du noyau ou l'installation des dépendances Rust).
 
@@ -84,6 +84,9 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `08_proton_gamescope.sh` | 🎮 Compilation de Proton-GE (Steam) et GameScope pour l'upscaling. |
 | `09_montage_ntfs.sh`     | 💾 Détection et ajout (fstab) de vos disques de jeu Windows (NTFS). |
 | `10_son_demarrage.sh`    | 🔊 Injection du son au démarrage KDE (Ambiance ROG). |
+| `11_batterie_extreme.sh` | 🔋 Déploiement de `auto-cpufreq` pour doubler l'autonomie sur batterie. |
+| `12_mangohud_rog.sh`     | 📊 Création d'un profil agressif Rouge/Noir pour surveiller vos FPS en jeu. |
+| `13_pack_streamer.sh`    | 🎥 Installation massive d'OBS, `obs-vkcapture` (Wayland), et IA `NoiseTorch`. |
 
 ---
 
