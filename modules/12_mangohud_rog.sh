@@ -5,7 +5,7 @@
 # Phase: 12 - Profil MangoHud ROG & GOverlay
 # ==========================================
 
-set -u
+
 
 RED='\033[0;31m'
 WHITE='\033[1;37m'

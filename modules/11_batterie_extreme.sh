@@ -5,7 +5,7 @@
 # Phase: 11 - Batterie Extrême (auto-cpufreq)
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 RED='\033[0;31m'

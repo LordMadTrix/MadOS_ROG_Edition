@@ -6,7 +6,7 @@
 # Configure un point de sauvegarde système par sécurité
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 # ---- Couleurs & Styles ----

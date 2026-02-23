@@ -6,7 +6,7 @@
 # Cherche la carte dédiée et installe les pilotes appropriés.
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 # ---- Couleurs & Styles ----

@@ -7,7 +7,7 @@
 # ==========================================
 
 # Enlever 'set -e' pour éviter qu'une simple erreur réseau/apt update ne fasse crasher tout le script
-set -u
+
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a

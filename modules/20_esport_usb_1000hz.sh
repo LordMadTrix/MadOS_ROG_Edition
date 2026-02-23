@@ -5,7 +5,7 @@
 # Phase: 20 - E-Sport Zero Latency (USB Udev Rules)
 # ==========================================
 
-set -u
+
 
 RED='\033[0;31m'
 WHITE='\033[1;37m'

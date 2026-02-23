@@ -5,7 +5,7 @@
 # Phase: 13 - Outils de Streaming (OBS)
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 RED='\033[0;31m'

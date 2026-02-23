@@ -6,7 +6,7 @@
 # Transforme le rendu pour correspondre au style ROG
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 # ---- Couleurs & Styles ----

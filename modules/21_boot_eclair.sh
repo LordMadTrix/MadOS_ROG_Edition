@@ -5,7 +5,7 @@
 # Phase: 21 - Boot Éclair (LZ4 & Silent GRUB)
 # ==========================================
 
-set -u
+
 
 RED='\033[0;31m'
 WHITE='\033[1;37m'

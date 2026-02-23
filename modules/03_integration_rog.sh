@@ -5,7 +5,7 @@
 # Phase: 3 - ASUS ROG Laptop Full Integration
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 # ---- Couleurs & Styles ----

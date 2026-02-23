@@ -5,7 +5,7 @@
 # Phase: 14 - Assistant IA OpenClaw
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 RED='\033[0;31m'

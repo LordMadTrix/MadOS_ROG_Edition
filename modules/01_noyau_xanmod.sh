@@ -6,7 +6,7 @@
 # Cible spécifiquement la variance x64v3 pour ROG (AVX2).
 # ==========================================
 
-set -u
+
 export DEBIAN_FRONTEND=noninteractive
 
 # ---- Couleurs & Styles ----
