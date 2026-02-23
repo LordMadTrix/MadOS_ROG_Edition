@@ -27,6 +27,12 @@ fi
 
 chmod +x "$MODULES_DIR"/*.sh 2>/dev/null || true
 
+# Empêcher sudo de réinitialiser les variables cruciales pour l'installation silencieuse
+echo 'Defaults env_keep += "DEBIAN_FRONTEND NEEDRESTART_MODE"' | sudo tee /etc/sudoers.d/mados-apt-env >/dev/null
+sudo chmod 0440 /etc/sudoers.d/mados-apt-env
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
 export LOG_FILE="/var/log/mados_install.log"
 echo "=== Début de l'installation MadOS ROG ===" > "$LOG_FILE"
 echo "Date: $(date)" >> "$LOG_FILE"
