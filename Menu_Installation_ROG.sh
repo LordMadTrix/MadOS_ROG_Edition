@@ -39,24 +39,21 @@ export GRAY='\033[0;90m'
 export NC='\033[0m'
 export BOLD='\033[1m'
 
-# ---- Thème Visuel ROG pour Whiptail (GUI) ----
-# Remplace le bleu classique par un thème Sombre/Rouge ASUS ROG
 export NEWT_COLORS='
     root=white,black
     window=white,black
     border=red,black
     shadow=black,black
-    title=red,black
-    button=white,red
-    actbutton=red,white
-    compactbutton=white,red
-    title=white,red
+    title=black,red
+    button=white,black
+    actbutton=black,red
+    compactbutton=white,black
     textbox=white,black
-    actlistbox=white,red
     listbox=white,black
-    sellistbox=white,red
-    actsellistbox=white,red
-    checkbox=red,black
+    actlistbox=black,red
+    sellistbox=white,black
+    actsellistbox=black,red
+    checkbox=white,black
     actcheckbox=black,red
 '
 
