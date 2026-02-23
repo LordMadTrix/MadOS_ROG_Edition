@@ -88,6 +88,10 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `12_mangohud_rog.sh`     | 📊 Création d'un profil agressif Rouge/Noir pour surveiller vos FPS en jeu. |
 | `13_pack_streamer.sh`    | 🎥 Installation massive d'OBS, `obs-vkcapture` (Wayland), et IA `NoiseTorch`. |
 | `14_openclaw_ai.sh`      | 🤖 Compilation automatisée de `OpenClaw` (service systemd silencieux). |
+| `15_reseau_antilag.sh`   | 🌐 Profil noyau TCP BBR & _fq_codel_ pour réduire le ping multijoueur. |
+| `16_zram_memoire.sh`     | 🧠 Swap ZRAM compressée (zstd) pour doubler la capacité de mémoire vive en jeu. |
+| `17_bouclier_antipub.sh` | 🛡️ Injection _StevenBlack Hosts_ bloquant traqueurs et malwares au niveau noyau. |
+| `18_pack_pro_dev.sh`     | 💻 QEMU, KVM, Docker, VSCodium pour les pros et la virtualisation bas-niveau. |
 
 ---
 

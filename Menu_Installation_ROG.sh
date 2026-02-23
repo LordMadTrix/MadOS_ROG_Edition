@@ -53,7 +53,7 @@ run_module() {
 
 menu_principal() {
     local CHOIX
-    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.4) - Menu Principal" \
+    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.5) - Menu Principal" \
         --cancel-button "Quitter" \
         --menu "Choisissez votre mode d'installation :" 15 65 4 \
         "1" "Déploiement Total (Recommandé)" \
@@ -75,8 +75,8 @@ menu_principal() {
 installation_totale() {
     local CHOIX_BONUS
     # Affichage des options facultatives auto-sélectionnées ou non
-    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.4)" \
-        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 20 75 8 \
+    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.5)" \
+        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 21 80 12 \
         "SNAP" "Bouclier Système Timeshift" ON \
         "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
         "NTFS" "Montage NTFS des jeux Windows" OFF \
@@ -84,7 +84,11 @@ installation_totale() {
         "BATT" "Gestion de Batterie Extrême (auto-cpufreq)" ON \
         "MANG" "Profil dynamique MangoHud Rouge ROG" ON \
         "STRM" "Pack Streamer (OBS + NoiseTorch)" OFF \
-        "CLAW" "Assistant IA OpenClaw (Local)" OFF 3>&1 1>&2 2>&3)
+        "CLAW" "Assistant IA OpenClaw (Local)" OFF \
+        "NET"  "Réseau Anti-Lag BBR (Multijoueur)" ON \
+        "ZRAM" "RAM Compressée au vol (ZSTD)" ON \
+        "ADS"  "Bouclier Anti-Pub Global (Hosts)" ON \
+        "DEV"  "Pack Pro Dev (VSCodium, Docker, QEMU)" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -111,6 +115,10 @@ installation_totale() {
     [[ "$CHOIX_BONUS" == *"MANG"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
     [[ "$CHOIX_BONUS" == *"STRM"* ]] && run_module "13_pack_streamer.sh" "OBS Streamer Pack"
     [[ "$CHOIX_BONUS" == *"CLAW"* ]] && run_module "14_openclaw_ai.sh" "Installation Agent IA"
+    [[ "$CHOIX_BONUS" == *"NET"* ]]  && run_module "15_reseau_antilag.sh" "Optimisation TCP BBR"
+    [[ "$CHOIX_BONUS" == *"ZRAM"* ]] && run_module "16_zram_memoire.sh" "Compression RAM"
+    [[ "$CHOIX_BONUS" == *"ADS"* ]]  && run_module "17_bouclier_antipub.sh" "Patch Fichier Hosts"
+    [[ "$CHOIX_BONUS" == *"DEV"* ]]  && run_module "18_pack_pro_dev.sh" "Déploiement IDE & VM"
 
     cloture_installation
 }
@@ -118,7 +126,7 @@ installation_totale() {
 installation_custom() {
     local CHOIX_ALL
     CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
-        --checklist "Sélectionnez les modules individuels à exécuter :" 22 75 13 \
+        --checklist "Sélectionnez les modules individuels à exécuter :" 26 80 18 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
         "02_gpu" "Pilotes GPU auto (Nvidia/AMD)" OFF \
@@ -133,7 +141,11 @@ installation_custom() {
         "11_batt" "Auto-cpufreq Batterie" OFF \
         "12_mang" "MangoHud ROG Edition" OFF \
         "13_strm" "Pack OBS Stream" OFF \
-        "14_claw" "Assistant IA OpenClaw" OFF 3>&1 1>&2 2>&3)
+        "14_claw" "Assistant IA OpenClaw" OFF \
+        "15_net" "Optimisation Réseau TCP" OFF \
+        "16_zrm" "Compression Mémoire ZRAM" OFF \
+        "17_ads" "Bouclier Anti-Pub" OFF \
+        "18_dev" "Pack Professionnel" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -156,6 +168,10 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"12_mang"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
     [[ "$CHOIX_ALL" == *"13_strm"* ]] && run_module "13_pack_streamer.sh" "OBS et Capture"
     [[ "$CHOIX_ALL" == *"14_claw"* ]] && run_module "14_openclaw_ai.sh" "Agent IA OpenClaw"
+    [[ "$CHOIX_ALL" == *"15_net"* ]] && run_module "15_reseau_antilag.sh" "TCP BBR Anti-Lag"
+    [[ "$CHOIX_ALL" == *"16_zrm"* ]] && run_module "16_zram_memoire.sh" "Swap ZRAM"
+    [[ "$CHOIX_ALL" == *"17_ads"* ]] && run_module "17_bouclier_antipub.sh" "Hosts StevenBlack"
+    [[ "$CHOIX_ALL" == *"18_dev"* ]] && run_module "18_pack_pro_dev.sh" "Pack Docker/QEMU"
 
     cloture_installation
 }
