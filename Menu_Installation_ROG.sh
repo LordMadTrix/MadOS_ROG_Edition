@@ -27,12 +27,34 @@ fi
 
 chmod +x "$MODULES_DIR"/*.sh 2>/dev/null || true
 
-# ---- Couleurs Terminal Classique ----
+# ---- Couleurs & Styles Shell ----
 RED='\033[0;31m'
 WHITE='\033[1;37m'
 CYAN='\033[0;36m'
 GRAY='\033[0;90m'
 NC='\033[0m'
+BOLD='\033[1m'
+
+# ---- Thème Visuel ROG pour Whiptail (GUI) ----
+# Remplace le bleu classique par un thème Sombre/Rouge ASUS ROG
+export NEWT_COLORS='
+    root=white,black
+    window=white,black
+    border=red,black
+    shadow=black,black
+    title=red,black
+    button=white,red
+    actbutton=red,white
+    compactbutton=white,red
+    title=white,red
+    textbox=white,black
+    actlistbox=white,red
+    listbox=white,black
+    sellistbox=white,red
+    actsellistbox=white,red
+    checkbox=red,black
+    actcheckbox=black,red
+'
 
 run_module() {
     local SCRIPT="$1"
