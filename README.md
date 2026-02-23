@@ -48,7 +48,7 @@ Il suffit de cloner (ou télécharger) ce dépôt sur votre nouvelle machine, et
 
 ```bash
 # 1. Cloner ce dépôt
-git clone https://github.com/VOTRE_NOM/MadOS_ROG_Edition.git
+git clone https://github.com/LordMadTrix/MadOS_ROG_Edition.git
 cd MadOS_ROG_Edition
 
 # 2. Rendre le script exécutable (facultatif si déjà fait via Git)
