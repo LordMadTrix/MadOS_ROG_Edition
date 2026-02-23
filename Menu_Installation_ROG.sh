@@ -53,7 +53,7 @@ run_module() {
 
 menu_principal() {
     local CHOIX
-    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.3) - Menu Principal" \
+    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.4) - Menu Principal" \
         --cancel-button "Quitter" \
         --menu "Choisissez votre mode d'installation :" 15 65 4 \
         "1" "Déploiement Total (Recommandé)" \
@@ -75,15 +75,16 @@ menu_principal() {
 installation_totale() {
     local CHOIX_BONUS
     # Affichage des options facultatives auto-sélectionnées ou non
-    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.3)" \
-        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 20 75 7 \
+    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.4)" \
+        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 20 75 8 \
         "SNAP" "Bouclier Système Timeshift" ON \
         "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
         "NTFS" "Montage NTFS des jeux Windows" OFF \
         "SOND" "Son d'épée ROG au démarrage" ON \
         "BATT" "Gestion de Batterie Extrême (auto-cpufreq)" ON \
         "MANG" "Profil dynamique MangoHud Rouge ROG" ON \
-        "STRM" "Pack Streamer (OBS + NoiseTorch)" OFF 3>&1 1>&2 2>&3)
+        "STRM" "Pack Streamer (OBS + NoiseTorch)" OFF \
+        "CLAW" "Assistant IA OpenClaw (Local)" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -109,6 +110,7 @@ installation_totale() {
     [[ "$CHOIX_BONUS" == *"BATT"* ]] && run_module "11_batterie_extreme.sh" "Auto-cpufreq"
     [[ "$CHOIX_BONUS" == *"MANG"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
     [[ "$CHOIX_BONUS" == *"STRM"* ]] && run_module "13_pack_streamer.sh" "OBS Streamer Pack"
+    [[ "$CHOIX_BONUS" == *"CLAW"* ]] && run_module "14_openclaw_ai.sh" "Installation Agent IA"
 
     cloture_installation
 }
@@ -116,7 +118,7 @@ installation_totale() {
 installation_custom() {
     local CHOIX_ALL
     CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
-        --checklist "Sélectionnez les modules individuels à exécuter :" 22 75 12 \
+        --checklist "Sélectionnez les modules individuels à exécuter :" 22 75 13 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
         "02_gpu" "Pilotes GPU auto (Nvidia/AMD)" OFF \
@@ -130,7 +132,8 @@ installation_custom() {
         "10_snd" "Son de démarrage ROG" OFF \
         "11_batt" "Auto-cpufreq Batterie" OFF \
         "12_mang" "MangoHud ROG Edition" OFF \
-        "13_strm" "Pack OBS Stream" OFF 3>&1 1>&2 2>&3)
+        "13_strm" "Pack OBS Stream" OFF \
+        "14_claw" "Assistant IA OpenClaw" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -152,6 +155,7 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"11_batt"* ]] && run_module "11_batterie_extreme.sh" "Auto-cpufreq"
     [[ "$CHOIX_ALL" == *"12_mang"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
     [[ "$CHOIX_ALL" == *"13_strm"* ]] && run_module "13_pack_streamer.sh" "OBS et Capture"
+    [[ "$CHOIX_ALL" == *"14_claw"* ]] && run_module "14_openclaw_ai.sh" "Agent IA OpenClaw"
 
     cloture_installation
 }

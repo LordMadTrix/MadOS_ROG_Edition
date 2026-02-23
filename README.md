@@ -87,6 +87,7 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `11_batterie_extreme.sh` | 🔋 Déploiement de `auto-cpufreq` pour doubler l'autonomie sur batterie. |
 | `12_mangohud_rog.sh`     | 📊 Création d'un profil agressif Rouge/Noir pour surveiller vos FPS en jeu. |
 | `13_pack_streamer.sh`    | 🎥 Installation massive d'OBS, `obs-vkcapture` (Wayland), et IA `NoiseTorch`. |
+| `14_openclaw_ai.sh`      | 🤖 Compilation automatisée de `OpenClaw` (service systemd silencieux). |
 
 ---
 
