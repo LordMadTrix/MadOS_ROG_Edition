@@ -53,7 +53,7 @@ run_module() {
 
 menu_principal() {
     local CHOIX
-    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.5) - Menu Principal" \
+    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.6) - Menu Principal" \
         --cancel-button "Quitter" \
         --menu "Choisissez votre mode d'installation :" 15 65 4 \
         "1" "Déploiement Total (Recommandé)" \
@@ -75,8 +75,8 @@ menu_principal() {
 installation_totale() {
     local CHOIX_BONUS
     # Affichage des options facultatives auto-sélectionnées ou non
-    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.5)" \
-        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 21 80 12 \
+    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.6)" \
+        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 24 85 15 \
         "SNAP" "Bouclier Système Timeshift" ON \
         "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
         "NTFS" "Montage NTFS des jeux Windows" OFF \
@@ -88,7 +88,10 @@ installation_totale() {
         "NET"  "Réseau Anti-Lag BBR (Multijoueur)" ON \
         "ZRAM" "RAM Compressée au vol (ZSTD)" ON \
         "ADS"  "Bouclier Anti-Pub Global (Hosts)" ON \
-        "DEV"  "Pack Pro Dev (VSCodium, Docker, QEMU)" OFF 3>&1 1>&2 2>&3)
+        "DEV"  "Pack Pro Dev (VSCodium, Docker, QEMU)" OFF \
+        "SSD"  "Maintenance NVMe (Auto Fstrim)" ON \
+        "USB"  "Zero Latency E-Sport (Polling forcée)" ON \
+        "BOOT" "Démarrage Éclair (Initramfs LZ4)" ON 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -119,6 +122,9 @@ installation_totale() {
     [[ "$CHOIX_BONUS" == *"ZRAM"* ]] && run_module "16_zram_memoire.sh" "Compression RAM"
     [[ "$CHOIX_BONUS" == *"ADS"* ]]  && run_module "17_bouclier_antipub.sh" "Patch Fichier Hosts"
     [[ "$CHOIX_BONUS" == *"DEV"* ]]  && run_module "18_pack_pro_dev.sh" "Déploiement IDE & VM"
+    [[ "$CHOIX_BONUS" == *"SSD"* ]]  && run_module "19_donnees_fstrim.sh" "Trim Auto SSD"
+    [[ "$CHOIX_BONUS" == *"USB"* ]]  && run_module "20_esport_usb_1000hz.sh" "Zero Latency USB"
+    [[ "$CHOIX_BONUS" == *"BOOT"* ]] && run_module "21_boot_eclair.sh" "Fast Boot System"
 
     cloture_installation
 }
@@ -126,7 +132,7 @@ installation_totale() {
 installation_custom() {
     local CHOIX_ALL
     CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
-        --checklist "Sélectionnez les modules individuels à exécuter :" 26 80 18 \
+        --checklist "Sélectionnez les modules individuels à exécuter :" 28 85 21 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
         "02_gpu" "Pilotes GPU auto (Nvidia/AMD)" OFF \
@@ -145,7 +151,10 @@ installation_custom() {
         "15_net" "Optimisation Réseau TCP" OFF \
         "16_zrm" "Compression Mémoire ZRAM" OFF \
         "17_ads" "Bouclier Anti-Pub" OFF \
-        "18_dev" "Pack Professionnel" OFF 3>&1 1>&2 2>&3)
+        "18_dev" "Pack Professionnel" OFF \
+        "19_ssd" "Auto Trim NVMe" OFF \
+        "20_usb" "Latence USB E-Sport" OFF \
+        "21_bot" "Démarrage LZ4 Éclair" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -172,6 +181,9 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"16_zrm"* ]] && run_module "16_zram_memoire.sh" "Swap ZRAM"
     [[ "$CHOIX_ALL" == *"17_ads"* ]] && run_module "17_bouclier_antipub.sh" "Hosts StevenBlack"
     [[ "$CHOIX_ALL" == *"18_dev"* ]] && run_module "18_pack_pro_dev.sh" "Pack Docker/QEMU"
+    [[ "$CHOIX_ALL" == *"19_ssd"* ]] && run_module "19_donnees_fstrim.sh" "SSD Auto Trim"
+    [[ "$CHOIX_ALL" == *"20_usb"* ]] && run_module "20_esport_usb_1000hz.sh" "USB Mod E-Sport"
+    [[ "$CHOIX_ALL" == *"21_bot"* ]] && run_module "21_boot_eclair.sh" "GRUB Initramfs Lz4"
 
     cloture_installation
 }

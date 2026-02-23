@@ -92,6 +92,9 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `16_zram_memoire.sh`     | 🧠 Swap ZRAM compressée (zstd) pour doubler la capacité de mémoire vive en jeu. |
 | `17_bouclier_antipub.sh` | 🛡️ Injection _StevenBlack Hosts_ bloquant traqueurs et malwares au niveau noyau. |
 | `18_pack_pro_dev.sh`     | 💻 QEMU, KVM, Docker, VSCodium pour les pros et la virtualisation bas-niveau. |
+| `19_donnees_fstrim.sh`   | 🧹 Timer système activant la purge SSD/NVMe (Fstrim) et limitant la taille des logs. |
+| `20_esport_usb_1000hz.sh`| 🖱️ `udev` rules pour annuler l'autosuspend USB, forçant le Polling Rate Zero-Latency. |
+| `21_boot_eclair.sh`      | ⚡ Compression _Initramfs_ `lz4` ultra-rapide et camouflage aveugle des textes de GRUB. |
 
 ---
 

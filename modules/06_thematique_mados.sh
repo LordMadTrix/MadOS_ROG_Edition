@@ -30,10 +30,10 @@ echo -e "${RED}╚════════════════════�
 echo -e "${RED}>>> ${WHITE}[1/5] ${BOLD}Configuration de l'identité système...${NC}"
 cat > /etc/os-release <<'OSRELEASE'
 NAME="MadOS ROG Edition"
-VERSION="2.5 (Noble)"
+VERSION="2.6 (Noble)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="MadOS ROG Edition 2.5"
+PRETTY_NAME="MadOS ROG Edition 2.6"
 VERSION_ID="24.04"
 HOME_URL="https://github.com/mados-rog"
 OSRELEASE
@@ -53,7 +53,7 @@ echo -e "${RED}${BOLD}  ██╔████╔██║███████�
 echo -e "${RED}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║${RESET}"
 echo -e "${RED}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║${RESET}"
 echo -e "${RED}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝${RESET}"
-echo -e "  ${CYAN}${BOLD}MadOS ROG Edition 2.2${RESET}  |  Kernel: $(uname -r)"
+echo -e "  \${CYAN}\${BOLD}MadOS ROG Edition 2.6\${RESET}  |  Kernel: \$(uname -r)"
 MOTD
 chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
 
