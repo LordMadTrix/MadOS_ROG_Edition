@@ -48,12 +48,12 @@ AUTO_APPROVE_SAFE_COMMANDS=true
 DEFAULT_SYSTEM_PROMPT="Tu es l'Agent IA de MadOS ROG Edition. Tu es intégré au cœur du système Linux pour assister un gamer passionné. Sois précis, pertinent, et concis."
 ENV_EOF
 
-echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peut prendre 1 à 3 minutes...${NC}"
+echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peut prendre 1 à 5 minutes selon le CPU...${NC}"
 sudo corepack enable pnpm >/dev/null 2>&1 || true
 
-# Execution du build STRICTEMENT sous l'utilisateur réel
-sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && pnpm install" >/dev/null 2>&1 || true
-sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && pnpm run build" >/dev/null 2>&1 || true
+# Execution du build STRICTEMENT sous l'utilisateur réel avec affichage (plus de freeze silencieux)
+sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm install" || true
+sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm run build" || true
 
 echo -e "    ${GRAY}├─ Création du service d'arrière-plan système...${NC}"
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/systemd/user"
