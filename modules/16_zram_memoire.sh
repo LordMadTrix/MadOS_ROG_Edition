@@ -5,7 +5,7 @@
 # Phase: 16 - Compression Mémoire (ZRAM zstd)
 # ==========================================
 
-set -euo pipefail
+set -u
 export DEBIAN_FRONTEND=noninteractive
 
 RED='\033[0;31m'

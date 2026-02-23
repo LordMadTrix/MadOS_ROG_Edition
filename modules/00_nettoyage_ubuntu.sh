@@ -6,10 +6,18 @@
 # Nettoie les composants serveur et prépare l'environnement.
 # ==========================================
 
-set -euo pipefail
+# Enlever 'set -e' pour éviter qu'une simple erreur réseau/apt update ne fasse crasher tout le script
+set -u
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
+
+# Kill process that could lock APT temporarily on fresh boot
+sudo killall apt apt-get 2>/dev/null || true
+sudo rm /var/lib/apt/lists/lock 2>/dev/null || true
+sudo rm /var/cache/apt/archives/lock 2>/dev/null || true
+sudo rm /var/lib/dpkg/lock* 2>/dev/null || true
+sudo dpkg --configure -a 2>/dev/null || true
 
 # ---- Couleurs & Styles ----
 RED='\033[0;31m'

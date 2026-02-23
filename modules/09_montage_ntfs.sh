@@ -5,7 +5,7 @@
 # Phase: 9 - Montage Automatique des jeux NTFS
 # ==========================================
 
-set -euo pipefail
+set -u
 
 RED='\033[0;31m'
 WHITE='\033[1;37m'

@@ -5,7 +5,7 @@
 # Phase: 8 - Ultra Gaming (Proton-GE & GameScope)
 # ==========================================
 
-set -euo pipefail
+set -u
 export DEBIAN_FRONTEND=noninteractive
 
 RED='\033[0;31m'

@@ -5,7 +5,7 @@
 # Phase: 15 - Optimisation Réseau (Anti-Lag TCP BBR & fq_codel)
 # ==========================================
 
-set -euo pipefail
+set -u
 
 RED='\033[0;31m'
 WHITE='\033[1;37m'

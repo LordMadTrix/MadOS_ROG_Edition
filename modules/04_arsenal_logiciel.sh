@@ -6,7 +6,7 @@
 # Installe Chrome, Steam, Lutris, et les outils Gaming.
 # ==========================================
 
-set -euo pipefail
+set -u
 export DEBIAN_FRONTEND=noninteractive
 
 # ---- Couleurs & Styles ----

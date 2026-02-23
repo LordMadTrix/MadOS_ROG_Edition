@@ -5,7 +5,7 @@
 # Phase: 17 - Bouclier Anti-Pub / Malwares (Hosts)
 # ==========================================
 
-set -euo pipefail
+set -u
 
 RED='\033[0;31m'
 WHITE='\033[1;37m'

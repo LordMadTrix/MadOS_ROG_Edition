@@ -5,7 +5,7 @@
 # Phase: 10 - Son d'ouverture de session ROG
 # ==========================================
 
-set -euo pipefail
+set -u
 export DEBIAN_FRONTEND=noninteractive
 
 RED='\033[0;31m'

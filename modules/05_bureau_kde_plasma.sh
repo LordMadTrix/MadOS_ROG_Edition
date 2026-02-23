@@ -5,7 +5,7 @@
 # Phase: 5 - KDE Plasma Desktop & Élimination Bloatware
 # ==========================================
 
-set -euo pipefail
+set -u
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 

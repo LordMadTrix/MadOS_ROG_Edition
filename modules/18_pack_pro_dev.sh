@@ -5,7 +5,7 @@
 # Phase: 18 - Pack Professionnel / Virt / Dev
 # ==========================================
 
-set -euo pipefail
+set -u
 export DEBIAN_FRONTEND=noninteractive
 
 RED='\033[0;31m'
