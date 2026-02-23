@@ -1,0 +1,29 @@
+# MadOS ROG Edition - Gitignore
+
+# Systèmes de fichiers / OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Dossiers d'éditeurs & IDE
+.vscode/
+.idea/
+*.swp
+*~
+# Logs et fichiers temporaires
+*.log
+/tmp/
+/temp/
+test_*.sh
+*mados_error.log
+
+# Outils de build perso (s'il y en a)
+/build/
+/rog_v2_build/
+
+# Ignorer d'éventuels clés gpg ou fichiers secrets par accident
+*.gpg
+*.key
+*.pem
+.env
+secret/
