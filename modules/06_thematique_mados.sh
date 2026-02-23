@@ -30,10 +30,10 @@ echo -e "${RED}╚════════════════════�
 echo -e "${RED}>>> ${WHITE}[1/5] ${BOLD}Configuration de l'identité système...${NC}"
 cat > /etc/os-release <<'OSRELEASE'
 NAME="MadOS ROG Edition"
-VERSION="2.1 (Noble)"
+VERSION="2.2 (Noble)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="MadOS ROG Edition 2.1"
+PRETTY_NAME="MadOS ROG Edition 2.2"
 VERSION_ID="24.04"
 HOME_URL="https://github.com/mados-rog"
 OSRELEASE
@@ -53,7 +53,7 @@ echo -e "${RED}${BOLD}  ██╔████╔██║███████�
 echo -e "${RED}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║${RESET}"
 echo -e "${RED}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║${RESET}"
 echo -e "${RED}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝${RESET}"
-echo -e "  ${CYAN}${BOLD}MadOS ROG Edition 2.1${RESET}  |  Kernel: $(uname -r)"
+echo -e "  ${CYAN}${BOLD}MadOS ROG Edition 2.2${RESET}  |  Kernel: $(uname -r)"
 MOTD
 chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
 
@@ -84,17 +84,19 @@ ZSHRC
 chown "$REAL_USER:$REAL_USER" "$USER_HOME/.zshrc"
 
 # 3. Wallpapers & SDDM
-echo -e "\n${RED}>>> ${WHITE}[3/5] ${BOLD}Intégration du Fonds d'écran Officiel...${NC}"
+echo -e "\n${RED}>>> ${WHITE}[3/5] ${BOLD}Intégration des Fonds d'écran Officiels...${NC}"
 WALLPAPER_DIR="/usr/share/wallpapers/MadOS"
-mkdir -p "$WALLPAPER_DIR"
+sudo mkdir -p "$WALLPAPER_DIR"
 
-if [ -f "$ASSETS_DIR/slide1.png" ]; then
-    cp "$ASSETS_DIR/slide1.png" "$WALLPAPER_DIR/mados_rog_wall1.png" 2>/dev/null || true
-    # Sync sur SDDM
+if [ -d "$ASSETS_DIR/wallpapers" ]; then
+    echo -e "    ${GRAY}├─ Déploiement du pack complet de fonds d'écran...${NC}"
+    sudo cp -r "$ASSETS_DIR/wallpapers/"* "$WALLPAPER_DIR/" 2>/dev/null || true
+    
+    # Sync sur SDDM avec le premier wallpaper (MadRog1.jpg)
     sudo mkdir -p /usr/share/sddm/themes/breeze/
     cat <<'THEME_EOF' | sudo tee /usr/share/sddm/themes/breeze/theme.conf.user > /dev/null
 [General]
-background=/usr/share/wallpapers/MadOS/mados_rog_wall1.png
+background=/usr/share/wallpapers/MadOS/MadRog1.jpg
 THEME_EOF
 fi
 
