@@ -82,14 +82,59 @@ sudo loginctl enable-linger "$REAL_USER" 2>/dev/null || true
 sudo -u "$REAL_USER" XDG_RUNTIME_DIR="/run/user/$(id -u "$REAL_USER")" systemctl --user daemon-reload 2>/dev/null || true
 sudo -u "$REAL_USER" XDG_RUNTIME_DIR="/run/user/$(id -u "$REAL_USER")" systemctl --user enable openclaw.service 2>/dev/null || true
 
-echo -e "    ${GRAY}├─ Création du raccourci Bureau...${NC}"
+echo -e "    ${GRAY}├─ Création du Control Panel (OpenClaw_Launcher.sh)...${NC}"
+cat <<'LCH_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/OpenClaw_Launcher.sh" >/dev/null
+#!/bin/bash
+while true; do
+  CHOICE=$(whiptail --title "🤖 OpenClaw AI - Control Panel" --menu "Gestion du Cerveau OpenClaw" 18 64 6 \
+    "1" "Ouvrir l'Interface Chat (TUI)" \
+    "2" "Démarrer le moteur de l'IA (Gateway)" \
+    "3" "Arrêter le moteur de l'IA" \
+    "4" "Redémarrer l'IA (Restart)" \
+    "5" "Diagnostic (Mode Doctor / Logs)" \
+    "6" "Quitter" 3>&1 1>&2 2>&3)
+
+  if [ -z "$CHOICE" ] || [ "$CHOICE" = "6" ]; then break; fi
+
+  case $CHOICE in
+    1)
+      cd "$HOME/OpenClaw" && pnpm run start tui
+      ;;
+    2)
+      systemctl --user start openclaw.service
+      whiptail --msgbox "✅ Moteur OpenClaw démarré en tâche de fond !" 8 50
+      ;;
+    3)
+      systemctl --user stop openclaw.service
+      whiptail --msgbox "🛑 Moteur OpenClaw arrêté avec succès." 8 50
+      ;;
+    4)
+      systemctl --user restart openclaw.service
+      whiptail --msgbox "🔄 Moteur OpenClaw redémarré à neuf !" 8 50
+      ;;
+    5)
+      echo "=== DIAGNOSTIC OPENCLAW (DOCTOR) ===" > /tmp/oc_doctor.txt
+      echo "--- STATUT SYSTEMD ---" >> /tmp/oc_doctor.txt
+      systemctl --user status openclaw.service --no-pager | head -n 12 >> /tmp/oc_doctor.txt
+      echo -e "\n--- DERNIERES ERREURS (LOGS) ---" >> /tmp/oc_doctor.txt
+      journalctl --user -u openclaw.service -n 15 --no-pager >> /tmp/oc_doctor.txt
+      whiptail --title "OpenClaw Doctor 🩺" --scrolltext --textbox /tmp/oc_doctor.txt 22 80
+      ;;
+  esac
+done
+LCH_EOF
+
+sudo chmod +x "$OC_DIR/OpenClaw_Launcher.sh" 2>/dev/null || true
+
+echo -e "    ${GRAY}├─ Création du raccourci Bureau (Control Panel)...${NC}"
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/Bureau" "$USER_HOME/Desktop" 2>/dev/null || true
 
 cat <<DSK_EOF | sudo -u "$REAL_USER" tee "$USER_HOME/Bureau/OpenClaw.desktop" >/dev/null
 [Desktop Entry]
-Name=OpenClaw AI
-Exec=google-chrome --app=http://localhost:3000
+Name=OpenClaw AI Control
+Exec=konsole -e bash -c "$USER_HOME/OpenClaw/OpenClaw_Launcher.sh"
 Icon=utilities-terminal
+Terminal=false
 Type=Application
 DSK_EOF
 

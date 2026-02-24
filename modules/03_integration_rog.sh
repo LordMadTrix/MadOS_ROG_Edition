@@ -81,10 +81,14 @@ build_tool() {
     if [ ! -d "$REPO_DIR" ]; then git clone -q "$REPO" "$REPO_DIR"; else cd "$REPO_DIR" && git pull -q; fi
     cd "$REPO_DIR"
     if [ -f "Makefile" ]; then
-        make -j"$(nproc)" >/dev/null 2>&1
+        MAX_JOBS=$(nproc)
+        if [ "$MAX_JOBS" -gt 2 ]; then MAX_JOBS=2; fi
+        make -j"$MAX_JOBS" >/dev/null 2>&1
         sudo make install >/dev/null 2>&1
     elif [ -f "Cargo.toml" ]; then
-        cargo build --release -j"$(nproc)" >/dev/null 2>&1
+        MAX_JOBS=$(nproc)
+        if [ "$MAX_JOBS" -gt 2 ]; then MAX_JOBS=2; fi
+        cargo build --release -j"$MAX_JOBS" >/dev/null 2>&1
         sudo cp "target/release/$NAME" /usr/local/bin/ 2>/dev/null || true
         if [ -f "target/release/rog-control-center" ]; then
             sudo cp "target/release/rog-control-center" /usr/local/bin/ 2>/dev/null || true
