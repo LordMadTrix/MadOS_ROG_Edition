@@ -20,7 +20,7 @@ USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-ASSETS_DIR="$PROJECT_ROOT/assets/installer"
+ASSETS_DIR="$PROJECT_ROOT/assets"
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════╗${NC}"
 echo -e "${RED}║${NC}   ${WHITE}${BOLD}MadOS ROG V2 — APPLICATION DE LA CHARTE GRAPHIQUE${NC}  ${RED}║${NC}"
@@ -98,6 +98,21 @@ if [ -d "$ASSETS_DIR/wallpapers" ]; then
 [General]
 background=/usr/share/wallpapers/MadOS/MadRog1.jpg
 THEME_EOF
+
+    # Configurer l'application automatique du wallpaper pour la session KDE via autostart
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/autostart"
+    cat > /tmp/set-wallpaper.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Exec=sh -c "sleep 4 && plasma-apply-wallpaperimage /usr/share/wallpapers/MadOS/MadRog1.jpg && rm -f ~/.config/autostart/set-wallpaper.desktop"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Set MadOS Wallpaper
+EOF
+    sudo cp /tmp/set-wallpaper.desktop "$USER_HOME/.config/autostart/"
+    sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/autostart/set-wallpaper.desktop"
+    rm -f /tmp/set-wallpaper.desktop
 fi
 
 # 4. GRUB Theme
@@ -140,8 +155,17 @@ rm -f /tmp/kdeglobals_mados
 
 # Plymouth simple setup
 if [ -f "$ASSETS_DIR/logo.png" ]; then
+    echo -e "    ${GRAY}├─ Remplacement du logo Ubuntu pour Plymouth...${NC}"
+    # Création du dossier custom et backup optionnel
     sudo mkdir -p /usr/share/plymouth/themes/mados-rog
-    cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/themes/mados-rog/logo.png 2>/dev/null || true
+    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/themes/mados-rog/logo.png 2>/dev/null || true
+    
+    # Remplacer les logos utilisés par le thème spinner/bgrt (défaut ubuntu)
+    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/ubuntu-logo.png 2>/dev/null || true
+    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/themes/spinner/bgrt-fallback.png 2>/dev/null || true
+    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/themes/spinner/watermark.png 2>/dev/null || true
+    
+    sudo update-initramfs -u >/dev/null 2>&1 || true
 fi
 
 echo -e "    ${WHITE}✅ Phase 6 Terminée.${NC}"
