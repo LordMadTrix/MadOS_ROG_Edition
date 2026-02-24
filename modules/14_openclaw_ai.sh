@@ -78,9 +78,11 @@ SRV_EOF
 # We just enable it globally for the user using loginctl linger or by symlinking.
 sudo loginctl enable-linger "$REAL_USER" 2>/dev/null || true
 
-# Workaround for enabling user systemd service during a sudo script:
+# Workaround for enabling user systemd service during a sudo script without active DBUS session:
+sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/systemd/user/default.target.wants"
+sudo -u "$REAL_USER" ln -sf "$USER_HOME/.config/systemd/user/openclaw.service" "$USER_HOME/.config/systemd/user/default.target.wants/openclaw.service"
+
 sudo -u "$REAL_USER" XDG_RUNTIME_DIR="/run/user/$(id -u "$REAL_USER")" systemctl --user daemon-reload 2>/dev/null || true
-sudo -u "$REAL_USER" XDG_RUNTIME_DIR="/run/user/$(id -u "$REAL_USER")" systemctl --user enable openclaw.service 2>/dev/null || true
 
 echo -e "    ${GRAY}├─ Création du Control Panel (OpenClaw_Launcher.sh)...${NC}"
 cat <<'LCH_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/OpenClaw_Launcher.sh" >/dev/null
