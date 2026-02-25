@@ -24,5 +24,5 @@ echo "Application des permissions d'exécution..."
 sudo chmod +x Menu_Installation_ROG.sh modules/*.sh
 
 echo "Lancement de la Matrice..."
-# Nettoyage et exécution directe via la commande formattée pour terminal tty
-exec sudo bash -i Menu_Installation_ROG.sh
+# Nettoyage et exécution directe
+sudo bash Menu_Installation_ROG.sh
