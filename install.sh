@@ -25,4 +25,4 @@ sudo chmod +x Menu_Installation_ROG.sh modules/*.sh
 
 echo "Lancement de la Matrice..."
 # Nettoyage et exécution directe via la commande formattée pour terminal tty
-exec sudo /usr/bin/script -q -c "bash Menu_Installation_ROG.sh" /dev/null
+exec sudo bash -i Menu_Installation_ROG.sh
