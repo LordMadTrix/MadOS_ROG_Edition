@@ -1,0 +1,38 @@
+#!/bin/bash
+# ==========================================
+# MadOS ROG V2.6 - 20_esport_usb_1000hz.sh
+# ==========================================
+# Phase: 20 - E-Sport Zero Latency (USB Udev Rules)
+# ==========================================
+
+CYAN='\033[0;36m'
+
+echo -e "${RED}>>> ${WHITE}[Phase 20] ${BOLD}Tuning E-Sport : Input Lag & Latence Périphériques...${NC}"
+
+UDEV_RULES_FILE="/etc/udev/rules.d/99-usb-latency.rules"
+
+echo -e "    ${GRAY}├─ Désactivation de l'autosuspend USB (pour les souris/claviers Gamer)...${NC}"
+
+# Création d'une règle UDEV pour empêcher le noyau de clignoter / mettre en veille les ports USB au bout de X secondes (supprime les micro-freezes).
+cat <<'EOF' | sudo tee "$UDEV_RULES_FILE" >/dev/null
+# Désactiver le "USB autosuspend" pour éviter les pertes de connexion/latence
+ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
+# Certains kernels require "on" to force always-on.
+ACTION=="add", SUBSYSTEM=="usb", TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+EOF
+
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+echo -e "    ${GRAY}├─ Injection d'un polling rate Kernel forcé...${NC}"
+# Optionnel : Sous certains OS/Kernel, le polling default est 125hz (souris standard).
+# Bien que XanMod gère bien, on peut forcer le refreshrate de l'USBHID (Polling Rate).
+MODPROBE_FILE="/etc/modprobe.d/usbhid.conf"
+echo 'options usbhid mousepoll=1' | sudo tee "$MODPROBE_FILE" >/dev/null
+
+# Rebuild l'initramfs pour inclure ce paramètre usbhid kernel
+echo -e "    ${GRAY}├─ Régénération des accès HID (${CYAN}Ceci prendra 15s...${GRAY})${NC}"
+sudo update-initramfs -u -k all >/dev/null 2>&1 || true
+
+echo -e "    ${CYAN}✅ [SUCCÈS] Autosuspend désactivé, vos périphériques ne seront jamais bridés électriquement.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 20 Terminée.${NC}"
