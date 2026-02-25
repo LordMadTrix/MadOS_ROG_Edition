@@ -133,9 +133,9 @@ sudo -u "$REAL_USER" mkdir -p "$USER_HOME/Bureau" "$USER_HOME/Desktop" 2>/dev/nu
 cat <<DSK_EOF | sudo -u "$REAL_USER" tee "$USER_HOME/Bureau/OpenClaw.desktop" >/dev/null
 [Desktop Entry]
 Name=OpenClaw AI Control
-Exec=konsole -e bash -c "$USER_HOME/OpenClaw/OpenClaw_Launcher.sh"
+Exec="$USER_HOME/OpenClaw/OpenClaw_Launcher.sh"
 Icon=utilities-terminal
-Terminal=false
+Terminal=true
 Type=Application
 DSK_EOF
 
