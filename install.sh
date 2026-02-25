@@ -24,4 +24,6 @@ echo "Application des permissions d'exécution..."
 chmod +x Menu_Installation_ROG.sh modules/*.sh
 
 echo "Lancement de la Matrice..."
-sudo bash Menu_Installation_ROG.sh
+# On force le script interactif à lire depuis le TTY (l'écran/clavier de l'utilisateur)
+# car "wget | bash" supprime l'entrée standard interactive.
+sudo bash Menu_Installation_ROG.sh < /dev/tty
