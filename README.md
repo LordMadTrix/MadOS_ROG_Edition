@@ -48,10 +48,10 @@
 Il n'a jamais été aussi simple de rejoindre la matrice. Une seule ligne de commande suffit :
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh | sudo bash
+wget -qO install.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh && bash install.sh
 ```
 
-> **Comment ça marche ?** : La commande va télécharger Git, récupérer la dernière version du dépôt en cache, appliquer automatiquement les droits d'exécution, puis lancer l'installeur (Menu_Installation_ROG).
+> **Comment ça marche ?** : La commande va télécharger le script, récupérer la dernière version du dépôt en cache, appliquer automatiquement les droits d'exécution, puis lancer l'installeur (Menu_Installation_ROG).
 
 Une fois le script lancé, une interface graphique "BIOS" (Whiptail) apparaîtra. Vous aurez le choix entre :
 - `[1] Déploiement Total` : Un sous-menu interactif vous permettra de cocher/décocher les modules bonus.
