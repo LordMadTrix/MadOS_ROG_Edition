@@ -45,21 +45,15 @@
 
 ## 🚀 Installation
 
-Il suffit de cloner (ou télécharger) ce dépôt sur votre nouvelle machine, et de lancer le menu interactif (surnommé *La Matrice*).
+Il n'a jamais été aussi simple de rejoindre la matrice. Une seule ligne de commande suffit :
 
 ```bash
-# 1. Cloner ce dépôt
-git clone https://github.com/LordMadTrix/MadOS_ROG_Edition.git
-cd MadOS_ROG_Edition
-
-# 2. Rendre le script exécutable (facultatif si déjà fait via Git)
-chmod +x Menu_Installation_ROG.sh modules/*.sh
-
-# 3. Lancer la Matrice
-sudo bash Menu_Installation_ROG.sh
+wget -qO- https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh | sudo bash
 ```
 
-Une fois le script lancé, une interface "BIOS" graphique (Whiptail) apparaîtra. Vous aurez le choix entre :
+> **Comment ça marche ?** : La commande va télécharger Git, récupérer la dernière version du dépôt en cache, appliquer automatiquement les droits d'exécution, puis lancer l'installeur (Menu_Installation_ROG).
+
+Une fois le script lancé, une interface graphique "BIOS" (Whiptail) apparaîtra. Vous aurez le choix entre :
 - `[1] Déploiement Total` : Un sous-menu interactif vous permettra de cocher/décocher les modules bonus.
 - `[2] Déploiement Personnalisé` : Sélectionnez précisément les modules voulus avec la barre [ESPACE].
 - `[3] Mode Destruction 🔥` : Purge le système de Canonical (Snap, etc.).
