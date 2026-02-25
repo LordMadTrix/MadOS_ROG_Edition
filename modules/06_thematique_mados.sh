@@ -143,16 +143,56 @@ sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/kdeglobals"
 
 # Plymouth simple setup
 if [ -f "$ASSETS_DIR/logo.png" ]; then
-    echo -e "    ${GRAY}├─ Remplacement du logo Ubuntu pour Plymouth...${NC}"
-    # Création du dossier custom et backup optionnel
-    sudo mkdir -p /usr/share/plymouth/themes/mados-rog
-    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/themes/mados-rog/logo.png 2>/dev/null || true
+    echo -e "    ${GRAY}├─ Construction du thème de démarrage Plymouth (MadOS ROG)...${NC}"
+    sudo DEBIAN_FRONTEND=noninteractive apt install -y imagemagick plymouth-label >/dev/null 2>&1 || true
     
-    # Remplacer les logos utilisés par le thème spinner/bgrt (défaut ubuntu)
-    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/ubuntu-logo.png 2>/dev/null || true
-    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/themes/spinner/bgrt-fallback.png 2>/dev/null || true
-    sudo cp "$ASSETS_DIR/logo.png" /usr/share/plymouth/themes/spinner/watermark.png 2>/dev/null || true
+    PLY_DIR="/usr/share/plymouth/themes/mados-rog"
+    sudo mkdir -p "$PLY_DIR"
     
+    # Préparation des assets visuels figés, évitant les problèmes de scale dynamiques d'Ubuntu
+    sudo convert "$ASSETS_DIR/logo.png" -resize 250x250 "$PLY_DIR/logo.png" 2>/dev/null || sudo cp "$ASSETS_DIR/logo.png" "$PLY_DIR/logo.png"
+    sudo convert -size 600x100 xc:transparent -fill "#FFFFFF" -gravity center -pointsize 38 -annotate +0+0 "MadOS ROG Edition" "$PLY_DIR/text.png" 2>/dev/null
+    
+    # Création du descripteur de thème
+    cat <<'PLY_EOF' | sudo tee "$PLY_DIR/mados-rog.plymouth" >/dev/null
+[Plymouth Theme]
+Name=MadOS ROG Custom
+Description=A custom boot theme for MadOS ROG
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/mados-rog
+ScriptFile=/usr/share/plymouth/themes/mados-rog/mados-rog.script
+PLY_EOF
+
+    # Création de la logique d'animation (Script Plymouth)
+    cat <<'SCRIPT_EOF' | sudo tee "$PLY_DIR/mados-rog.script" >/dev/null
+Window.SetBackgroundTopColor(0.0, 0.0, 0.0);
+Window.SetBackgroundBottomColor(0.0, 0.0, 0.0);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 30);
+
+text.image = Image("text.png");
+text.sprite = Sprite(text.image);
+text.sprite.SetX(Window.GetWidth() / 2 - text.image.GetWidth() / 2);
+text.sprite.SetY(logo.sprite.GetY() + logo.image.GetHeight() + 40);
+
+logo.opacity_angle = 0;
+fun refresh_callback () {
+  logo.opacity_angle += 0.05;
+  logo.sprite.SetOpacity(0.6 + Math.Sin(logo.opacity_angle) * 0.4);
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+SCRIPT_EOF
+
+    # Application brute du thème personnalisé sur le système
+    sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/mados-rog/mados-rog.plymouth 100 >/dev/null 2>&1
+    sudo update-alternatives --set default.plymouth /usr/share/plymouth/themes/mados-rog/mados-rog.plymouth >/dev/null 2>&1
+    
+    echo -e "    ${GRAY}├─ Recompilation du Kernel et de l'initramfs (Patientez svp)...${NC}"
     sudo update-initramfs -u >/dev/null 2>&1 || true
 fi
 
