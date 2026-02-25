@@ -60,13 +60,13 @@ sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/systemd/user"
 
 cat <<SRV_EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.config/systemd/user/openclaw.service" >/dev/null
 [Unit]
-Description=OpenClaw AI UI Service
+Description=OpenClaw AI Gateway Service
 After=network.target
 
 [Service]
 Type=simple
 WorkingDirectory=$OC_DIR
-ExecStart=/usr/bin/env pnpm run start
+ExecStart=/usr/bin/env pnpm run start gateway
 Restart=on-failure
 
 [Install]
@@ -74,7 +74,6 @@ WantedBy=default.target
 SRV_EOF
 
 # Recharger les démons user-level (requires DBUS_SESSION_BUS_ADDRESS which sudo drops, so we run via machinectl or su -l but su is tricky.
-# In a post-install chroot context, systemctl --user may fail if no active session.
 # We just enable it globally for the user using loginctl linger or by symlinking.
 sudo loginctl enable-linger "$REAL_USER" 2>/dev/null || true
 
