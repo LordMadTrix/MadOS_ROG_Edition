@@ -87,33 +87,41 @@ echo -e "    ${GRAY}├─ Création du Control Panel (OpenClaw_Launcher.sh)...$
 cat <<'LCH_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/OpenClaw_Launcher.sh" >/dev/null
 #!/bin/bash
 while true; do
-  CHOICE=$(whiptail --title "🤖 OpenClaw AI - Control Panel" --menu "Gestion du Cerveau OpenClaw" 18 64 6 \
-    "1" "Ouvrir l'Interface Chat (TUI)" \
-    "2" "Démarrer le moteur de l'IA (Gateway)" \
-    "3" "Arrêter le moteur de l'IA" \
-    "4" "Redémarrer l'IA (Restart)" \
-    "5" "Diagnostic (Mode Doctor / Logs)" \
-    "6" "Quitter" 3>&1 1>&2 2>&3)
+  CHOICE=$(whiptail --title "🤖 OpenClaw AI - Control Panel" --menu "Gestion du Cerveau OpenClaw" 19 64 7 \
+    "1" "Ouvrir l'Interface Graphique (Web UI)" \
+    "2" "Ouvrir l'Interface Chat (TUI / Terminal)" \
+    "3" "Démarrer le moteur de l'IA (Gateway)" \
+    "4" "Arrêter le moteur de l'IA" \
+    "5" "Redémarrer l'IA (Restart)" \
+    "6" "Diagnostic (Mode Doctor / Logs)" \
+    "7" "Quitter" 3>&1 1>&2 2>&3)
 
-  if [ -z "$CHOICE" ] || [ "$CHOICE" = "6" ]; then break; fi
+  if [ -z "$CHOICE" ] || [ "$CHOICE" = "7" ]; then break; fi
 
   case $CHOICE in
     1)
-      cd "$HOME/OpenClaw" && pnpm run start tui
+      if systemctl --user is-active --quiet openclaw.service; then
+        google-chrome --app=http://localhost:3000 2>/dev/null || xdg-open http://localhost:3000
+      else
+        whiptail --msgbox "⚠️ Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 60
+      fi
       ;;
     2)
-      systemctl --user start openclaw.service
-      whiptail --msgbox "✅ Moteur OpenClaw démarré en tâche de fond !" 8 50
+      cd "$HOME/OpenClaw" && pnpm run start tui
       ;;
     3)
+      systemctl --user start openclaw.service
+      whiptail --msgbox "✅ Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 3000." 9 55
+      ;;
+    4)
       systemctl --user stop openclaw.service
       whiptail --msgbox "🛑 Moteur OpenClaw arrêté avec succès." 8 50
       ;;
-    4)
+    5)
       systemctl --user restart openclaw.service
       whiptail --msgbox "🔄 Moteur OpenClaw redémarré à neuf !" 8 50
       ;;
-    5)
+    6)
       echo "=== DIAGNOSTIC OPENCLAW (DOCTOR) ===" > /tmp/oc_doctor.txt
       echo "--- STATUT SYSTEMD ---" >> /tmp/oc_doctor.txt
       systemctl --user status openclaw.service --no-pager | head -n 12 >> /tmp/oc_doctor.txt
