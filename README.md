@@ -28,9 +28,10 @@
 - 🧠 **Détection Intelligente GPU** : Scan matériel automatique (`lspci`) pour déployer les pilotes NVIDIA (DKMS), AMD (Mesa/RADV) ou Intel sans la moindre configuration manuelle.
 - 💻 **Noyau XanMod EDGE** : Compilation automatique du kernel orienté gaming avec support des instructions AVX2 / AVX512 (selon votre CPU).
 - ⚙️ **Contrôle Hardware ASUS** : Intégration CLI native de `asusctl` et `supergfxctl` (compilés via Rust) pour la gestion du MUX Switch, des ventilateurs et du clavier RGB.
-- 🎨 **Esthétique ROG Immersive** : Thème sombre, accents rouges, SDDM Wallpaper animé, Neofetch exclusif, et terminal ZSH (Powerlevel10k).
-- 🤖 **Assistant IA ([OpenClaw](https://openclaw.ai/))** : (Optionnel) Installation intégrée d'un agent IA local directement utilisable sur votre bureau.
+- 🎨 **Esthétique ROG Immersive** : Thème sombre, accents rouges, SDDM Wallpaper animé, Neofetch exclusif, et terminal ZSH (Powerlevel10k). Interface de console uniformisée avec une charte graphique agressive (ASCII Art & Couleurs standardisées).
+- 🤖 **Assistant IA ([OpenClaw](https://openclaw.ai/) & Antigravity)** : (Optionnel) Installation intégrée d'un agent IA local (Node.js) directement utilisable sur votre bureau ainsi que l'assistant Google Antigravity.
 - 🧹 **Purge Anti-Bloatware** : Suppression radicale de Snapd, GNOME, et de la télémétrie Ubuntu.
+- 🛡️ **Fiabilité Accrue** : Gestion moderne des clés GPG (`/etc/apt/keyrings`), traçabilité des logs d'installation (suppression des échecs silencieux d'APT), et détection GPU sécurisée.
 
 ---
 

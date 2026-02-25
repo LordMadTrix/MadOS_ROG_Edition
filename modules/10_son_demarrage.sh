@@ -5,18 +5,13 @@
 # Phase: 10 - Son d'ouverture de session ROG
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
 
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 REAL_USER=${SUDO_USER:-$USER}
 
 echo -e "${RED}>>> ${WHITE}[Phase 10] ${BOLD}Installation du Son de Démarrage ROG...${NC}"
 
-sudo apt install -y sox libsox-fmt-all freedesktop-sound-theme >/dev/null 2>&1 || true
+sudo apt install -y sox libsox-fmt-all freedesktop-sound-theme || true
 
 AUTOSTART_DIR="/home/$REAL_USER/.config/autostart"
 sudo -u "$REAL_USER" mkdir -p "$AUTOSTART_DIR"
@@ -32,5 +27,5 @@ Type=Application
 X-KDE-AutostartScript=true
 EOF
 
-echo -e "    ${GRAY}✅ Effet audio d'ouverture de session ajouté.${NC}"
-echo -e "    ${WHITE}✅ Phase 10 Terminée.${NC}"
+echo -e "    ${GRAY}✅ [SUCCÈS] Effet audio d'ouverture de session ajouté.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 10 Terminée.${NC}"

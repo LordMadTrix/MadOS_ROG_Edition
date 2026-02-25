@@ -5,13 +5,7 @@
 # Phase: 20 - E-Sport Zero Latency (USB Udev Rules)
 # ==========================================
 
-
-
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
 CYAN='\033[0;36m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 20] ${BOLD}Tuning E-Sport : Input Lag & Latence Périphériques...${NC}"
 
@@ -40,5 +34,5 @@ echo 'options usbhid mousepoll=1' | sudo tee "$MODPROBE_FILE" >/dev/null
 echo -e "    ${GRAY}├─ Régénération des accès HID (${CYAN}Ceci prendra 15s...${GRAY})${NC}"
 sudo update-initramfs -u -k all >/dev/null 2>&1 || true
 
-echo -e "    ${CYAN}✅ Autosuspend désactivé, vos périphériques ne seront jamais bridés électriquement.${NC}"
-echo -e "    ${WHITE}✅ Phase 20 Terminée.${NC}"
+echo -e "    ${CYAN}✅ [SUCCÈS] Autosuspend désactivé, vos périphériques ne seront jamais bridés électriquement.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 20 Terminée.${NC}"

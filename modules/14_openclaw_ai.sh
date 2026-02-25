@@ -5,14 +5,9 @@
 # Phase: 14 - Assistant IA OpenClaw
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
 
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
 CYAN='\033[0;36m'
-NC='\033[0m'
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
@@ -21,15 +16,15 @@ echo -e "${RED}>>> ${WHITE}[Phase 14] ${BOLD}Déploiement Automatique de l'IA Op
 
 echo -e "    ${GRAY}├─ Installation des dépendances systèmes (Node.js, Git)...${NC}"
 if ! command -v node >/dev/null 2>&1; then
-    sudo apt-get install -y ca-certificates curl gnupg 2>/dev/null || true
+    sudo apt-get install -y ca-certificates curl gnupg || true
     sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg 2>/dev/null || true
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -yes -o /etc/apt/keyrings/nodesource.gpg || true
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list > /dev/null
-    sudo apt-get update -q >/dev/null 2>&1
-    sudo apt-get install -y nodejs >/dev/null 2>&1
+    sudo apt-get update -q
+    sudo apt-get install -y nodejs
 fi
 
-sudo apt-get install -y git build-essential >/dev/null 2>&1 || true
+sudo apt-get install -y git build-essential || true
 
 OC_DIR="$USER_HOME/OpenClaw"
 
@@ -48,12 +43,11 @@ AUTO_APPROVE_SAFE_COMMANDS=true
 DEFAULT_SYSTEM_PROMPT="Tu es l'Agent IA de MadOS ROG Edition. Tu es intégré au cœur du système Linux pour assister un gamer passionné. Sois précis, pertinent, et concis."
 ENV_EOF
 
-echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peut prendre 1 à 5 minutes selon le CPU...${NC}"
-sudo corepack enable pnpm >/dev/null 2>&1 || true
+echo -e "    ${GRAY}├─ Compilation de l'IA (npm install & build) - Cela peut prendre 1 à 5 minutes selon le CPU...${NC}"
 
 # Execution du build STRICTEMENT sous l'utilisateur réel avec affichage (plus de freeze silencieux)
-sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm install" || true
-sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm run build" || true
+sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && npm install" || true
+sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && npm run build" || true
 
 echo -e "    ${GRAY}├─ Création du service d'arrière-plan système...${NC}"
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/systemd/user"
@@ -66,7 +60,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=$OC_DIR
-ExecStart=/usr/bin/env pnpm run start
+ExecStart=/usr/bin/env npm run start
 Restart=on-failure
 
 [Install]
@@ -97,6 +91,6 @@ sudo chmod +x "$USER_HOME/Bureau/OpenClaw.desktop" 2>/dev/null || true
 # Copie vers Desktop s'il existe (pour systèmes anglophones)
 sudo -u "$REAL_USER" cp "$USER_HOME/Bureau/OpenClaw.desktop" "$USER_HOME/Desktop/" 2>/dev/null || true
 
-echo -e "    ${WHITE}✅ L'Agent IA OpenClaw a été forgé avec succès.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] L'Agent IA OpenClaw a été forgé avec succès.${NC}"
 echo -e "    ${CYAN}ℹ️  Il démarrera automatiquement à votre prochaine connexion.${NC}"
-echo -e "    ${WHITE}✅ Phase 14 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 14 Terminée.${NC}"

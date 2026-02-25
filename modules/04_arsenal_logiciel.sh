@@ -6,14 +6,7 @@
 # Installe Chrome, Steam, Lutris, et les outils Gaming.
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
-
-# ---- Couleurs & Styles ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
@@ -23,7 +16,7 @@ echo -e "${RED}>>> ${WHITE}[Phase 4] ${BOLD}Installation de l'Arsenal Logiciel..
 install_pkg() {
     for pkg in "$@"; do
         if apt-cache show "$pkg" &>/dev/null 2>&1; then
-            sudo apt install -y "$pkg" 2>/dev/null || true
+            sudo apt install -y "$pkg" || true
         fi
     done
 }
@@ -46,4 +39,4 @@ sudo -u "$REAL_USER" pipx install protonup-qt 2>/dev/null || true
 
 # OpenClaw IA a été extrait vers son propre module (14_openclaw_ai.sh) pour l'automatisation.
 
-echo -e "    ${WHITE}✅ Phase 4 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 4 Terminée.${NC}"

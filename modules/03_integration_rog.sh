@@ -5,14 +5,7 @@
 # Phase: 3 - ASUS ROG Laptop Full Integration
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
-
-# ---- Couleurs & Styles ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 
 REAL_USER=${SUDO_USER:-$USER}
 
@@ -28,7 +21,7 @@ echo -e "    ${WHITE}├─ [SCAN MATERIEL] Modèle détecté : ${RED}${BOLD}$RO
 
 # 1. WiFi & Audio
 echo -e "    ${WHITE}├─ [RESEAU/AUDIO] Injection Firmware WiFi / Sound Open Firmware (SOF)...${NC}"
-sudo apt install -y firmware-misc-nonfree linux-firmware wireless-tools iw rfkill wpasupplicant firmware-sof-signed sof-firmware alsa-base alsa-utils pulseaudio pipewire pipewire-pulse wireplumber libspa-0.2-bluetooth blueman bluetooth bluez 2>/dev/null || true
+sudo apt install -y firmware-misc-nonfree linux-firmware wireless-tools iw rfkill wpasupplicant firmware-sof-signed sof-firmware alsa-base alsa-utils pulseaudio pipewire pipewire-pulse wireplumber libspa-0.2-bluetooth blueman bluetooth bluez || true
 
 if systemctl --user list-unit-files pipewire.service &>/dev/null; then
     sudo -u "$REAL_USER" systemctl --user enable pipewire pipewire-pulse wireplumber 2>/dev/null || true
@@ -37,7 +30,7 @@ fi
 # 2. ACPI, TLP (Power Management)
 echo -e "\n    ${WHITE}├─ [ENERGIE] Service d'Énergie Thermique (TLP, thermald)...${NC}"
 sudo apt remove --purge -y power-profiles-daemon 2>/dev/null || true
-sudo apt install -y tlp tlp-rdw thermald acpi acpid cpufrequtils 2>/dev/null || true
+sudo apt install -y tlp tlp-rdw thermald acpi acpid cpufrequtils || true
 
 sudo tee /etc/modules-load.d/asus-rog.conf > /dev/null <<'EOF'
 asus_wmi
@@ -68,7 +61,7 @@ if ! command -v cargo &>/dev/null; then
     if [ -f "$HOME/.cargo/env" ]; then source "$HOME/.cargo/env"; fi
 fi
 
-sudo apt install -y libclang-dev libudev-dev libfontconfig1-dev libseat-dev libinput-dev libdbus-1-dev libgdk-pixbuf-2.0-dev libglib2.0-dev libxml2-dev protobuf-compiler libfreetype-dev libexpat1-dev libgtk-3-dev libayatana-appindicator3-dev clang llvm >/dev/null 2>&1
+sudo apt install -y libclang-dev libudev-dev libfontconfig1-dev libseat-dev libinput-dev libdbus-1-dev libgdk-pixbuf-2.0-dev libglib2.0-dev libxml2-dev protobuf-compiler libfreetype-dev libexpat1-dev libgtk-3-dev libayatana-appindicator3-dev clang llvm
 
 BUILD_DIR="$HOME/rog_v2_build"
 mkdir -p "$BUILD_DIR"
@@ -104,4 +97,4 @@ build_tool "https://gitlab.com/asus-linux/supergfxctl.git" "supergfxctl"
 echo -e "    ${GRAY}├─ Traitement asusctl et rog-control-center...${NC}"
 build_tool "https://gitlab.com/asus-linux/asusctl.git" "asusctl"
 
-echo -e "    ${WHITE}✅ Phase 3 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 3 Terminée.${NC}"

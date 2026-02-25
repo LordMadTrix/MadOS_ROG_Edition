@@ -5,13 +5,7 @@
 # Phase: 9 - Montage Automatique des jeux NTFS
 # ==========================================
 
-
-
-RED='\033[0;31m'
-WHITE='\033[1;37m'
 CYAN='\033[0;36m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 REAL_USER=${SUDO_USER:-$USER}
 USER_UID=$(id -u "$REAL_USER")
 USER_GID=$(id -g "$REAL_USER")
@@ -23,7 +17,7 @@ NTFS_DRIVES=$(sudo blkid | grep -i ntfs || true)
 
 if [ -z "$NTFS_DRIVES" ]; then
     echo -e "    ${GRAY}├─ Aucun disque NTFS additionnel trouvé (ou déjà géré).${NC}"
-    echo -e "    ${WHITE}✅ Phase 9 Terminée.${NC}"
+    echo -e "    ${WHITE}✅ [SUCCÈS] Phase 9 Terminée.${NC}"
     exit 0
 fi
 
@@ -49,15 +43,15 @@ if sudo blkid | grep -q "$TARGET_DRIVE"; then
     
     # Check si déjà dans fstab
     if grep -q "$UUID" /etc/fstab; then
-        echo -e "    ${RED}⚠️  Le disque est déjà configuré dans /etc/fstab.${NC}"
+        echo -e "    ${RED}⚠️  [ATTENTION] Le disque est déjà configuré dans /etc/fstab.${NC}"
     else
         echo -e "    ${GRAY}├─ Ajout de l'entrée fstab optimisée Steam...${NC}"
         echo "UUID=$UUID $MOUNT_POINT ntfs-3g uid=$USER_UID,gid=$USER_GID,rw,user,exec,umask=000,utf8 0 0" | sudo tee -a /etc/fstab >/dev/null
-        sudo mount -a || echo -e "    ${RED}⚠️  Erreur lors du montage automatique.${NC}"
-        echo -e "    ${GREEN}✅ Disque monté avec succès dans $MOUNT_POINT !${NC}"
+        sudo mount -a || echo -e "    ${RED}⚠️  [ATTENTION] Erreur lors du montage automatique.${NC}"
+        echo -e "    ${GREEN}✅ [SUCCÈS] Disque monté avec succès dans $MOUNT_POINT !${NC}"
     fi
 else
-    echo -e "    ${RED}❌ Périphérique invalide.${NC}"
+    echo -e "    ${RED}❌ [ERREUR] Périphérique invalide.${NC}"
 fi
 
-echo -e "    ${WHITE}✅ Phase 9 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 9 Terminée.${NC}"

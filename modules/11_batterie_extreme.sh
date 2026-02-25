@@ -5,12 +5,7 @@
 # Phase: 11 - Batterie Extrême (auto-cpufreq)
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
-
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 11] ${BOLD}Installation du gestionnaire Batterie Extrême...${NC}"
 
@@ -31,9 +26,9 @@ fi
 
 if command -v auto-cpufreq >/dev/null 2>&1; then
     sudo systemctl enable auto-cpufreq >/dev/null 2>&1 || true
-    echo -e "    ✅ auto-cpufreq est installé et activé en service."
+    echo -e "    ✅ [SUCCÈS] auto-cpufreq est installé et activé en service."
 else
-    echo -e "    ❌ Erreur lors de l'installation de auto-cpufreq."
+    echo -e "    ❌ [ERREUR] Erreur lors de l'installation de auto-cpufreq."
 fi
 
-echo -e "    ${WHITE}✅ Phase 11 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 11 Terminée.${NC}"

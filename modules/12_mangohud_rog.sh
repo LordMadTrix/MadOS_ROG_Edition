@@ -5,19 +5,12 @@
 # Phase: 12 - Profil MangoHud ROG & GOverlay
 # ==========================================
 
-
-
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
-
 REAL_USER=${SUDO_USER:-$USER}
 
 echo -e "${RED}>>> ${WHITE}[Phase 12] ${BOLD}Génération du Profil MangoHud ROG Edition...${NC}"
 
 # Installation de GOverlay si non présent
-sudo apt install -y goverlay >/dev/null 2>&1 || true
+sudo apt install -y goverlay || true
 
 # Création de la configuration MangoHud
 MANGO_DIR="/home/$REAL_USER/.config/MangoHud"
@@ -53,5 +46,5 @@ frame_timing=1
 histogram
 EOF
 
-echo -e "    ${GRAY}✅ Fichier MangoHud.conf généré aux couleurs ROG.${NC}"
-echo -e "    ${WHITE}✅ Phase 12 Terminée.${NC}"
+echo -e "    ${GRAY}✅ [SUCCÈS] Fichier MangoHud.conf généré aux couleurs ROG.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 12 Terminée.${NC}"

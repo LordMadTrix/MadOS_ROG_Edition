@@ -5,13 +5,7 @@
 # Phase: 15 - Optimisation Réseau (Anti-Lag TCP BBR & fq_codel)
 # ==========================================
 
-
-
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
 CYAN='\033[0;36m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 15] ${BOLD}Déploiement du profil Réseau Anti-Lag (TCP BBR)...${NC}"
 
@@ -41,5 +35,5 @@ echo -e "    ${GRAY}├─ Fichier de configuration /etc/sysctl.d/99-mados-netwo
 
 sudo sysctl --system >/dev/null 2>&1 || true
 
-echo -e "    ${CYAN}✅ Profil TCP BBR et fq_codel actif. Le ping multijoueur est maintenant protégé contre le bufferbloat.${NC}"
-echo -e "    ${WHITE}✅ Phase 15 Terminée.${NC}"
+echo -e "    ${CYAN}✅ [SUCCÈS] Profil TCP BBR et fq_codel actif. Le ping multijoueur est maintenant protégé contre le bufferbloat.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 15 Terminée.${NC}"

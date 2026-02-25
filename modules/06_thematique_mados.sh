@@ -6,14 +6,7 @@
 # Transforme le rendu pour correspondre au style ROG
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
-
-# ---- Couleurs & Styles ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
@@ -43,7 +36,6 @@ hostname mados-rog 2>/dev/null || true
 
 cat > /etc/update-motd.d/00-mados-header <<'MOTD'
 #!/bin/bash
-RED='\033[0;31m'
 CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
@@ -101,7 +93,7 @@ THEME_EOF
 
     # Configurer l'application automatique du wallpaper pour la session KDE via autostart
     sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/autostart"
-    cat > /tmp/set-wallpaper.desktop <<'EOF'
+    cat <<'EOF' | sudo -u "$REAL_USER" tee "$USER_HOME/.config/autostart/set-wallpaper.desktop" >/dev/null
 [Desktop Entry]
 Type=Application
 Exec=sh -c "sleep 4 && plasma-apply-wallpaperimage /usr/share/wallpapers/MadOS/MadRog1.jpg && rm -f ~/.config/autostart/set-wallpaper.desktop"
@@ -110,9 +102,7 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 Name=Set MadOS Wallpaper
 EOF
-    sudo cp /tmp/set-wallpaper.desktop "$USER_HOME/.config/autostart/"
     sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/autostart/set-wallpaper.desktop"
-    rm -f /tmp/set-wallpaper.desktop
 fi
 
 # 4. GRUB Theme
@@ -129,7 +119,7 @@ update-grub > /dev/null 2>&1 || true
 
 # 5. Accent Rouge & Papirus Icons
 echo -e "\n${RED}>>> ${WHITE}[5/5] ${BOLD}Configuration UI et Accentuation KDE Plasma (Rouge)...${NC}"
-sudo apt install -y papirus-icon-theme plymouth plymouth-theme-spinner >/dev/null 2>&1 || true
+sudo apt install -y papirus-icon-theme plymouth plymouth-theme-spinner || true
 
 wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/install.sh | sh 2>/dev/null || true
 if command -v papirus-folders &>/dev/null; then
@@ -137,7 +127,7 @@ if command -v papirus-folders &>/dev/null; then
 fi
 
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config"
-cat > /tmp/kdeglobals_mados <<'KDEGLOBALS'
+cat <<'KDEGLOBALS' | sudo -u "$REAL_USER" tee "$USER_HOME/.config/kdeglobals" >/dev/null
 [General]
 ColorScheme=BreezeDark
 Name=Breeze Dark
@@ -149,9 +139,7 @@ LookAndFeelPackage=org.kde.breezedark.desktop
 BackgroundAlternate=200,0,0
 BackgroundNormal=255,0,0
 KDEGLOBALS
-sudo cp /tmp/kdeglobals_mados "$USER_HOME/.config/kdeglobals"
 sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/kdeglobals"
-rm -f /tmp/kdeglobals_mados
 
 # Plymouth simple setup
 if [ -f "$ASSETS_DIR/logo.png" ]; then
@@ -168,4 +156,4 @@ if [ -f "$ASSETS_DIR/logo.png" ]; then
     sudo update-initramfs -u >/dev/null 2>&1 || true
 fi
 
-echo -e "    ${WHITE}✅ Phase 6 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 6 Terminée.${NC}"

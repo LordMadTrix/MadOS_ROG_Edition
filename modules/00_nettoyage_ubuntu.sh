@@ -8,22 +8,19 @@
 
 # Enlever 'set -e' pour éviter qu'une simple erreur réseau/apt update ne fasse crasher tout le script
 
-
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
 # Kill process that could lock APT temporarily on fresh boot
-sudo killall apt apt-get 2>/dev/null || true
+if command -v pkill >/dev/null 2>&1; then
+    sudo pkill -f apt 2>/dev/null || true
+else
+    sudo killall apt apt-get 2>/dev/null || true
+fi
 sudo rm /var/lib/apt/lists/lock 2>/dev/null || true
 sudo rm /var/cache/apt/archives/lock 2>/dev/null || true
 sudo rm /var/lib/dpkg/lock* 2>/dev/null || true
 sudo dpkg --configure -a 2>/dev/null || true
-
-# ---- Couleurs & Styles ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 0] ${BOLD}Purification du Système & Préparation...${NC}"
 
@@ -42,7 +39,7 @@ if [ -f /etc/netplan/50-cloud-init.yaml ]; then
     sudo rm /etc/netplan/50-cloud-init.yaml 2>/dev/null || true
 fi
 # Créer un fichier netplan simple géré par NM
-cat <<EOF | sudo tee /etc/netplan/01-network-manager-all.yaml > /dev/null
+sudo tee /etc/netplan/01-network-manager-all.yaml > /dev/null <<'EOF'
 network:
   version: 2
   renderer: NetworkManager
@@ -62,9 +59,9 @@ wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dear
 echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
 
 # Spotify
-curl -sS https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.asc | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify-new.gpg
-curl -sS https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify-old.gpg
-echo "deb [arch=amd64] https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list > /dev/null
+curl -sS https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/spotify-new.gpg
+curl -sS https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/spotify-old.gpg
+echo "deb [signed-by=/etc/apt/keyrings/spotify-new.gpg,/etc/apt/keyrings/spotify-old.gpg arch=amd64] https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list > /dev/null
 
 # XanMod
 wget -qO - https://dl.xanmod.org/archive.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/xanmod-archive-keyring.gpg
@@ -87,4 +84,4 @@ sudo apt upgrade -y -q
 echo -e "    ${WHITE}├─ [BASE] Utilitaires fondamentaux...${NC}"
 sudo apt install -y build-essential git curl wget cmake pkg-config unzip p7zip-full htop vim nano pipx zsh gamemode software-properties-common ca-certificates gcc g++ make file
 
-echo -e "    ${WHITE}✅ Phase 0 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 0 Terminée.${NC}"

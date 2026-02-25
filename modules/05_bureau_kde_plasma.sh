@@ -5,15 +5,8 @@
 # Phase: 5 - KDE Plasma Desktop & Élimination Bloatware
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
-
-# ---- Couleurs & Styles ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
@@ -32,10 +25,10 @@ echo "gdm3 shared/default-x-display-manager select sddm" | sudo debconf-set-sele
 
 # Installation KDE
 echo -e "    ${WHITE}├─ [BUREAU] Compilation KDE Plasma Desktop 6...${NC}"
-sudo DEBIAN_FRONTEND=noninteractive apt install -y kubuntu-desktop kde-plasma-desktop plasma-workspace plasma-nm plasma-pa plasma-systemmonitor kde-standard dolphin konsole kate ark gwenview spectacle kcalc partitionmanager >/dev/null 2>&1
+sudo DEBIAN_FRONTEND=noninteractive apt install -y kubuntu-desktop kde-plasma-desktop plasma-workspace plasma-nm plasma-pa plasma-systemmonitor kde-standard dolphin konsole kate ark gwenview spectacle kcalc partitionmanager
 
 echo -e "    ${WHITE}├─ [TRADUCTION] Conversion Locale vers Français...${NC}"
-sudo DEBIAN_FRONTEND=noninteractive apt install -y language-pack-fr language-pack-gnome-fr language-pack-kde-fr hunspell-fr >/dev/null 2>&1
+sudo DEBIAN_FRONTEND=noninteractive apt install -y language-pack-fr language-pack-gnome-fr language-pack-kde-fr hunspell-fr
 sudo update-locale LANG=fr_FR.UTF-8 LC_MESSAGES=fr_FR.UTF-8 2>/dev/null || true
 
 # Config SDDM
@@ -76,4 +69,4 @@ sudo apt-get purge -y firefox snapd 2>/dev/null || true
 sudo apt-get autoremove -y --purge > /dev/null 2>&1 || true
 sudo apt-get clean > /dev/null 2>&1 || true
 
-echo -e "    ${WHITE}✅ Phase 5 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 5 Terminée.${NC}"

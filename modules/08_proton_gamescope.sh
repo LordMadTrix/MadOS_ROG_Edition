@@ -5,20 +5,15 @@
 # Phase: 8 - Ultra Gaming (Proton-GE & GameScope)
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
 
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 REAL_USER=${SUDO_USER:-$USER}
 
 echo -e "${RED}>>> ${WHITE}[Phase 8] ${BOLD}Optimisations Ultra Gaming (Proton/GameScope)...${NC}"
 
 # 1. Installer GameScope et Feral GameMode
 echo -e "    ${WHITE}├─ [COMPOSITEUR] Installation de GameScope & GameMode...${NC}"
-sudo apt install -y gamescope gamemode >/dev/null 2>&1 || true
+sudo apt install -y gamescope gamemode || true
 
 # 2. Installer protonup en cli via pipx
 echo -e "    ${WHITE}├─ [PROTON-GE] Recherche de la dernière version custom pour Steam...${NC}"
@@ -33,9 +28,9 @@ sudo -u "$REAL_USER" mkdir -p "$STEAM_COMPAT_DIR"
 
 if sudo -u "$REAL_USER" command -v protonup &>/dev/null; then
     sudo -u "$REAL_USER" protonup -d "$STEAM_COMPAT_DIR" -y >/dev/null 2>&1 || true
-    echo -e "    ${GRAY}✅ Proton-GE a été déployé pour votre compte Steam.${NC}"
+    echo -e "    ${GRAY}✅ [SUCCÈS] Proton-GE a été déployé pour votre compte Steam.${NC}"
 else
-    echo -e "    ${RED}⚠️  Impossible de télécharger Proton-GE automatiquement. Utilisez ProtonUp-Qt.${NC}"
+    echo -e "    ${RED}⚠️  [ATTENTION] Impossible de télécharger Proton-GE automatiquement. Utilisez ProtonUp-Qt.${NC}"
 fi
 
-echo -e "    ${WHITE}✅ Phase 8 Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 8 Terminée.${NC}"

@@ -5,13 +5,7 @@
 # Phase: 19 - Automaintenance SSD & Logs (Fstrim)
 # ==========================================
 
-
-
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
 CYAN='\033[0;36m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 19] ${BOLD}Déploiement Maintenance SSD & OS (Automatisé)...${NC}"
 
@@ -34,5 +28,5 @@ sudo apt-get clean >/dev/null 2>&1
 sudo journalctl --vacuum-time=3d >/dev/null 2>&1 || true
 sudo fstrim -av >/dev/null 2>&1 || true
 
-echo -e "    ${CYAN}✅ Votre système se nettoiera tout seul en mode fantôme pour préserver votre SSD.${NC}"
-echo -e "    ${WHITE}✅ Phase 19 Terminée.${NC}"
+echo -e "    ${CYAN}✅ [SUCCÈS] Votre système se nettoiera tout seul en mode fantôme pour préserver votre SSD.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 19 Terminée.${NC}"

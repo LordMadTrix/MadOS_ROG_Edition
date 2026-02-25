@@ -5,14 +5,9 @@
 # Phase: 16 - Compression Mémoire (ZRAM zstd)
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
 
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
 CYAN='\033[0;36m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 16] ${BOLD}Configuration ZRAM (Compression Mémoire Ultra-Rapide)...${NC}"
 
@@ -43,5 +38,5 @@ sudo sysctl --system >/dev/null 2>&1 || true
 
 sudo systemctl restart zramsetup >/dev/null 2>&1 || true
 
-echo -e "    ${CYAN}✅ Service ZRAM opérationnel. Durée de vie du SSD préservée et fluidité RAM assurée.${NC}"
-echo -e "    ${WHITE}✅ Phase 16 Terminée.${NC}"
+echo -e "    ${CYAN}✅ [SUCCÈS] Service ZRAM opérationnel. Durée de vie du SSD préservée et fluidité RAM assurée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 16 Terminée.${NC}"

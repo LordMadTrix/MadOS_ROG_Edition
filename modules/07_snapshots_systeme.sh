@@ -6,20 +6,13 @@
 # Configure un point de sauvegarde système par sécurité
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
-
-# ---- Couleurs & Styles ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 7] ${BOLD}Déploiement du bouclier Timeshift...${NC}"
 
 # Installation
 if ! command -v timeshift &>/dev/null; then
-    sudo apt install -y timeshift > /dev/null 2>&1
+    sudo apt install -y timeshift || true
 fi
 
 # Basic check if root is btrfs
@@ -34,4 +27,4 @@ else
     echo -e "    ${GRAY}├─ Veuillez ouvrir Timeshift graphiquement plus tard pour faire un backup.${NC}"
 fi
 
-echo -e "    ${WHITE}✅ Phase 7 (Snapshots) Terminée.${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 7 (Snapshots) Terminée.${NC}"

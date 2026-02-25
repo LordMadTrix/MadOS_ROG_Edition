@@ -42,6 +42,8 @@ export RED='\033[0;31m'
 export WHITE='\033[1;37m'
 export CYAN='\033[0;36m'
 export GRAY='\033[0;90m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[0;33m'
 export NC='\033[0m'
 export BOLD='\033[1m'
 
@@ -67,10 +69,10 @@ run_module() {
     local SCRIPT="$1"
     local DESCRIPTION="${2:-}"
     
-    echo -e "\n${CYAN}╭──────────────────────────────────────────────────────────────╮${NC}"
-    echo -e "${CYAN}│${NC} 🚀 ${WHITE}Exécution : ${SCRIPT}${NC}"
-    echo -e "${CYAN}│${NC} 📌 ${GRAY}${DESCRIPTION}${NC}"
-    echo -e "${CYAN}╰──────────────────────────────────────────────────────────────╯${NC}\n"
+    echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Exécution : ${SCRIPT}${NC}"
+    echo -e "${RED}║${NC} 📌 ${GRAY}${DESCRIPTION}${NC}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════════════╝${NC}\n"
     
     echo -e "\n--- Exécution: $SCRIPT ---" >> "$LOG_FILE"
     if ! bash "$MODULES_DIR/$SCRIPT" 2>&1 | tee -a "$LOG_FILE"; then
@@ -82,6 +84,16 @@ run_module() {
 }
 
 menu_principal() {
+    clear
+    echo -e "${RED}${BOLD}"
+    echo "  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗"
+    echo "  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝"
+    echo "  ██╔████╔██║███████║██║  ██║██║   ██║███████╗"
+    echo "  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║"
+    echo "  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║"
+    echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝"
+    echo -e "${NC}${WHITE}${BOLD}         --- INSTALLATEUR ROG EDITION ---${NC}\n"
+
     local CHOIX
     CHOIX=$(whiptail --title "MadOS ROG Edition (v2.6) - Menu Principal" \
         --cancel-button "Quitter" \

@@ -6,14 +6,7 @@
 # Cible spécifiquement la variance x64v3 pour ROG (AVX2).
 # ==========================================
 
-
 export DEBIAN_FRONTEND=noninteractive
-
-# ---- Couleurs & Styles ----
-RED='\033[0;31m'
-WHITE='\033[1;37m'
-GRAY='\033[0;90m'
-NC='\033[0m'
 
 echo -e "${RED}>>> ${WHITE}[Phase 1] ${BOLD}Déploiement du Noyau XanMod EDGE...${NC}"
 
@@ -33,20 +26,20 @@ XANMOD_PKG="linux-xanmod-edge-${CPU_LEVEL}"
 echo -e "    ${GRAY}├─ Injection du paquet : $XANMOD_PKG...${NC}"
 
 if sudo apt install -y "$XANMOD_PKG"; then
-    echo -e "    ${GRAY}✅ Noyau $XANMOD_PKG installé.${NC}"
+    echo -e "    ${GRAY}✅ [SUCCÈS] Noyau $XANMOD_PKG installé.${NC}"
 else
-    echo -e "    ${RED}⚠️  Moteur introuvable, tentative version générique...${NC}"
+    echo -e "    ${RED}⚠️  [ATTENTION] Moteur introuvable, tentative version générique...${NC}"
     sudo apt install -y linux-xanmod-edge
 fi
 
 echo -e "    ${WHITE}├─ [HEADERS] Construction des en-têtes (Prérequis DKMS GPU)...${NC}"
 if sudo apt install -y "linux-headers-${CPU_LEVEL}" 2>/dev/null; then
-    echo -e "    ${GRAY}✅ linux-headers-${CPU_LEVEL} déployés.${NC}"
+    echo -e "    ${GRAY}✅ [SUCCÈS] linux-headers-${CPU_LEVEL} déployés.${NC}"
 elif sudo apt install -y linux-headers-xanmod-edge 2>/dev/null; then
-    echo -e "    ${GRAY}✅ linux-headers-xanmod-edge déployés.${NC}"
+    echo -e "    ${GRAY}✅ [SUCCÈS] linux-headers-xanmod-edge déployés.${NC}"
 fi
 
 echo -e "    ${WHITE}├─ [BOOT] Séquenceur GRUB mis à jour.${NC}"
 sudo update-grub 2>/dev/null || true
 
-echo -e "    ${WHITE}✅ Phase 1 Terminée (Ne pas redémarrer avant le script GPU).${NC}"
+echo -e "    ${WHITE}✅ [SUCCÈS] Phase 1 Terminée (Ne pas redémarrer avant le script GPU).${NC}"
