@@ -16,11 +16,7 @@ echo -e "${RED}>>> ${WHITE}[Phase 14] ${BOLD}Déploiement Automatique de l'IA Op
 
 echo -e "    ${GRAY}├─ Installation des dépendances systèmes (Node.js, Git)...${NC}"
 if ! command -v node >/dev/null 2>&1; then
-    sudo apt-get install -y ca-certificates curl gnupg || true
-    sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -yes -o /etc/apt/keyrings/nodesource.gpg || true
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list > /dev/null
-    sudo apt-get update -q
+    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null 2>&1
     sudo apt-get install -y nodejs
 fi
 
@@ -44,7 +40,7 @@ DEFAULT_SYSTEM_PROMPT="Tu es l'Agent IA de MadOS ROG Edition. Tu es intégré au
 ENV_EOF
 
 echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peut prendre 1 à 5 minutes selon le CPU...${NC}"
-sudo corepack enable pnpm >/dev/null 2>&1 || true
+sudo npm install -g pnpm >/dev/null 2>&1 || true
 
 # Execution du build STRICTEMENT sous l'utilisateur réel avec affichage (plus de freeze silencieux)
 sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm install" || true
