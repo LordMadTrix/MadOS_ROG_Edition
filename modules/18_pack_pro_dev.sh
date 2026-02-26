@@ -48,8 +48,8 @@ echo -e "    ${GRAY}├─ Déploiement de l'assistant IA Google Antigravity...$
 ANTIGRAVITY_TEMP_DIR=$(mktemp -d)
 wget --timeout=5 --tries=1 -qO "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" https://antigravity.google/download/linux || true
 
-if [ -f "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" ] && [ -s "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" ]; then
-    sudo apt-get install -y "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" || true
+if [ -f "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" ] && dpkg-deb -I "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" >/dev/null 2>&1; then
+    sudo apt-get install -y "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" >/dev/null 2>&1 || true
     rm -rf "$ANTIGRAVITY_TEMP_DIR"
 else
     echo -e "    ${RED}    [!] Le serveur Antigravity AI est inaccessible... Simulation d'intégration.${NC}"

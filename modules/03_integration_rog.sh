@@ -20,8 +20,8 @@ fi
 echo -e "    ${WHITE}├─ [SCAN MATERIEL] Modèle détecté : ${RED}${BOLD}$ROG_MODEL${NC}"
 
 # 1. WiFi & Audio
-echo -e "    ${WHITE}├─ [RESEAU/AUDIO] Injection Firmware WiFi / Sound Open Firmware (SOF)...${NC}"
-sudo apt install -y firmware-misc-nonfree linux-firmware wireless-tools iw rfkill wpasupplicant firmware-sof-signed sof-firmware alsa-base alsa-utils pulseaudio pipewire pipewire-pulse wireplumber libspa-0.2-bluetooth blueman bluetooth bluez || true
+echo -e "    ${GRAY}├─ [RESEAU/AUDIO] Injection Firmware WiFi / Sound Open Firmware (SOF)...${NC}"
+sudo apt install -y linux-firmware firmware-sof-signed wireless-tools iw rfkill wpasupplicant alsa-base alsa-utils pulseaudio pipewire pipewire-pulse wireplumber libspa-0.2-bluetooth blueman bluetooth bluez >/dev/null 2>&1 || true
 
 if systemctl --user list-unit-files pipewire.service &>/dev/null; then
     sudo -u "$REAL_USER" systemctl --user enable pipewire pipewire-pulse wireplumber 2>/dev/null || true

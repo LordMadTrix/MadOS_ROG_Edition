@@ -25,7 +25,7 @@ echo "gdm3 shared/default-x-display-manager select sddm" | sudo debconf-set-sele
 
 # Installation KDE
 echo -e "    ${WHITE}├─ [BUREAU] Compilation KDE Plasma Desktop 6...${NC}"
-sudo DEBIAN_FRONTEND=noninteractive apt install -y kubuntu-desktop kde-plasma-desktop plasma-workspace plasma-nm plasma-pa plasma-systemmonitor kde-standard dolphin konsole kate ark gwenview spectacle kcalc partitionmanager
+sudo DEBIAN_FRONTEND=noninteractive apt install -y kubuntu-desktop kde-plasma-desktop plasma-workspace plasma-nm plasma-pa plasma-systemmonitor kde-standard dolphin konsole kate ark gwenview kde-spectacle kcalc partitionmanager
 
 echo -e "    ${WHITE}├─ [TRADUCTION] Conversion Locale vers Français...${NC}"
 sudo DEBIAN_FRONTEND=noninteractive apt install -y language-pack-fr language-pack-gnome-fr language-pack-kde-fr hunspell-fr

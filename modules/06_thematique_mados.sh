@@ -28,6 +28,8 @@ ID=ubuntu
 ID_LIKE=debian
 PRETTY_NAME="MadOS ROG Edition 2.6"
 VERSION_ID="24.04"
+VERSION_CODENAME=noble
+UBUNTU_CODENAME=noble
 HOME_URL="https://github.com/mados-rog"
 OSRELEASE
 

@@ -12,8 +12,8 @@ REAL_USER=${SUDO_USER:-$USER}
 echo -e "${RED}>>> ${WHITE}[Phase 8] ${BOLD}Optimisations Ultra Gaming (Proton/GameScope)...${NC}"
 
 # 1. Installer GameScope et Feral GameMode
-echo -e "    ${WHITE}├─ [COMPOSITEUR] Installation de GameScope & GameMode...${NC}"
-sudo apt install -y gamescope gamemode || true
+echo -e "    ${WHITE}├─ [COMPOSITEUR] Installation de Feral GameMode...${NC}"
+sudo apt install -y gamemode >/dev/null 2>&1 || true
 
 # 2. Installer protonup en cli via pipx
 echo -e "    ${WHITE}├─ [PROTON-GE] Recherche de la dernière version custom pour Steam...${NC}"

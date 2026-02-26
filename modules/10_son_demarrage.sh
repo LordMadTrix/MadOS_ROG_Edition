@@ -10,8 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 REAL_USER=${SUDO_USER:-$USER}
 
 echo -e "${RED}>>> ${WHITE}[Phase 10] ${BOLD}Installation du Son de Démarrage ROG...${NC}"
-
-sudo apt install -y sox libsox-fmt-all freedesktop-sound-theme || true
+sudo apt install -y sox libsox-fmt-all sound-theme-freedesktop >/dev/null 2>&1 || true
 
 AUTOSTART_DIR="/home/$REAL_USER/.config/autostart"
 sudo -u "$REAL_USER" mkdir -p "$AUTOSTART_DIR"
