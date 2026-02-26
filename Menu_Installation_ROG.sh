@@ -27,8 +27,9 @@ fi
 
 chmod +x "$MODULES_DIR"/*.sh 2>/dev/null || true
 
-# Réattacher stdin au terminal (nécessaire quand lancé via wget | bash)
+# Réattacher stdin au terminal et nettoyer l'affichage (indispensable avec wget pipe)
 exec < /dev/tty
+tput reset 2>/dev/null || true
 
 # Empêcher sudo de réinitialiser les variables cruciales pour l'installation silencieuse
 echo 'Defaults env_keep += "DEBIAN_FRONTEND NEEDRESTART_MODE"' | sudo tee /etc/sudoers.d/mados-apt-env >/dev/null
@@ -114,9 +115,9 @@ menu_principal() {
     local CHOIX
     CHOIX=$(whiptail --title "MadOS ROG Edition (v2.7) - Menu Principal" \
         --cancel-button "Quitter" \
-        --menu "Choisissez votre mode d'installation :" 15 65 4 \
-        "1" "Déploiement Total (Recommandé)" \
-        "2" "Déploiement Personnalisé (Experts)" \
+        --menu "Choisissez votre mode d'installation :" 16 72 3 \
+        "1" "Deploiement Total (Recommande)" \
+        "2" "Deploiement Personnalise (Experts)" \
         "3" "Mode Destruction (Purge Ubuntu)" 3>&1 1>&2 2>&3)
     
     if [ $? -eq 0 ]; then
