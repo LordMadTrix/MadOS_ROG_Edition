@@ -51,7 +51,7 @@
 Il n'a jamais été aussi simple de rejoindre la matrice. **Une seule commande suffit :**
 
 ```bash
-wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition | bash
+wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition/install.sh | bash
 ```
 
 > **Comment ça marche ?** La commande télécharge et exécute le script bootstrap qui clone automatiquement le dépôt, applique les permissions, et lance l'installeur principal. Aucune interaction préalable n'est nécessaire.
