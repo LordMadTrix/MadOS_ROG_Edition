@@ -8,6 +8,7 @@
   [![Bash](https://img.shields.io/badge/Script-Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
   [![Ubuntu](https://img.shields.io/badge/OS-Ubuntu_24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
   [![KDE Plasma](https://img.shields.io/badge/Desktop-KDE_Plasma_6-1D99F3?style=for-the-badge&logo=kde&logoColor=white)](https://kde.org/)
+  [![Version](https://img.shields.io/badge/Version-2.4-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
   <p align="center">
@@ -15,7 +16,7 @@
     <a href="#prérequis">Prérequis</a> •
     <a href="#installation">Déploiement</a> •
     <a href="#architecture-des-modules">Modules</a> •
-    <a href="#contribution">Contribution</a>
+    <a href="https://lordmadtrix.github.io/MadOS_ROG_Edition">🌐 Site Officiel</a>
   </p>
 </div>
 
@@ -26,32 +27,33 @@
 **MadOS ROG Edition** n'est pas qu'un simple script, c'est une matrice d'installation interactive conçue pour transformer une base Ubuntu Server ou Desktop (24.04 LTS) en une station de combat orientée Gaming, optimisée spécifiquement pour les PC portables **ASUS Republic of Gamers**.
 
 - 🧠 **Détection Intelligente GPU** : Scan matériel automatique (`lspci`) pour déployer les pilotes NVIDIA (DKMS), AMD (Mesa/RADV) ou Intel sans la moindre configuration manuelle.
-- 💻 **Noyau XanMod EDGE** : Compilation automatique du kernel orienté gaming avec support des instructions AVX2 / AVX512 (selon votre CPU).
+- 💻 **Noyau XanMod EDGE** : Compilation automatique du kernel orienté gaming avec support AVX2 / AVX512 (selon votre CPU).
 - ⚙️ **Contrôle Hardware ASUS** : Intégration CLI native de `asusctl` et `supergfxctl` (compilés via Rust) pour la gestion du MUX Switch, des ventilateurs et du clavier RGB.
-- 🎨 **Esthétique ROG Immersive** : Thème sombre, accents rouges, SDDM Wallpaper animé, Neofetch exclusif, et terminal ZSH (Powerlevel10k). Interface de console uniformisée avec une charte graphique agressive (ASCII Art & Couleurs standardisées).
-- 🤖 **Assistant IA ([OpenClaw](https://openclaw.ai/) & Antigravity)** : (Optionnel) Installation intégrée d'un agent IA local (Node.js) directement utilisable sur votre bureau ainsi que l'assistant Google Antigravity.
+- 🎨 **Esthétique ROG Immersive** : Thème sombre, accents rouges, SDDM Wallpaper animé, Neofetch exclusif, et terminal ZSH (Powerlevel10k).
+- 🤖 **Assistant IA [OpenClaw](https://openclaw.ai/)** : Agent IA local intégré (Node.js / systemd), panneau de contrôle whiptail, démarrage automatique à la connexion.
 - 🧹 **Purge Anti-Bloatware** : Suppression radicale de Snapd, GNOME, et de la télémétrie Ubuntu.
-- 🛡️ **Fiabilité Accrue** : Gestion moderne des clés GPG (`/etc/apt/keyrings`), traçabilité des logs d'installation (suppression des échecs silencieux d'APT), et détection GPU sécurisée.
+- 🛡️ **Fiabilité Accrue** : Gestion moderne des clés GPG (`/etc/apt/keyrings`), logs d'installation tracés, et détection GPU sécurisée.
 
 ---
 
 ## 🛠 Prérequis
 
 1. Un PC (idéalement **ASUS ROG**) avec une connexion internet active.
-2. Une installation fraîche d'**Ubuntu 24.04 LTS (Noble Numbat)**, version **Serveur** de préférence (pour partir d'une base légère), ou Desktop (le script désinstallera GNOME).
+2. Une installation fraîche d'**Ubuntu 24.04 LTS (Noble Numbat)**, version **Serveur** de préférence, ou Desktop (le script désinstallera GNOME).
 3. L'utilisateur courant doit faire partie du groupe `sudo`.
+4. RAM : **8 Go minimum** · Espace disque : **40 Go minimum**
 
 ---
 
 ## 🚀 Installation
 
-Il n'a jamais été aussi simple de rejoindre la matrice. Une seule ligne de commande suffit :
+Il n'a jamais été aussi simple de rejoindre la matrice. **Une seule commande suffit :**
 
 ```bash
-wget -qO install.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh && sudo bash install.sh
+wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition | bash
 ```
 
-> **Comment ça marche ?** : La commande va télécharger le script, récupérer la dernière version du dépôt en cache, appliquer automatiquement les droits d'exécution, puis lancer l'installeur (Menu_Installation_ROG).
+> **Comment ça marche ?** La commande télécharge et exécute le script bootstrap qui clone automatiquement le dépôt, applique les permissions, et lance l'installeur principal. Aucune interaction préalable n'est nécessaire.
 
 Une fois le script lancé, une interface graphique "BIOS" (Whiptail) apparaîtra. Vous aurez le choix entre :
 - `[1] Déploiement Total` : Un sous-menu interactif vous permettra de cocher/décocher les modules bonus.
@@ -82,14 +84,16 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `11_batterie_extreme.sh` | 🔋 Déploiement de `auto-cpufreq` pour doubler l'autonomie sur batterie. |
 | `12_mangohud_rog.sh`     | 📊 Création d'un profil agressif Rouge/Noir pour surveiller vos FPS en jeu. |
 | `13_pack_streamer.sh`    | 🎥 Installation massive d'OBS, `obs-vkcapture` (Wayland), et IA `NoiseTorch`. |
-| `14_openclaw_ai.sh`      | 🤖 Compilation automatisée de `OpenClaw` (service systemd silencieux). |
+| `14_openclaw_ai.sh`      | 🤖 Compilation et démarrage automatique de l'IA `OpenClaw` (service systemd). |
 | `15_reseau_antilag.sh`   | 🌐 Profil noyau TCP BBR & _fq_codel_ pour réduire le ping multijoueur. |
-| `16_zram_memoire.sh`     | 🧠 Swap ZRAM compressée (zstd) pour doubler la capacité de mémoire vive en jeu. |
+| `16_zram_memoire.sh`     | 🧠 Swap ZRAM compressée (zstd) pour augmenter la capacité mémoire vive en jeu. |
 | `17_bouclier_antipub.sh` | 🛡️ Injection _StevenBlack Hosts_ bloquant traqueurs et malwares au niveau noyau. |
 | `18_pack_pro_dev.sh`     | 💻 QEMU, KVM, Docker, VSCodium et Google Antigravity AI pour les développeurs. |
-| `19_donnees_fstrim.sh`   | 🧹 Timer système activant la purge SSD/NVMe (Fstrim) et limitant la taille des logs. |
-| `20_esport_usb_1000hz.sh`| 🖱️ `udev` rules pour annuler l'autosuspend USB, forçant le Polling Rate Zero-Latency. |
-| `21_boot_eclair.sh`      | ⚡ Compression _Initramfs_ `lz4` ultra-rapide et camouflage aveugle des textes de GRUB. |
+| `19_donnees_fstrim.sh`   | 🧹 Timer système activant la purge SSD/NVMe (Fstrim) et limitant les logs. |
+| `20_esport_usb_1000hz.sh`| 🖱️ `udev` rules pour forcer le Polling Rate Zero-Latency sur les périphériques USB. |
+| `21_boot_eclair.sh`      | ⚡ Compression _Initramfs_ `lz4` ultra-rapide et camouflage des textes GRUB. |
+| `22_cpu_undervolt.sh`    | 🌡️ Undervolting CPU automatique pour réduire les températures. |
+| `23_control_center.sh`   | 🖥️ Centre de contrôle MadOS avec dashboard système et raccourcis rapides. |
 
 ---
 
@@ -110,5 +114,6 @@ Ce projet a été imaginé et propulsé par amour du matériel ASUS et de l'univ
 Distribué sous la licence **MIT**. Voir `LICENSE` pour plus d'informations.
 
 <div align="center">
-  <i>Conçu pour les joueurs. Codé avec passion. 🩸</i>
+  <i>Conçu pour les joueurs. Codé avec passion. 🩸</i><br><br>
+  <a href="https://lordmadtrix.github.io/MadOS_ROG_Edition">🌐 lordmadtrix.github.io/MadOS_ROG_Edition</a>
 </div>
