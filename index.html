@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MadOS ROG Edition - Le système d'exploitation Linux ultime pour gamers ASUS ROG. Installez en une seule commande.">
+    <title>MadOS ROG Edition — Linux Gaming Redéfini</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --rog-red: #e8003d;
+            --rog-red-glow: rgba(232, 0, 61, 0.6);
+            --rog-dark: #080808;
+            --rog-panel: rgba(15, 15, 15, 0.9);
+            --rog-border: rgba(232, 0, 61, 0.5);
+            --cyan: #00e5ff;
+            --green: #00ff88;
+            --text: #ffffff;
+            --text-dim: #666;
+        }
+
+        html, body {
+            width: 100%; height: 100%;
+            background: var(--rog-dark);
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* ===== BACKGROUND ===== */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(232,0,61,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(0,229,255,0.05) 0%, transparent 60%),
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* CRT scanlines */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0) 0px,
+                rgba(0,0,0,0) 2px,
+                rgba(0,0,0,0.12) 2px,
+                rgba(0,0,0,0.12) 4px
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* ===== NAV ===== */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 1.2rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(232,0,61,0.2);
+            backdrop-filter: blur(20px);
+            background: rgba(8,8,8,0.7);
+            z-index: 100;
+        }
+        .nav-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem; font-weight: 900;
+            letter-spacing: 0.15em;
+            color: white;
+        }
+        .nav-logo span { color: var(--rog-red); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--rog-red); }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative; z-index: 1;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.4rem 1.2rem;
+            border: 1px solid var(--rog-border);
+            border-radius: 100px;
+            background: rgba(232,0,61,0.08);
+            font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--rog-red);
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease both;
+        }
+        .badge::before {
+            content: ''; width: 6px; height: 6px;
+            background: var(--rog-red);
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            line-height: 0.95;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s 0.2s ease both;
+        }
+        h1 .rog { color: var(--rog-red); display: block; }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: var(--text-dim);
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 3.5rem;
+            font-weight: 500;
+            animation: fadeInUp 0.8s 0.4s ease both;
+        }
+
+        /* ===== INSTALL BOX ===== */
+        .install-section {
+            animation: fadeInUp 0.8s 0.6s ease both;
+            width: 100%; max-width: 780px;
+        }
+
+        .install-label {
+            font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 0.8rem;
+            text-align: left;
+        }
+
+        .install-box {
+            background: var(--rog-panel);
+            border: 1px solid var(--rog-border);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(232,0,61,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .install-box::before {
+            content: 'TERMINAL';
+            position: absolute; top: 1rem; left: 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 0.15em;
+        }
+        .install-box::after {
+            content: '● ● ●';
+            position: absolute; top: 0.85rem; right: 1.5rem;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.1);
+            letter-spacing: 0.2em;
+        }
+
+        .install-cmd {
+            padding: 3rem 1.5rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .prompt {
+            color: var(--rog-red);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .cmd-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            color: var(--green);
+            flex: 1;
+            word-break: break-all;
+        }
+        .copy-btn {
+            flex-shrink: 0;
+            background: var(--rog-red);
+            color: white; border: none;
+            padding: 0.65rem 1.4rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .copy-btn:hover { background: #ff1a52; box-shadow: 0 0 20px rgba(232,0,61,0.5); }
+        .copy-btn:active { transform: scale(0.96); }
+
+        .install-note {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 0.8rem 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .install-note span { color: var(--cyan); }
+
+        /* ===== FEATURES ===== */
+        .section {
+            position: relative; z-index: 1;
+            max-width: 1200px; margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+        .section-header {
+            text-align: center; margin-bottom: 4rem;
+        }
+        .section-tag {
+            font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--rog-red); margin-bottom: 0.8rem;
+        }
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.8rem);
+            font-weight: 700;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--rog-panel);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative; overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute; bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: linear-gradient(90deg, var(--rog-red), transparent);
+            transition: width 0.4s ease;
+        }
+        .feature-card:hover { border-color: var(--rog-border); transform: translateY(-4px); }
+        .feature-card:hover::before { width: 100%; }
+
+        .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .feature-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem; font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            color: white;
+        }
+        .feature-desc { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
+
+        /* ===== SPECS ===== */
+        .specs-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px; overflow: hidden;
+        }
+        .spec-item {
+            background: var(--rog-panel);
+            padding: 1.5rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .spec-label { color: var(--text-dim); font-size: 0.9rem; font-weight: 600; }
+        .spec-value {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--cyan); font-size: 0.9rem;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            position: relative; z-index: 1;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem;
+            background: #111; border: 1px solid var(--rog-red);
+            color: white; padding: 0.9rem 1.8rem;
+            border-radius: 6px; font-weight: 700;
+            font-size: 0.9rem; letter-spacing: 0.05em;
+            opacity: 0; transform: translateY(10px);
+            transition: all 0.3s ease; z-index: 9999;
+            box-shadow: 0 0 20px rgba(232,0,61,0.3);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 640px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { display: none; }
+            .install-cmd { flex-direction: column; align-items: flex-start; }
+            .copy-btn { width: 100%; text-align: center; }
+            .specs-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">Mad<span>OS</span>_ROG</div>
+        <div class="nav-links">
+            <a href="#features">Fonctionnalités</a>
+            <a href="#specs">Specs</a>
+            <a href="https://github.com/LordMadTrix/MadOS_ROG_Edition" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="badge">Version 2.4 disponible — Stable</div>
+
+        <h1>
+            MadOS
+            <span class="rog">ROG Edition</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            Linux redéfini pour les gamers ASUS ROG. 
+            Performances extrêmes, IA intégrée, thème cyberpunk total.
+            Une commande sufficient pour tout installer.
+        </p>
+
+        <div class="install-section" id="install">
+            <div class="install-label">// Commande d'installation rapide</div>
+            <div class="install-box">
+                <div class="install-cmd">
+                    <span class="prompt">$</span>
+                    <code class="cmd-text" id="installCmd">wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition | bash</code>
+                    <button class="copy-btn" onclick="copyInstall()" id="copyBtn">Copier</button>
+                </div>
+                <div class="install-note">
+                    <span>ℹ</span>
+                    Requiert sudo · Ubuntu/Debian 22.04+ · ~15 minutes d'installation
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+        <div class="section-header">
+            <div class="section-tag">// Fonctionnalités</div>
+            <h2 class="section-title">Forgé pour le Jeu. Taillé pour la Victoire.</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Kernel XanMod</div>
+                <div class="feature-desc">Noyau hyperoptimisé pour les jeux, réduisant la latence et maximisant le débit CPU. Bien au-delà du kernel Ubuntu standard.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <div class="feature-title">Gaming Stack Complet</div>
+                <div class="feature-desc">Steam, Lutris, Heroic, MangoHud, GameMode, Proton, GE-Proton, Gamescope. Tout est préinstallé et pré-configuré.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">OpenClaw IA</div>
+                <div class="feature-desc">Assistant IA intégré au niveau système. Contrôlez votre machine, diagnostiquez des problèmes et automatisez des tâches par conversation.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">Thème ROG Total</div>
+                <div class="feature-desc">GRUB, Plymouth, SDDM, KDE Plasma. L'esthétique Republic of Gamers du démarrage à l'extinction.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🖥️</div>
+                <div class="feature-title">Pilotes Auto-Détectés</div>
+                <div class="feature-desc">NVIDIA ou AMD, le bon pilote s'installe automatiquement selon votre GPU détecté. Asusctl, supergfxctl pour le ROG.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📡</div>
+                <div class="feature-title">1-Click Installation</div>
+                <div class="feature-desc">Un script intelligent, 20+ modules, 0 interaction nécessaire. Il suffit de lancer la commande et d'attendre le résultat.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SPECS -->
+    <section class="section" id="specs">
+        <div class="section-header">
+            <div class="section-tag">// Spécifications</div>
+            <h2 class="section-title">Configuration du Système</h2>
+        </div>
+        <div class="specs-grid">
+            <div class="spec-item">
+                <span class="spec-label">Base</span>
+                <span class="spec-value">Ubuntu 22.04 LTS</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Noyau</span>
+                <span class="spec-value">XanMod Edge</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Interface</span>
+                <span class="spec-value">KDE Plasma 5 ROG</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">GPU Support</span>
+                <span class="spec-value">NVIDIA + AMD + Intel</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Écran de démarrage</span>
+                <span class="spec-value">Plymouth ROG Animated</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">IA intégrée</span>
+                <span class="spec-value">OpenClaw v2026.2</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">RAM requise</span>
+                <span class="spec-value">8 GB minimum</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Espace disque</span>
+                <span class="spec-value">40 GB minimum</span>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>MadOS ROG Edition — Forgé par <strong>LordMadTrix</strong> · Open Source sur 
+            <a href="https://github.com/LordMadTrix/MadOS_ROG_Edition" style="color:var(--rog-red); text-decoration:none;">GitHub</a>
+        </p>
+    </footer>
+
+    <div class="toast" id="toast">✅ Commande copiée !</div>
+
+    <script>
+        function copyInstall() {
+            const cmd = document.getElementById('installCmd').innerText;
+            navigator.clipboard.writeText(cmd).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '✓ Copié !';
+                setTimeout(() => btn.textContent = 'Copier', 2000);
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            });
+        }
+    </script>
+</body>
+</html>

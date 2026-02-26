@@ -57,8 +57,9 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=$OC_DIR
-ExecStart=/usr/bin/env pnpm run start gateway
+ExecStart=/usr/bin/env node scripts/run-node.mjs gateway
 Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=default.target
@@ -97,7 +98,12 @@ while true; do
       fi
       ;;
     2)
-      cd "$HOME/OpenClaw" && pnpm run start tui
+      if systemctl --user is-active --quiet openclaw.service; then
+        clear
+        cd "$HOME/OpenClaw" && pnpm run start tui
+      else
+        whiptail --msgbox "⚠️ Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 60
+      fi
       ;;
     3)
       systemctl --user start openclaw.service
