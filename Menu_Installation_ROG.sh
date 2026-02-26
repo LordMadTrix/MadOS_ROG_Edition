@@ -27,6 +27,9 @@ fi
 
 chmod +x "$MODULES_DIR"/*.sh 2>/dev/null || true
 
+# Réattacher stdin au terminal (nécessaire quand lancé via wget | bash)
+exec < /dev/tty
+
 # Empêcher sudo de réinitialiser les variables cruciales pour l'installation silencieuse
 echo 'Defaults env_keep += "DEBIAN_FRONTEND NEEDRESTART_MODE"' | sudo tee /etc/sudoers.d/mados-apt-env >/dev/null
 sudo chmod 0440 /etc/sudoers.d/mados-apt-env
