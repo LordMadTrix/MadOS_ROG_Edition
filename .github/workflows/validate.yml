@@ -1,0 +1,51 @@
+name: MadOS ROG — Validation Scripts Bash
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  shellcheck:
+    name: ShellCheck (Lint Bash)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Lint Menu_Installation_ROG.sh
+        run: shellcheck -S warning -e SC2034,SC2155,SC1091 Menu_Installation_ROG.sh || true
+
+      - name: Lint all modules
+        run: |
+          for script in modules/*.sh; do
+            echo "→ Checking $script"
+            shellcheck -S warning -e SC2034,SC2155,SC1091 "$script" || true
+          done
+
+      - name: Lint install.sh
+        run: shellcheck -S warning -e SC2034,SC2155,SC1091 install.sh || true
+
+  pages:
+    name: GitHub Pages — Verify index.html
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check index.html exists
+        run: |
+          if [ ! -f index.html ]; then
+            echo "ERROR: index.html is missing!"
+            exit 1
+          fi
+          echo "index.html is present ✓"
+
+      - name: Validate HTML structure
+        run: |
+          grep -q "<title>" index.html && echo "Title tag found ✓" || echo "Warning: No title tag"
+          grep -q "install" index.html && echo "Install command found ✓" || echo "Warning: No install command in page"

@@ -707,7 +707,68 @@
         </div>
     </section>
 
+    <!-- CHANGELOG -->
+    <section class="section" id="changelog">
+        <div class="section-header">
+            <div class="section-tag">// Journal des Mises à Jour</div>
+            <h2 class="section-title">Historique des Versions</h2>
+        </div>
+        <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:1rem;">
+
+            <div
+                style="background:var(--rog-panel); border-left:3px solid var(--rog-red); border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; flex-wrap:wrap; gap:0.5rem;">
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700;">v2.7 —
+                        2026-02-26</span>
+                    <span
+                        style="background:var(--rog-red); color:white; font-size:0.7rem; padding:0.2rem 0.7rem; border-radius:100px; font-weight:700; letter-spacing:0.1em;">LATEST</span>
+                </div>
+                <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
+                    <li>🆕 Module <code style="color:var(--cyan)">24_mados_update.sh</code> — Mise à jour automatique
+                        depuis GitHub</li>
+                    <li>🆕 Module <code style="color:var(--cyan)">25_sante_systeme.sh</code> — Diagnostic santé avec
+                        score coloré</li>
+                    <li>🤖 OpenClaw configuré avec <strong>Google Gemini 2.0 Flash</strong></li>
+                    <li>🌐 Page de présentation graphique (GitHub Pages) en ligne</li>
+                    <li>⚙️ CI/CD GitHub Actions (ShellCheck) activé</li>
+                    <li>🔴 Version menu mise à jour v2.7</li>
+                </ul>
+            </div>
+
+            <div
+                style="background:var(--rog-panel); border-left:3px solid #444; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                <div style="margin-bottom:0.8rem;">
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#888;">v2.4 —
+                        2026-02-23</span>
+                </div>
+                <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
+                    <li>🔧 Correction pilotes NVIDIA/AMD détection GPU auto</li>
+                    <li>🤖 Intégration initiale OpenClaw AI (service systemd)</li>
+                    <li>🔑 Gestion clés GPG via <code style="color:var(--cyan)">/etc/apt/keyrings</code></li>
+                    <li>🎨 Thème Plymouth ROG animé (écran de démarrage)</li>
+                </ul>
+            </div>
+
+            <div
+                style="background:var(--rog-panel); border-left:3px solid #444; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                <div style="margin-bottom:0.8rem;">
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#888;">v2.0 —
+                        2026-02-19</span>
+                </div>
+                <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
+                    <li>⚡ Passage à Ubuntu 24.04 LTS (Noble Numbat)</li>
+                    <li>💻 Noyau XanMod avec sélection automatique du profil CPU</li>
+                    <li>🎮 Intégration asusctl + supergfxctl (compilés Rust)</li>
+                    <li>🖥️ KDE Plasma 6 via PPA kubuntu-ppa/backports</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
     <footer>
+
         <p>MadOS ROG Edition — Forgé par <strong>LordMadTrix</strong> · Open Source sur
             <a href="https://github.com/LordMadTrix/MadOS_ROG_Edition"
                 style="color:var(--rog-red); text-decoration:none;">GitHub</a>

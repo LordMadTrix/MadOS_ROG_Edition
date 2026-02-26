@@ -109,7 +109,7 @@ menu_principal() {
     echo -e "${NC}${WHITE}${BOLD}         --- INSTALLATEUR ROG EDITION ---${NC}\n"
 
     local CHOIX
-    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.6) - Menu Principal" \
+    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.7) - Menu Principal" \
         --cancel-button "Quitter" \
         --menu "Choisissez votre mode d'installation :" 15 65 4 \
         "1" "Déploiement Total (Recommandé)" \
@@ -149,7 +149,9 @@ installation_totale() {
         "USB"  "Zero Latency E-Sport (Polling forcée)" ON \
         "BOOT" "Démarrage Éclair (Initramfs LZ4)" ON \
         "VOLT" "Undervolt CPU / Thermiques 85C" ON \
-        "GUI"  "MadOS Control Center (Bureau)" ON 3>&1 1>&2 2>&3)
+        "GUI"  "MadOS Control Center (Bureau)" ON \
+        "UPD"  "Mise à jour automatique MadOS" OFF \
+        "SAN"  "Diagnostic Santé Système" ON 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -185,6 +187,8 @@ installation_totale() {
     [[ "$CHOIX_BONUS" == *"BOOT"* ]] && run_module "21_boot_eclair.sh" "Fast Boot System"
     [[ "$CHOIX_BONUS" == *"VOLT"* ]] && run_module "22_cpu_undervolt.sh" "Protection Thermique"
     [[ "$CHOIX_BONUS" == *"GUI"* ]]  && run_module "23_control_center.sh" "Panneau de Contrôle GUI"
+    [[ "$CHOIX_BONUS" == *"UPD"* ]]  && run_module "24_mados_update.sh" "Mise à jour MadOS depuis GitHub"
+    [[ "$CHOIX_BONUS" == *"SAN"* ]]  && run_module "25_sante_systeme.sh" "Diagnostic Santé du Système"
 
     cloture_installation
 }
@@ -216,7 +220,9 @@ installation_custom() {
         "20_usb" "Latence USB E-Sport" OFF \
         "21_bot" "Démarrage LZ4 Éclair" OFF \
         "22_cpu" "Undervolt CPU (Intel/AMD)" OFF \
-        "23_gui" "Interface Graphique MadOS" OFF 3>&1 1>&2 2>&3)
+        "23_gui" "Interface Graphique MadOS" OFF \
+        "24_upd" "Mise à jour Auto MadOS" OFF \
+        "25_san" "Diagnostic Santé Système" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -248,6 +254,8 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"21_bot"* ]] && run_module "21_boot_eclair.sh" "GRUB Initramfs Lz4"
     [[ "$CHOIX_ALL" == *"22_cpu"* ]] && run_module "22_cpu_undervolt.sh" "Undervolt & Thermiques"
     [[ "$CHOIX_ALL" == *"23_gui"* ]] && run_module "23_control_center.sh" "Interface Control Center"
+    [[ "$CHOIX_ALL" == *"24_upd"* ]] && run_module "24_mados_update.sh" "Mise à jour depuis GitHub"
+    [[ "$CHOIX_ALL" == *"25_san"* ]] && run_module "25_sante_systeme.sh" "Diagnostic Santé"
 
     cloture_installation
 }
