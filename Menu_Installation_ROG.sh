@@ -262,7 +262,15 @@ mode_destruction() {
 }
 
 cloture_installation() {
-    whiptail --title "MAD OS ROG TERMINÉ 🎉" --msgbox "Déploiement Terminé avec Succès !\n\nAu prochain redémarrage, vous entrerez dans la Matrice :\n - Kernel XanMod EDGE\n - Interface Wayland / KDE\n - Modules Avancés Actifs" 12 55
+    clear
+    echo -e "${CYAN}Génération du lien de diagnostic (Upload sécurisé vers Termbin)...${NC}"
+    if [ -f "$LOG_FILE" ]; then
+        LOG_URL=$(cat "$LOG_FILE" | nc termbin.com 9999 || echo "Échec de l'upload")
+    else
+        LOG_URL="Aucun log généré."
+    fi
+
+    whiptail --title "MAD OS ROG TERMINÉ 🎉" --msgbox "Déploiement Terminé avec Succès !\n\nLien de Diagnostic (Copiez-le pour le dev) :\n$LOG_URL\n\nAu prochain redémarrage, vous entrerez dans la Matrice :\n - Kernel XanMod EDGE\n - Interface Wayland / KDE\n - Modules Avancés Actifs" 16 68
     if whiptail --title "REDÉMARRAGE" --yesno "Voulez-vous redémarrer le système maintenant pour savourer le fruit de votre travail ?" 10 50; then
         clear
         echo -e "${RED}Initiation de la séquence de reboot...${NC}"
@@ -270,7 +278,7 @@ cloture_installation() {
         sudo reboot
     else
         clear
-        echo -e "${GRAY}À bientôt dans la Matrice.${NC}"
+        echo -e "${GRAY}À bientôt dans la Matrice. Lien de log : $LOG_URL${NC}"
         exit 0
     fi
 }
