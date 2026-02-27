@@ -220,12 +220,16 @@ class MadOSControlCenter(QMainWindow):
         lay.addWidget(self._label("DIAGNOSTIC SYSTÈME COMPLET"))
         lay.addWidget(self._btn("🏥  Lancer le Diagnostic de Santé MadOS",
                                 "x-terminal-emulator -e bash -c "
-                                "'curl -sL https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/25_sante_systeme.sh | sudo bash; read -p Appuyez-sur-Entree...'",
+                                "'wget -qO /tmp/mados_diag.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/25_sante_systeme.sh "
+                                "&& sudo bash /tmp/mados_diag.sh; "
+                                "read -p \"Appuyez sur Entree pour fermer...\"'",
                                 "#005599"))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("INFORMATIONS SYSTÈME"))
         lay.addWidget(self._btn("🐧  Version du Kernel", "uname -r", "#333", async_run=True))
-        lay.addWidget(self._btn("💻  Info CPU & RAM", "lscpu | grep 'Model name' && free -h", "#333", async_run=True))
+        lay.addWidget(self._btn("💻  Info CPU & RAM",
+                                "grep 'model name' /proc/cpuinfo | head -1 && free -h",
+                                "#333", async_run=True))
         lay.addWidget(self._btn("🎮  Info GPU", "nvidia-smi 2>/dev/null || glxinfo 2>/dev/null | grep 'OpenGL renderer' || echo 'GPU: GPU info non disponible'", "#333", async_run=True))
         lay.addWidget(self._btn("🌡️  Températures CPU", "sensors 2>/dev/null || echo 'lm-sensors non installé'", "#333", async_run=True))
         lay.addWidget(self._btn("📊  Utilisation Disque", "df -h /", "#333", async_run=True))
@@ -238,7 +242,9 @@ class MadOSControlCenter(QMainWindow):
         lay.addWidget(self._label("MISE À JOUR MADOS"))
         lay.addWidget(self._btn("🔄  Mettre à jour MadOS depuis GitHub",
                                 "x-terminal-emulator -e bash -c "
-                                "'curl -sL https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/24_mados_update.sh | sudo bash; read -p Appuyez-sur-Entree...'",
+                                "'wget -qO /tmp/mados_update.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/24_mados_update.sh "
+                                "&& sudo bash /tmp/mados_update.sh; "
+                                "read -p \"Appuyez sur Entree pour fermer...\"'",
                                 "#005599"))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("PAQUETS SYSTÈME"))
