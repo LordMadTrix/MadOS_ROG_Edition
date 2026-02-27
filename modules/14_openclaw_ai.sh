@@ -36,7 +36,8 @@ echo -e "    ${GRAY}├─ Configuration du cerveau IA (.env)...${NC}"
 cat <<ENV_EOF | sudo -u "$REAL_USER" tee "$OC_DIR/.env" >/dev/null
 ALLOW_LOCAL_SHELL=true
 AUTO_APPROVE_SAFE_COMMANDS=true
-DEFAULT_SYSTEM_PROMPT="Tu es l'Agent IA de MadOS ROG Edition. Tu es intégré au cœur du système Linux pour assister un gamer passionné. Sois précis, pertinent, et concis."
+gateway.mode=local
+DEFAULT_SYSTEM_PROMPT="Tu es l'Agent IA de MadOS ROG Edition, forge par LordMadTrix. Tu connais Linux et le gaming. Reponds en francais."
 ENV_EOF
 
 echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peut prendre 1 à 5 minutes selon le CPU...${NC}"
