@@ -61,9 +61,9 @@ cd "$HOME/OpenClaw" || exit 1
 
 # Vérifier que node est accessible
 if command -v node &>/dev/null; then
-    exec node scripts/run-node.mjs gateway
+    exec node scripts/run-node.mjs gateway --allow-unconfigured
 elif command -v pnpm &>/dev/null; then
-    exec pnpm run start gateway
+    exec pnpm run start gateway -- --allow-unconfigured
 else
     echo "ERROR: node/pnpm not found in PATH: $PATH" >&2
     exit 1
