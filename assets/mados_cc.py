@@ -219,8 +219,9 @@ class MadOSControlCenter(QMainWindow):
         w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
         lay.addWidget(self._label("DIAGNOSTIC SYSTÈME COMPLET"))
         lay.addWidget(self._btn("🏥  Lancer le Diagnostic de Santé MadOS",
-                                "x-terminal-emulator -e bash -c 'sudo bash ~/mados_install/modules/25_sante_systeme.sh; read'",
-                                "#005599", async_run=False))
+                                "x-terminal-emulator -e bash -c "
+                                "'curl -sL https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/25_sante_systeme.sh | sudo bash; read -p Appuyez-sur-Entree...'",
+                                "#005599"))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("INFORMATIONS SYSTÈME"))
         lay.addWidget(self._btn("🐧  Version du Kernel", "uname -r", "#333", async_run=True))
@@ -236,7 +237,8 @@ class MadOSControlCenter(QMainWindow):
         w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
         lay.addWidget(self._label("MISE À JOUR MADOS"))
         lay.addWidget(self._btn("🔄  Mettre à jour MadOS depuis GitHub",
-                                "x-terminal-emulator -e bash -c 'sudo bash ~/mados_install/modules/24_mados_update.sh; read'",
+                                "x-terminal-emulator -e bash -c "
+                                "'curl -sL https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/24_mados_update.sh | sudo bash; read -p Appuyez-sur-Entree...'",
                                 "#005599"))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("PAQUETS SYSTÈME"))

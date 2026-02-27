@@ -126,7 +126,7 @@ while true; do
     2)
       if systemctl --user is-active --quiet openclaw.service; then
         clear
-        cd "$HOME/OpenClaw" && pnpm run start tui
+        cd "$HOME/OpenClaw" && node scripts/run-node.mjs tui
       else
         whiptail --msgbox "⚠️ Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 60
       fi
@@ -157,21 +157,9 @@ LCH_EOF
 
 sudo chmod +x "$OC_DIR/OpenClaw_Launcher.sh" 2>/dev/null || true
 
-echo -e "    ${GRAY}├─ Création du raccourci Bureau (Control Panel)...${NC}"
-sudo -u "$REAL_USER" mkdir -p "$USER_HOME/Bureau" "$USER_HOME/Desktop" 2>/dev/null || true
-
-cat <<DSK_EOF | sudo -u "$REAL_USER" tee "$USER_HOME/Bureau/OpenClaw.desktop" >/dev/null
-[Desktop Entry]
-Name=OpenClaw AI Control
-Exec="$USER_HOME/OpenClaw/OpenClaw_Launcher.sh"
-Icon=utilities-terminal
-Terminal=true
-Type=Application
-DSK_EOF
-
-sudo chmod +x "$USER_HOME/Bureau/OpenClaw.desktop" 2>/dev/null || true
-# Copie vers Desktop s'il existe (pour systèmes anglophones)
-sudo -u "$REAL_USER" cp "$USER_HOME/Bureau/OpenClaw.desktop" "$USER_HOME/Desktop/" 2>/dev/null || true
+# Les raccourcis OpenClaw sont désormais intégrés dans MadOS Control Center.
+# Supprimer l'éventuel ancien raccourci OpenClaw séparé.
+sudo -u "$REAL_USER" rm -f "$USER_HOME/Bureau/OpenClaw.desktop" "$USER_HOME/Desktop/OpenClaw.desktop" 2>/dev/null || true
 
 echo -e "    ${WHITE}✅ [SUCCÈS] L'Agent IA OpenClaw a été forgé avec succès.${NC}"
 echo -e "    ${CYAN}ℹ️  Il démarrera automatiquement à votre prochaine connexion.${NC}"
