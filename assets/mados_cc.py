@@ -12,6 +12,7 @@ class Worker(QObject):
     finished = pyqtSignal(str, bool)  # output, success
 
 class MadOSControlCenter(QMainWindow):
+    log_signal = pyqtSignal(str)  # Thread-safe log updates
     def __init__(self):
         super().__init__()
         self.setWindowTitle("MadOS ROG Edition — Centre de Contrôle")
@@ -60,6 +61,8 @@ class MadOSControlCenter(QMainWindow):
         self.tabs.addTab(self._tab_diag(),   "🏥  Diagnostic")
         self.tabs.addTab(self._tab_update(), "🔄  Mise à jour")
 
+        self.log_signal.connect(self._append_log)
+
         # Refresh OpenClaw status every 5s
         self._refresh_claw_status()
         self.timer = QTimer(self)
@@ -105,22 +108,30 @@ class MadOSControlCenter(QMainWindow):
         f.setStyleSheet("color:#2a2a2a;")
         return f
 
+    def _append_log(self, html):
+        """Toujours appelé depuis le thread principal via signal."""
+        self.log.append(html)
+        sb = self.log.verticalScrollBar()
+        sb.setValue(sb.maximum())
+
     def _run(self, cmd):
-        self.log.append(f"<span style='color:#ff6600'>$ {cmd}</span>")
-        try:
-            out = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, text=True)
-            self.log.append(f"<span style='color:#00ff00'>{out.strip()}</span>")
-        except subprocess.CalledProcessError as e:
-            self.log.append(f"<span style='color:#ff4444'>ERREUR: {e.output.strip()}</span>")
+        """Lance cmd en arrière-plan (jamais bloquant)."""
+        self._run_async(cmd)
 
     def _run_async(self, cmd):
-        self.log.append(f"<span style='color:#ff6600'>$ {cmd}</span>")
+        self.log_signal.emit(f"<span style='color:#ff6600'>$ {cmd}</span>")
         def _worker():
             try:
-                out = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, text=True)
-                self.log.append(f"<span style='color:#00ff00'>{out.strip()[:2000]}</span>")
+                out = subprocess.check_output(
+                    cmd, shell=True, stderr=subprocess.STDOUT, text=True, timeout=30)
+                self.log_signal.emit(
+                    f"<span style='color:#00ff00'>{out.strip()[:3000]}</span>")
+            except subprocess.TimeoutExpired:
+                self.log_signal.emit(
+                    "<span style='color:#ffaa00'>⚠ Timeout (30s)</span>")
             except subprocess.CalledProcessError as e:
-                self.log.append(f"<span style='color:#ff4444'>ERREUR: {(e.output or '').strip()[:2000]}</span>")
+                self.log_signal.emit(
+                    f"<span style='color:#ff4444'>ERREUR: {(e.output or '').strip()[:2000]}</span>")
         threading.Thread(target=_worker, daemon=True).start()
 
     def _refresh_claw_status(self):
