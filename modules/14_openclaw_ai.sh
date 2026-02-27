@@ -49,17 +49,42 @@ sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm run build" || true
 echo -e "    ${GRAY}├─ Création du service d'arrière-plan système...${NC}"
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/systemd/user"
 
-cat <<SRV_EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.config/systemd/user/openclaw.service" >/dev/null
+# Créer un script wrapper pour garantir le bon environnement au démarrage
+cat <<'WRP_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/start-gateway.sh" > /dev/null
+#!/bin/bash
+# Wrapper OpenClaw Gateway — charge l'environnement utilisateur complet
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/.local/bin:$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node/ 2>/dev/null | tail -1)/bin"
+export HOME="${HOME:-/home/$(whoami)}"
+
+cd "$HOME/OpenClaw" || exit 1
+
+# Vérifier que node est accessible
+if command -v node &>/dev/null; then
+    exec node scripts/run-node.mjs gateway
+elif command -v pnpm &>/dev/null; then
+    exec pnpm run start gateway
+else
+    echo "ERROR: node/pnpm not found in PATH: $PATH" >&2
+    exit 1
+fi
+WRP_EOF
+sudo -u "$REAL_USER" chmod +x "$OC_DIR/start-gateway.sh"
+
+cat <<SRV_EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.config/systemd/user/openclaw.service" > /dev/null
 [Unit]
 Description=OpenClaw AI Gateway Service
-After=network.target
+After=network.target graphical-session.target
+Wants=graphical-session.target
 
 [Service]
 Type=simple
 WorkingDirectory=$OC_DIR
-ExecStart=/usr/bin/env node scripts/run-node.mjs gateway
+ExecStartPre=/bin/sleep 10
+ExecStart=$OC_DIR/start-gateway.sh
 Restart=on-failure
-RestartSec=5
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=default.target
