@@ -212,26 +212,144 @@
             seule. Si un module échoue, l'orchestrateur gère l'erreur (via <code>set -e</code> trappé), enregistre la
             trace dans <code>/tmp/mados_install.log</code>, et vous en informe.</p>
 
-        <div class="grid">
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
             <div class="module-card">
-                <h4>01_systeme_base.sh</h4>
-                <p>Noyau de l'OS. Installation de Xorg, sddm, et conversion de la timezone système (Asia/Seoul >
-                    Europe/Paris by default).</p>
+                <h4>00_nettoyage_ubuntu.sh</h4>
+                <p>Purge agressive des daemons inutiles (Snapd, Télémetrie, AppArmor) pour libérer la RAM initiale.</p>
+            </div>
+            <div class="module-card">
+                <h4>01_noyau_xanmod.sh</h4>
+                <p>Compilation et injection du Kernel Linux Custom XanMod Edge (Performances et latences extrêmes).</p>
             </div>
             <div class="module-card">
                 <h4>02_pilotes_gpu_auto.sh</h4>
-                <p>Détection Hardware Intelligente via <code>ubuntu-drivers autoinstall</code> pour forger le driver
-                    NVIDIA/Radeon parfait pour votre puce.</p>
+                <p>Détection matérielle IA : installe les pilotes propriétaires NVIDIA (550+) ou Open-Source Mesa
+                    (Radeon).</p>
+            </div>
+            <div class="module-card">
+                <h4>03_integration_rog.sh</h4>
+                <p>Installation des outils exclusifs ASUS ROG (asusctl, supergfxctl, rog-control-center) pour le
+                    pilotage matériel.</p>
+            </div>
+            <div class="module-card">
+                <h4>04_arsenal_logiciel.sh</h4>
+                <p>Déploiement massif en parallèle des utilitaires indispensables (VLC, Discord, GParted, Htop,
+                    FileZilla).</p>
             </div>
             <div class="module-card">
                 <h4>05_bureau_kde_plasma.sh</h4>
-                <p>La magie graphique. Installe <code>kde-plasma-desktop</code> et configure le Wayland display server.
+                <p>Déploiement du serveur d'affichage Wayland et de l'environnement de bureau ultra-léger KDE Plasma
+                    (V6+).</p>
+            </div>
+            <div class="module-card">
+                <h4>06_thematique_mados.sh</h4>
+                <p>Injection du thème Cyberpunk (Couleurs, icônes, polices, fonds d'écran dynamiques et SDDM
+                    personnalisé).</p>
+            </div>
+            <div class="module-card">
+                <h4>07_snapshots_systeme.sh</h4>
+                <p>Configuration de Timeshift sur système de fichiers BTRFS. Archéologie temporelle (Restauration OS).
                 </p>
             </div>
             <div class="module-card">
+                <h4>08_proton_gamescope.sh</h4>
+                <p>Mode Jeu. Déploiement de Valve Proton-GE, librairies Vulkan, Feral GameMode et compositing GameScope.
+                </p>
+            </div>
+            <div class="module-card">
+                <h4>09_montage_ntfs.sh</h4>
+                <p>Compatibilité inter-OS en déverrouillant l'écriture/lecture universelle sur les partitions Windows
+                    (NTFS-3g).</p>
+            </div>
+            <div class="module-card">
+                <h4>10_son_demarrage.sh</h4>
+                <p>Injection d'un effet sonore spatial (Startup Sound) mp3 lors de l'arrivée sur l'écran de verrouillage
+                    SDDM.</p>
+            </div>
+            <div class="module-card">
+                <h4>11_batterie_extreme.sh</h4>
+                <p>Déverrouillage des limiteurs matériels de charge ASUS pour stopper la charge pure à 60% ou 80%
+                    (préservation).</p>
+            </div>
+            <div class="module-card">
+                <h4>12_mangohud_rog.sh</h4>
+                <p>Installation de MangoHud et GOverlay. Affiche un compteur de FPS, Températures et FrameTime sur les
+                    jeux MESA/Vulkan.</p>
+            </div>
+            <div class="module-card">
+                <h4>13_pack_streamer.sh</h4>
+                <p>Outils de diffusion pour les créateurs : OBS Studio, Plugins d'encodage NVENC et outils de capture
+                    d'écran bas-niveau.</p>
+            </div>
+            <div class="module-card">
+                <h4>14_openclaw_ai.sh</h4>
+                <p>Le co-pilote IA. Un script Python génératif permettant de diagnostiquer votre Bash OS via une
+                    interface terminal fluide.</p>
+            </div>
+            <div class="module-card">
+                <h4>15_reseau_antilag.sh</h4>
+                <p>Modification de l'algorithme TCP vers BBR (Bottleneck Bandwidth and RTT) : réduction drastique de la
+                    latence (Ping).</p>
+            </div>
+            <div class="module-card">
+                <h4>16_zram_memoire.sh</h4>
+                <p>Compression de la RAM à la volée (ZSTD Algorithm) pour doubler techniquement la capacité matérielle
+                    de l'ordinateur.</p>
+            </div>
+            <div class="module-card">
+                <h4>17_bouclier_antipub.sh</h4>
+                <p>Modification agressive du fichier `/etc/hosts` pour bloquer 99% des trackers et des publicités
+                    directement au niveau de l'IP.</p>
+            </div>
+            <div class="module-card">
+                <h4>18_pack_pro_dev.sh</h4>
+                <p>Déploiement des outils logiciels pour les développeurs (Visual Studio Code Microsoft, Git, Node.js,
+                    Python3 pip).</p>
+            </div>
+            <div class="module-card">
+                <h4>19_donnees_fstrim.sh</h4>
+                <p>Optimisation hardware des disques SSD/NVMe via l'activation globale asynchrone des protocoles FSTRIM
+                    Linux automatiques.</p>
+            </div>
+            <div class="module-card">
+                <h4>20_esport_usb_1000hz.sh</h4>
+                <p>Injection Kernel : Overclocking matériel des ports USB pour forcer le Polling Rate natif des souris
+                    gaming à 1000 Hz constants.</p>
+            </div>
+            <div class="module-card">
+                <h4>21_boot_eclair.sh</h4>
+                <p>Génération du "Fast Boot" absolu. Suppression des Countdowns du bootloader GRUB et accélération du
+                    temps de démarrage EFI.</p>
+            </div>
+            <div class="module-card">
                 <h4>22_cpu_undervolt.sh</h4>
-                <p>Ingénierie matérielle bas-niveau pour les CPU Intel/AMD, manipulant les registres de tension pour
-                    réduire la température de 15%. (RyzenAdj).</p>
+                <p>Modification direct des courbes CPU pour abaisser les tensions via RyzenAdj/Intel-tools (Perte de
+                    température sans perte de Clock).</p>
+            </div>
+            <div class="module-card">
+                <h4>23_control_center.sh</h4>
+                <p>Appli PyQt6 "MadOS Control" offrant la MasterClass GUI pour tout piloter au clic depuis le bureau
+                    visuel (Aura Sync, MàJ, etc).</p>
+            </div>
+            <div class="module-card">
+                <h4>24_mados_update.sh</h4>
+                <p>Déploiement de l'utilitaire de mise à jour autonome de MadOS pour intégrer les scripts distants de la
+                    branche GitHub 'main'.</p>
+            </div>
+            <div class="module-card">
+                <h4>25_sante_systeme.sh</h4>
+                <p>Script bash de diagnostic en terminal profond (Températures de la carte mère, fréquences en temps
+                    réel, capteurs lm-sensors).</p>
+            </div>
+            <div class="module-card">
+                <h4>26_vr_oculus_quest.sh</h4>
+                <p>Injection de bout en bout du driver ALVR (Air Link VR) et du serveur ADB-tools pour jouer en VR
+                    sans-fil sous Linux.</p>
+            </div>
+            <div class="module-card" style="border-left: 3px solid var(--rog-red);">
+                <h4>format_scripts.py</h4>
+                <p>Nettoyeur local de sauts de lignes Microsoft (CRLF -> LF) pour garantir une exécution parfaite, même
+                    si modifié via Bloc-Notes.</p>
             </div>
         </div>
 
@@ -239,7 +357,8 @@
         <p>Les variables globales (comme le nom de l'utilisateur <code>$REAL_USER</code> ou le chemin
             <code>$USER_HOME</code>) sont passées dynamiquement de l'orchestrateur vers les modules <code>.sh</code> en
             tant qu'arguments (via <code>$1</code>). Cela sécurise les droits d'écriture et empêche un module de polluer
-            l'espace Root s'il n'en a pas besoin.</p>
+            l'espace Root s'il n'en a pas besoin.
+        </p>
 
         <h3>Exemple de mécanique de lancement isolé :</h3>
         <div class="code-block">
@@ -253,7 +372,8 @@
             dangereux retours chariots Windows (<code>\r\n</code> en <code>\n</code>). Cela garantit que le script MadOS
             ne plantera <b>jamais</b>, même si l'utilisateur l'a édité depuis un Bloc-Notes Microsoft.</p>
         <p>L'optimisation des temps de réponse et du nettoyage de l'OS est quant à elle déléguée à
-            <code>00_nettoyage_ubuntu.sh</code>, qui désactive violemment les daemons de télémétrie Snap Canonical.</p>
+            <code>00_nettoyage_ubuntu.sh</code>, qui désactive violemment les daemons de télémétrie Snap Canonical.
+        </p>
 
         <h2>🛡️ 5. L'Intelligence "OpenClaw AI"</h2>
         <p>Le système n'est plus un simple script. Il englobe une instance locale d'intelligence artificielle légère,
