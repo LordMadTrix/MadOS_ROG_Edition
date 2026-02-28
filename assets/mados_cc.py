@@ -13,6 +13,14 @@ class Worker(QObject):
 
 class MadOSControlCenter(QMainWindow):
     log_signal = pyqtSignal(str)  # Thread-safe log updates
+    def _make_scrollable(self, w):
+        from PyQt6.QtWidgets import QScrollArea
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(w)
+        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; } QScrollBar:vertical { background: #1a1a1a; width: 12px; } QScrollBar::handle:vertical { background: #444; min-height: 20px; border-radius: 6px; } QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }")
+        return scroll
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("MadOS ROG Edition — Centre de Contrôle")
@@ -55,12 +63,12 @@ class MadOSControlCenter(QMainWindow):
         root.addWidget(self.log)
 
         # Build tabs
-        self.tabs.addTab(self._tab_perf(),   "⚡  Performance")
-        self.tabs.addTab(self._tab_ai(),     "🤖  OpenClaw IA")
-        self.tabs.addTab(self._tab_sys(),    "🧹  Système")
-        self.tabs.addTab(self._tab_diag(),   "🏥  Diagnostic")
-        self.tabs.addTab(self._tab_update(), "🔄  Mise à jour")
-        self.tabs.addTab(self._tab_vr(),     "🥽  VR & Casque")
+        self.tabs.addTab(self._make_scrollable(self._tab_perf()),   "⚡  Performance")
+        self.tabs.addTab(self._make_scrollable(self._tab_ai()),     "🤖  OpenClaw IA")
+        self.tabs.addTab(self._make_scrollable(self._tab_sys()),    "🧹  Système")
+        self.tabs.addTab(self._make_scrollable(self._tab_diag()),   "🏥  Diagnostic")
+        self.tabs.addTab(self._make_scrollable(self._tab_update()), "🔄  Mise à jour")
+        self.tabs.addTab(self._make_scrollable(self._tab_vr()),     "🥽  VR & Casque")
 
         self.log_signal.connect(self._append_log)
 
