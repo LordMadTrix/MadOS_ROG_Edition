@@ -160,6 +160,17 @@ installation_totale() {
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
+    # Menu Overclocking si le module est coché
+    if [[ "$CHOIX_BONUS" == *"VOLT"* ]]; then
+        export MADOS_TDP_PROFILE=$(whiptail --title "Surcadençage & Profils Thermiques" --radiolist "Sélectionnez le comportement énergétique de votre processeur (TDP/Chauffe) :" 18 75 4 \
+            "SILENCE" "Bridage 25W - Autonomie & Calme Absolu" OFF \
+            "EQUILIBRE" "Stock 45W - Performances d'Usine (Défaut)" ON \
+            "EXTREME" "Débridage 65W - E-Sport & FPS Maximum" OFF 3>&1 1>&2 2>&3)
+        if [ $? -ne 0 ]; then menu_principal; return; fi
+    else
+        export MADOS_TDP_PROFILE="EQUILIBRE"
+    fi
+
     clear
     echo -e "${RED}⚠️  DÉPLOIEMENT TOTAL ENGAGÉ ⚠️${NC}"
     echo -e "${GRAY}Le système va configurer automatiquement votre ROG...${NC}\n"
@@ -232,6 +243,16 @@ installation_custom() {
         "26_vr"  "Casque VR (Meta Quest)" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
+
+    if [[ "$CHOIX_ALL" == *"22_cpu"* ]]; then
+        export MADOS_TDP_PROFILE=$(whiptail --title "Surcadençage & Profils Thermiques" --radiolist "Sélectionnez le comportement énergétique de votre processeur (TDP/Chauffe) :" 18 75 4 \
+            "SILENCE" "Bridage 25W - Autonomie & Calme Absolu" OFF \
+            "EQUILIBRE" "Stock 45W - Performances d'Usine (Défaut)" ON \
+            "EXTREME" "Débridage 65W - E-Sport & FPS Maximum" OFF 3>&1 1>&2 2>&3)
+        if [ $? -ne 0 ]; then menu_principal; return; fi
+    else
+        export MADOS_TDP_PROFILE="EQUILIBRE"
+    fi
 
     clear
     echo -e "${RED}Début du protocole custom...${NC}\n"
