@@ -9,7 +9,7 @@
   [![Ubuntu](https://img.shields.io/badge/OS-Ubuntu_24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
   [![KDE Plasma](https://img.shields.io/badge/Desktop-KDE_Plasma_6-1D99F3?style=for-the-badge&logo=kde&logoColor=white)](https://kde.org/)
 
-  [![Version](https://img.shields.io/badge/Version-2.4-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
+  [![Version](https://img.shields.io/badge/Version-2.8-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
   <p align="center">
@@ -95,6 +95,9 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `21_boot_eclair.sh`      | ⚡ Compression _Initramfs_ `lz4` ultra-rapide et camouflage des textes GRUB. |
 | `22_cpu_undervolt.sh`    | 🌡️ Undervolting CPU automatique pour réduire les températures. |
 | `23_control_center.sh`   | 🖥️ Centre de contrôle MadOS avec dashboard système et raccourcis rapides. |
+| `24_mados_update.sh`     | 🔄 Système de mise à jour automatique "One-Click" depuis GitHub. |
+| `25_sante_systeme.sh`    | 🏥 Diagnostic complet de santé, de sécurité et d'intégrité de l'OS. |
+| `26_vr_oculus_quest.sh`  | 🥽 Intégration VR native (SideQuest, ALVR PCVR, ADB/Udev Quest 3). |
 
 ---
 
