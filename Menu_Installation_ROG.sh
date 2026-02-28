@@ -52,21 +52,21 @@ export NC='\033[0m'
 export BOLD='\033[1m'
 
 export NEWT_COLORS='
-    root=white,black
+    root=,black
     window=white,black
     border=red,black
     shadow=black,black
-    title=black,red
+    title=white,red
     button=white,black
-    actbutton=black,red
+    actbutton=white,red
     compactbutton=white,black
     textbox=white,black
     listbox=white,black
-    actlistbox=black,red
+    actlistbox=white,red
     sellistbox=white,black
-    actsellistbox=black,red
+    actsellistbox=white,red
     checkbox=white,black
-    actcheckbox=black,red
+    actcheckbox=white,red
 '
 
 run_module() {
@@ -75,7 +75,7 @@ run_module() {
     
     while true; do
         echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════╗${NC}"
-        echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Exécution : ${SCRIPT}${NC}"
+        echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Injection : ${SCRIPT}${NC}"
         echo -e "${RED}║${NC} 📌 ${GRAY}${DESCRIPTION}${NC}"
         echo -e "${RED}╚══════════════════════════════════════════════════════════════════╝${NC}\n"
         
@@ -110,15 +110,16 @@ menu_principal() {
     echo "  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║"
     echo "  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║"
     echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝"
-    echo -e "${NC}${WHITE}${BOLD}         --- INSTALLATEUR ROG EDITION ---${NC}\n"
+    echo -e "${NC}${WHITE}${BOLD}         --- CŒUR MATRICIEL ROG EDITION ---${NC}\n"
 
     local CHOIX
-    CHOIX=$(whiptail --title "MadOS ROG Edition (v2.7) - Menu Principal" \
-        --cancel-button "Quitter" \
-        --menu "Choisissez votre mode d'installation :" 16 72 3 \
-        "1" "Deploiement Total (Recommande)" \
-        "2" "Deploiement Personnalise (Experts)" \
-        "3" "Mode Destruction (Purge Ubuntu)" 3>&1 1>&2 2>&3)
+    CHOIX=$(whiptail --title "⚡ MadOS ROG Edition (v3.0) ⚡" \
+        --cancel-button "Annuler l'Injection" \
+        --ok-button "Engager" \
+        --menu "Sélectionnez le protocole de déploiement matriciel :" 16 75 3 \
+        "1" "Déploiement Total (Expérience E-Sport ROG Optimisée)" \
+        "2" "Déploiement Custom (Ingénieurs et Experts Uniquement)" \
+        "3" "Protocole Destruction (Purge Radicale Canonical)" 3>&1 1>&2 2>&3)
     
     if [ $? -eq 0 ]; then
         case $CHOIX in
