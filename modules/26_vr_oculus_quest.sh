@@ -43,11 +43,12 @@ sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR
 echo -e "\n${BLUE}[+] Installation de SideQuest (Sideloading & Gestion Casque)...${NC}"
 SQ_PATH="/opt/MadOS_VR/SideQuest-X11.tar.xz"
 echo -e "    ${GRAY}├─ Téléchargement de la dernière version de SideQuest...${NC}"
-# On parse directement la page HTML pour éviter la limite d'API GitHub (60 requêtes/heure)
-SQ_LATEST_REF=$(curl -sL "https://github.com/SideQuestVR/SideQuest/releases/latest" | grep -Eo 'href="[^"]*SideQuest-[0-9.]*\.tar\.xz"' | head -n 1 | cut -d'"' -f2)
-SQ_LATEST_URL="https://github.com${SQ_LATEST_REF}"
+# Méthode robuste: on demande le lien de redirection de la page "latest" (pas de limite d'API)
+SQ_LATEST_TAG=$(curl -sS -o /dev/null -w "%{url_effective}" -I -L https://github.com/SideQuestVR/SideQuest/releases/latest | awk -F'/' '{print $NF}')
+SQ_NUM_VERSION=${SQ_LATEST_TAG#v}
+SQ_LATEST_URL="https://github.com/SideQuestVR/SideQuest/releases/download/${SQ_LATEST_TAG}/SideQuest-${SQ_NUM_VERSION}.tar.xz"
 
-if [ -n "$SQ_LATEST_REF" ]; then
+if [ -n "$SQ_LATEST_TAG" ]; then
     wget -qO "$SQ_PATH" "$SQ_LATEST_URL"
     echo -e "    ${GRAY}├─ Extraction de SideQuest dans /opt/MadOS_VR/SideQuest...${NC}"
     sudo rm -rf /opt/MadOS_VR/SideQuest
@@ -76,10 +77,10 @@ fi
 echo -e "\n${BLUE}[+] Installation de ALVR (Streaming PCVR Sans Fils)...${NC}"
 ALVR_PATH="/opt/MadOS_VR/alvr_launcher_linux.tar.gz"
 echo -e "    ${GRAY}├─ Téléchargement de la dernière version de ALVR...${NC}"
-ALVR_LATEST_REF=$(curl -sL "https://github.com/alvr-org/ALVR/releases/latest" | grep -Eo 'href="[^"]*alvr_launcher_linux\.tar\.gz"' | head -n 1 | cut -d'"' -f2)
-ALVR_LATEST_URL="https://github.com${ALVR_LATEST_REF}"
+ALVR_LATEST_TAG=$(curl -sS -o /dev/null -w "%{url_effective}" -I -L https://github.com/alvr-org/ALVR/releases/latest | awk -F'/' '{print $NF}')
+ALVR_LATEST_URL="https://github.com/alvr-org/ALVR/releases/download/${ALVR_LATEST_TAG}/alvr_launcher_linux.tar.gz"
 
-if [ -n "$ALVR_LATEST_REF" ]; then
+if [ -n "$ALVR_LATEST_TAG" ]; then
     wget -qO "$ALVR_PATH" "$ALVR_LATEST_URL"
     echo -e "    ${GRAY}├─ Extraction de ALVR dans /opt/MadOS_VR/ALVR...${NC}"
     sudo rm -rf /opt/MadOS_VR/ALVR
