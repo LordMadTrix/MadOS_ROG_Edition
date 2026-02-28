@@ -266,6 +266,19 @@ class MadOSControlCenter(QMainWindow):
         h_oai.addWidget(btn_oai)
         lay.addLayout(h_oai)
         
+        # Gemini
+        h_gem = QHBoxLayout()
+        self.gem_input = QLineEdit()
+        self.gem_input.setPlaceholderText("Clé API Google Gemini (AIza...)")
+        self.gem_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        self.gem_input.setStyleSheet("background:#1a1a1a; color:#fff; padding:6px; border:1px solid #333; border-radius:4px;")
+        btn_gem = QPushButton("💾 Sauvegarder")
+        btn_gem.setStyleSheet("background:#388e3c; color:#fff; padding:6px 16px; font-weight:bold; border:none; border-radius:4px;")
+        btn_gem.clicked.connect(lambda: self._save_api_key("GEMINI_API_KEY", self.gem_input))
+        h_gem.addWidget(self.gem_input)
+        h_gem.addWidget(btn_gem)
+        lay.addLayout(h_gem)
+        
         lay.addWidget(self._separator())
         # ------------------------------
 
