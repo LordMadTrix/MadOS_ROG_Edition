@@ -46,8 +46,10 @@ if command -v plasmashell &>/dev/null; then
     echo "Plasma : $PLASMA_VER" >> "$REPORT_FILE"
     if echo "$PLASMA_VER" | grep -q "^6\." ; then
         check_ok "KDE Plasma 6 installé (v$PLASMA_VER)"
+    elif echo "$PLASMA_VER" | grep -q "^5\." ; then
+        check_ok "KDE Plasma 5 installé (v$PLASMA_VER)"
     else
-        check_warn "KDE Plasma installé mais version ancienne (v$PLASMA_VER)"
+        check_warn "KDE Plasma installé mais version inattendue (v$PLASMA_VER)"
     fi
 else
     check_fail "KDE Plasma non détecté"
