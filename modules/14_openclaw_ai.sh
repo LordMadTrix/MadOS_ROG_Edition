@@ -120,8 +120,8 @@ while true; do
     1)
       if systemctl --user is-active --quiet openclaw.service; then
         echo -e "\n${BLUE}[+] Ouverture automatique de l'interface OpenClaw via le navigateur...${NC}"
-        # Parse securely without capturing invisible ANSI codes from journalctl
-        TOKEN_URL=$(journalctl --user -u openclaw.service --no-pager | grep 'Dashboard URL' | tail -n 1 | grep -oE 'https?://[a-zA-Z0-9./?=&_-]+')
+        # Parse securely without capturing invisible ANSI codes from journalctl, explicitly looking for the token URL
+        TOKEN_URL=$(journalctl --user -u openclaw.service --no-pager | grep '?token=' | tail -n 1 | grep -oE 'https?://[a-zA-Z0-9./?=&_-]+')
         if [ -n "$TOKEN_URL" ]; then
           google-chrome --app="$TOKEN_URL" 2>/dev/null || xdg-open "$TOKEN_URL"
         else
