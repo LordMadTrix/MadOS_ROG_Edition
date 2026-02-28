@@ -3,7 +3,7 @@ import subprocess
 import threading
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QTabWidget, 
-                             QMessageBox, QTextEdit, QProgressBar, QFrame)
+                             QMessageBox, QTextEdit, QProgressBar, QFrame, QLineEdit)
 from PyQt6.QtGui import QFont, QColor, QPalette
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject
 
@@ -238,12 +238,73 @@ class MadOSControlCenter(QMainWindow):
                                 "x-terminal-emulator -e bash -c 'cd ~/OpenClaw && node scripts/run-node.mjs tui; read'",
                                 "#005599"))
         lay.addWidget(self._separator())
+        
+        # --- CONFIGURATION CLÉS API ---
+        lay.addWidget(self._label("CONFIGURATION CLÉS API (Modèles LLM)"))
+        
+        h_ant = QHBoxLayout()
+        self.ant_input = QLineEdit()
+        self.ant_input.setPlaceholderText("Clé API Anthropic (sk-ant-...)")
+        self.ant_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        self.ant_input.setStyleSheet("background:#1a1a1a; color:#fff; padding:6px; border:1px solid #333; border-radius:4px;")
+        btn_ant = QPushButton("💾 Sauvegarder")
+        btn_ant.setStyleSheet("background:#388e3c; color:#fff; padding:6px 16px; font-weight:bold; border:none; border-radius:4px;")
+        btn_ant.clicked.connect(lambda: self._save_api_key("ANTHROPIC_API_KEY", self.ant_input))
+        h_ant.addWidget(self.ant_input)
+        h_ant.addWidget(btn_ant)
+        lay.addLayout(h_ant)
+        
+        h_oai = QHBoxLayout()
+        self.oai_input = QLineEdit()
+        self.oai_input.setPlaceholderText("Clé API OpenAI (sk-proj-...)")
+        self.oai_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        self.oai_input.setStyleSheet("background:#1a1a1a; color:#fff; padding:6px; border:1px solid #333; border-radius:4px;")
+        btn_oai = QPushButton("💾 Sauvegarder")
+        btn_oai.setStyleSheet("background:#388e3c; color:#fff; padding:6px 16px; font-weight:bold; border:none; border-radius:4px;")
+        btn_oai.clicked.connect(lambda: self._save_api_key("OPENAI_API_KEY", self.oai_input))
+        h_oai.addWidget(self.oai_input)
+        h_oai.addWidget(btn_oai)
+        lay.addLayout(h_oai)
+        
+        lay.addWidget(self._separator())
+        # ------------------------------
+
         lay.addWidget(self._label("DIAGNOSTIC SERVICE"))
         lay.addWidget(self._btn("📋  Voir les logs du service",
                                 "journalctl --user -u openclaw.service -n 40 --no-pager", "#333",
                                 async_run=True))
         lay.addStretch()
         return w
+
+    def _save_api_key(self, env_var_name, input_widget):
+        import os
+        key = input_widget.text().strip()
+        if not key:
+            self.log_signal.emit(f"<span style='color:#ffaa00'>⚠ La clé pour {env_var_name} est vide. Action ignorée.</span>")
+            return
+            
+        env_file = os.path.expanduser("~/OpenClaw/.env")
+        try:
+            lines = []
+            if os.path.exists(env_file):
+                with open(env_file, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+            
+            # Nettoyer l'ancienne clé si elle existe
+            new_lines = [l for l in lines if not l.startswith(f"{env_var_name}=")]
+            new_lines.append(f"{env_var_name}={key}\n")
+            
+            with open(env_file, "w", encoding="utf-8") as f:
+                f.writelines(new_lines)
+                
+            input_widget.clear()
+            self.log_signal.emit(f"<span style='color:#00ff88'>✅ Paramètre {env_var_name} sauvegardé avec succès dans OpenClaw/.env !</br>Le moteur IA va redémarrer pour appliquer la clé...</span>")
+            
+            # Application de la nouvelle configuration
+            self._run_async("systemctl --user restart openclaw.service")
+            
+        except Exception as e:
+            self.log_signal.emit(f"<span style='color:#ff4444'>❌ Erreur de sauvegarde de la clé API : {e}</span>")
 
     # ── Onglet Système ────────────────────────────────────────────────────────
     def _tab_sys(self):
