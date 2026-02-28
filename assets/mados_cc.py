@@ -220,7 +220,20 @@ class MadOSControlCenter(QMainWindow):
                                 "#005599"))
         lay.addWidget(self._separator())
 
-        lay.addWidget(self._label("PROFIL CPU / BATTERIE (asusctl)"))
+        lay.addWidget(self._label("ÉCLAIRAGE CLAVIER (AURA SYNC)"))
+        lay.addWidget(self._btn("🌈  Mode Rainbow (Arc-en-ciel)", "asusctl led-mode rainbow", "#2e7d32"))
+        lay.addWidget(self._btn("💓  Mode Pulse (Respiration)", "asusctl led-mode pulse", "#b8690a"))
+        lay.addWidget(self._btn("🔴  Mode Statique (Rouge ROG)", "asusctl led-mode static -c ff0000", "#cc0000"))
+        lay.addWidget(self._btn("🌑  Éteindre les LEDs clavier", "asusctl led-mode static -c 000000", "#333"))
+        lay.addWidget(self._separator())
+
+        lay.addWidget(self._label("PRÉSERVATION DE LA BATTERIE (asusctl)"))
+        lay.addWidget(self._btn("🔋  Limiter la charge à 60% (Longévité Maximum)", "asusctl -c 60", "#2e7d32"))
+        lay.addWidget(self._btn("🔌  Limiter la charge à 80% (Équilibré)", "asusctl -c 80", "#b8690a"))
+        lay.addWidget(self._btn("⚡  Autoriser Charge Complète 100% (Déplacement)", "asusctl -c 100", "#cc0000"))
+        lay.addWidget(self._separator())
+
+        lay.addWidget(self._label("PROFIL CPU (asusctl)"))
         lay.addWidget(self._btn("🔇  Mode Silencieux (autonomie max)", "asusctl profile -P Quiet", "#2e7d32"))
         lay.addWidget(self._btn("⚖️  Mode Équilibré", "asusctl profile -P Balanced", "#b8690a"))
         lay.addWidget(self._btn("🔥  Mode Turbo Performance (GAMING)", "asusctl profile -P Performance"))
@@ -370,6 +383,8 @@ class MadOSControlCenter(QMainWindow):
         lay.addWidget(self._label("NETTOYAGE"))
         lay.addWidget(self._btn("🧹  Nettoyer paquets inutiles (autoremove)",
                                 "x-terminal-emulator -e bash -c 'sudo apt autoremove -y; read'"))
+        lay.addWidget(self._btn("☢️  Nettoyage Extrême (Deep Clean Cache & Logs)",
+                                "x-terminal-emulator -e bash -c 'sudo apt clean -y && flatpak uninstall --unused -y && sudo journalctl --vacuum-size=50M && rm -rf ~/.cache/thumbnails/*; echo \"Nettoyage Extrême Terminé !\"; read'", "#cc0000"))
         lay.addStretch()
         return w
 
@@ -383,6 +398,8 @@ class MadOSControlCenter(QMainWindow):
                                 "&& konsole -e bash /tmp/mados_diag.sh 2>/dev/null "
                                 "|| xterm -e bash /tmp/mados_diag.sh",
                                 "#005599", async_run=True))
+        lay.addWidget(self._btn("🔥  Banc d'Essai Thermique CPU (Stress Test s-tui)",
+                                "if ! command -v s-tui &> /dev/null; then x-terminal-emulator -e sudo apt install -y s-tui; fi && x-terminal-emulator -e s-tui", "#cc0000"))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("INFORMATIONS SYSTÈME"))
         lay.addWidget(self._btn("🐧  Version du Kernel", "uname -r", "#333", async_run=True))
