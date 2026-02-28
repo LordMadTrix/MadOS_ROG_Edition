@@ -119,7 +119,12 @@ while true; do
   case $CHOICE in
     1)
       if systemctl --user is-active --quiet openclaw.service; then
-        google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
+        TOKEN_URL=$(journalctl --user -u openclaw.service | grep 'Dashboard URL' | tail -n 1 | grep -o 'http.*')
+        if [ -n "$TOKEN_URL" ]; then
+          google-chrome --app="$TOKEN_URL" 2>/dev/null || xdg-open "$TOKEN_URL"
+        else
+          google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
+        fi
       else
         whiptail --msgbox "⚠️ Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 60
       fi

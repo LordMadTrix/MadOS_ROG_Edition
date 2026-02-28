@@ -152,7 +152,15 @@ class MadOSControlCenter(QMainWindow):
         r = subprocess.run("systemctl --user is-active openclaw.service",
                            shell=True, capture_output=True, text=True)
         if r.stdout.strip() == "active":
-            subprocess.Popen(["xdg-open", "http://localhost:18789"])
+            log_query = subprocess.run(
+                "journalctl --user -u openclaw.service | grep 'Dashboard URL' | tail -n 1",
+                shell=True, capture_output=True, text=True
+            )
+            url_line = log_query.stdout.strip()
+            url = "http://localhost:18789"
+            if "http://" in url_line:
+                url = "http" + url_line.split("http")[1]
+            subprocess.Popen(["xdg-open", url])
         else:
             self.log_signal.emit(
                 "<span style='color:#ffaa00'>⚠ OpenClaw est arrêté. Démarrez le moteur d'abord (bouton vert).</span>")
