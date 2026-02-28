@@ -550,6 +550,118 @@
         </div>
     </section>
 
+    <!-- TUTORIAL SECTION -->
+    <section class="section" id="tutorial"
+        style="background: rgba(20, 20, 20, 0.5); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <div class="section-header">
+            <div class="section-tag">// Guide de Déploiement</div>
+            <h2 class="section-title">Installation de A à Z</h2>
+            <p style="color:var(--text-dim); font-size:1.1rem; max-width:800px; margin:1rem auto 0; line-height:1.6;">
+                MadOS ROG Edition a été minutieusement conçu pour s'installer sur une base <strong>Ubuntu Server 24.04
+                    LTS</strong> vierge. Voici pourquoi et comment procéder.
+            </p>
+        </div>
+
+        <div style="max-width:1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+
+            <div
+                style="background: var(--rog-panel); border: 1px solid var(--rog-border); border-radius: 8px; padding: 2.5rem; box-shadow: 0 0 30px rgba(232,0,61,0.05);">
+                <h3
+                    style="font-family:'Orbitron',sans-serif; color:var(--cyan); margin-bottom: 1rem; font-size:1.6rem; text-transform:uppercase; letter-spacing:0.05em;">
+                    ❓ Pourquoi Ubuntu Server et non Desktop ?</h3>
+                <p style="color:var(--text-dim); line-height: 1.8; font-size:1.05rem; margin-bottom: 1rem;">
+                    Bien que MadOS fonctionne techniquement sur Ubuntu Desktop, <strong>Ubuntu Server est vivement
+                        recommandé</strong>. La version "Desktop" de Canonical vient chargée de centaines de paquets
+                    inutiles (Snapd intrusif, télémétrie, processus GNOME tournant en arrière-plan).
+                </p>
+                <p style="color:var(--text-dim); line-height: 1.8; font-size:1.05rem;">
+                    En partant d'une base Ubuntu Server, nous garantissons un système <strong>100% pur</strong>. MadOS
+                    va bâtir sa propre surcouche graphique (KDE Plasma 6 ultra-personnalisé) à partir du néant absolu.
+                    Résultat ? Une RAM divisée par deux au repos, zéro bloatware, une latence réduite et une fluidité
+                    absolue en jeu !
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+
+                <div
+                    style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 2rem; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top:-10px; right:-10px; font-family:'Orbitron',sans-serif; font-size:8rem; color:rgba(255,255,255,0.03); font-weight:900; line-height:1;">
+                        1</div>
+                    <div
+                        style="font-family:'Orbitron',sans-serif; color:white; font-size: 1.2rem; margin-bottom: 1rem; font-weight:700;">
+                        Préparation Média</div>
+                    <ul
+                        style="color:var(--text-dim); line-height: 1.7; font-size:0.95rem; padding-left: 1.2rem; position: relative; z-index: 2;">
+                        <li>Téléchargez l'ISO officielle <a href="https://ubuntu.com/download/server" target="_blank"
+                                style="color:var(--rog-red); text-decoration:none; font-weight:600;">Ubuntu Server 24.04
+                                LTS</a>.</li>
+                        <li>Flashez-la sur une clé USB avec un outil comme Rufus, BalenaEtcher ou Ventoy.</li>
+                        <li>Démarrez votre ASUS ROG sur cette clé USB (touche <code>Echap</code> ou <code>F8</code> au
+                            logo ASUS).</li>
+                    </ul>
+                </div>
+
+                <div
+                    style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 2rem; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top:-10px; right:-10px; font-family:'Orbitron',sans-serif; font-size:8rem; color:rgba(255,255,255,0.03); font-weight:900; line-height:1;">
+                        2</div>
+                    <div
+                        style="font-family:'Orbitron',sans-serif; color:white; font-size: 1.2rem; margin-bottom: 1rem; font-weight:700;">
+                        OS Serveur Basique</div>
+                    <ul
+                        style="color:var(--text-dim); line-height: 1.7; font-size:0.95rem; padding-left: 1.2rem; position: relative; z-index: 2;">
+                        <li>Pendant l'installation, choisissez l'installation standard (pas la version "minimale" pour
+                            éviter l'absence d'outils réseaux).</li>
+                        <li><strong>Ne cochez AUCUN paquet optionnel</strong> (ni Docker, ni serveurs annexes).</li>
+                        <li>Créez simplement votre profil utilisateur (qui deviendra l'Administrateur).</li>
+                    </ul>
+                </div>
+
+                <div
+                    style="background: rgba(232,0,61,0.05); border: 1px solid var(--rog-border); border-radius: 8px; padding: 2rem; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top:-10px; right:-10px; font-family:'Orbitron',sans-serif; font-size:8rem; color:rgba(232,0,61,0.05); font-weight:900; line-height:1;">
+                        3</div>
+                    <div
+                        style="font-family:'Orbitron',sans-serif; color:var(--rog-red); font-size: 1.2rem; margin-bottom: 1rem; font-weight:700;">
+                        Injection Cyberpunk</div>
+                    <ul
+                        style="color:var(--text-dim); line-height: 1.7; font-size:0.95rem; padding-left: 1.2rem; position: relative; z-index: 2;">
+                        <li>Redémarrez, et connectez-vous dans la console noire avec les identifiants que vous venez de
+                            créer.</li>
+                        <li>Assurez-vous qu'internet fonctionne.</li>
+                        <li>Tapez l'unique commande magique d'installation :<br><code
+                                style="background:#000; padding:2px 6px; border-radius:4px; color:var(--green); font-size:0.85rem; word-break:break-all;">wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition/install.sh | bash</code>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div
+                style="background: rgba(0,0,0,0.4); border-left: 4px solid #ffaa00; border-radius: 0 8px 8px 0; padding: 1.8rem; margin-top: 1rem;">
+                <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
+                    <span style="font-size:1.5rem;">⚠️</span>
+                    <h4 style="font-family:'Orbitron',sans-serif; color:white; font-size:1.1rem; margin:0;">
+                        Avertissement & Disclaimer</h4>
+                </div>
+                <p style="color:rgba(255,255,255,0.7); line-height: 1.6; font-size:0.9rem;">
+                    MadOS ROG Edition est un projet communautaire gratuit et open-source. Ce puissant framework modifie
+                    des composants critiques de votre matériel (Kernel, options de démarrage, VBIOS, courbes de
+                    ventilation, undervolting via RyzenAdj/Intel). L'auteur (LordMadTrix) et les contributeurs déclinent
+                    toute responsabilité formelle en cas de dommages matériels, pertes irréversibles de données ou
+                    surchauffes accidentelles. L'installation de logiciels de bas niveau, la gestion du MUX Switch et la
+                    manipulation des voltages comportent toujours un facteur de risque inhérent. <strong>Vous utilisez
+                        ces outils à vos propres risques. Lisez toujours les menus avant de les valider.</strong>
+                </p>
+            </div>
+
+        </div>
+    </section>
+
     <!-- FEATURES -->
     <section class="section" id="features">
         <div class="section-header">

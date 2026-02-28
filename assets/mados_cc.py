@@ -299,7 +299,7 @@ class MadOSControlCenter(QMainWindow):
         w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
         lay.addWidget(self._label("LANCEMENT DES OUTILS VR"))
         lay.addWidget(self._btn("🎮  Lancer ALVR (Streaming PCVR Sans-Fil)",
-                                "/opt/MadOS_VR/ALVR.AppImage", "#0055cc", async_run=True))
+                                "/opt/MadOS_VR/ALVR/alvr_launcher", "#0055cc", async_run=True))
         lay.addWidget(self._btn("🥽  Lancer SideQuest (Gestion Casque)",
                                 "/opt/MadOS_VR/SideQuest/sidequest", "#b8690a", async_run=True))
         lay.addWidget(self._separator())

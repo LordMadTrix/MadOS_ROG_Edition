@@ -74,15 +74,24 @@ fi
 
 # 4. Installation de ALVR (Air Light VR pour PCVR)
 echo -e "\n${BLUE}[+] Installation de ALVR (Streaming PCVR Sans Fils)...${NC}"
-ALVR_PATH="/opt/MadOS_VR/ALVR.AppImage"
+ALVR_PATH="/opt/MadOS_VR/alvr_launcher_linux.tar.gz"
 echo -e "    ${GRAY}├─ Téléchargement de la dernière version de ALVR...${NC}"
-ALVR_LATEST_REF=$(curl -sL "https://github.com/alvr-org/ALVR/releases/latest" | grep -Eo 'href="[^"]*ALVR_Launcher-[^-]*-x86_64\.AppImage"' | head -n 1 | cut -d'"' -f2)
+ALVR_LATEST_REF=$(curl -sL "https://github.com/alvr-org/ALVR/releases/latest" | grep -Eo 'href="[^"]*alvr_launcher_linux\.tar\.gz"' | head -n 1 | cut -d'"' -f2)
 ALVR_LATEST_URL="https://github.com${ALVR_LATEST_REF}"
 
 if [ -n "$ALVR_LATEST_REF" ]; then
     wget -qO "$ALVR_PATH" "$ALVR_LATEST_URL"
-    sudo chmod +x "$ALVR_PATH"
-    sudo chown $REAL_USER:$REAL_USER "$ALVR_PATH"
+    echo -e "    ${GRAY}├─ Extraction de ALVR dans /opt/MadOS_VR/ALVR...${NC}"
+    sudo rm -rf /opt/MadOS_VR/ALVR
+    sudo mkdir -p /opt/MadOS_VR/ALVR
+    sudo tar -xf "$ALVR_PATH" -C /opt/MadOS_VR/ALVR --strip-components=1
+    sudo rm -f "$ALVR_PATH"
+    
+    # Renommer l'exécutable qui contient un espace chiant "ALVR Launcher"
+    if [ -f "/opt/MadOS_VR/ALVR/ALVR Launcher" ]; then
+        sudo mv "/opt/MadOS_VR/ALVR/ALVR Launcher" "/opt/MadOS_VR/ALVR/alvr_launcher"
+    fi
+    sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/ALVR
     
     # Création du raccourci
     echo -e "    ${GRAY}├─ Création du raccourci Bureau pour ALVR Launcher...${NC}"
@@ -90,7 +99,7 @@ if [ -n "$ALVR_LATEST_REF" ]; then
 [Desktop Entry]
 Name=ALVR Launcher
 Comment=Wireless PCVR for Standalone Headsets
-Exec=/opt/MadOS_VR/ALVR.AppImage
+Exec=/opt/MadOS_VR/ALVR/alvr_launcher
 Terminal=false
 Type=Application
 Icon=steam
