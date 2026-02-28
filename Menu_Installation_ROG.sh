@@ -155,7 +155,8 @@ installation_totale() {
         "VOLT" "Undervolt CPU / Thermiques 85C" ON \
         "GUI"  "MadOS Control Center (Bureau)" ON \
         "UPD"  "Mise à jour automatique MadOS" OFF \
-        "SAN"  "Diagnostic Santé Système" ON 3>&1 1>&2 2>&3)
+        "SAN"  "Diagnostic Santé Système" ON \
+        "VR"   "Suite VR (Meta Quest 3, ALVR, SideQuest)" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -193,6 +194,7 @@ installation_totale() {
     [[ "$CHOIX_BONUS" == *"GUI"* ]]  && run_module "23_control_center.sh" "Panneau de Contrôle GUI"
     [[ "$CHOIX_BONUS" == *"UPD"* ]]  && run_module "24_mados_update.sh" "Mise à jour MadOS depuis GitHub"
     [[ "$CHOIX_BONUS" == *"SAN"* ]]  && run_module "25_sante_systeme.sh" "Diagnostic Santé du Système"
+    [[ "$CHOIX_BONUS" == *"VR"* ]]   && run_module "26_vr_oculus_quest.sh" "Intégration VR (Meta Quest)"
 
     cloture_installation
 }
@@ -226,7 +228,8 @@ installation_custom() {
         "22_cpu" "Undervolt CPU (Intel/AMD)" OFF \
         "23_gui" "Interface Graphique MadOS" OFF \
         "24_upd" "Mise à jour Auto MadOS" OFF \
-        "25_san" "Diagnostic Santé Système" OFF 3>&1 1>&2 2>&3)
+        "25_san" "Diagnostic Santé Système" OFF \
+        "26_vr"  "Casque VR (Meta Quest)" OFF 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then menu_principal; return; fi
 
@@ -260,6 +263,7 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"23_gui"* ]] && run_module "23_control_center.sh" "Interface Control Center"
     [[ "$CHOIX_ALL" == *"24_upd"* ]] && run_module "24_mados_update.sh" "Mise à jour depuis GitHub"
     [[ "$CHOIX_ALL" == *"25_san"* ]] && run_module "25_sante_systeme.sh" "Diagnostic Santé"
+    [[ "$CHOIX_ALL" == *"26_vr"* ]] && run_module "26_vr_oculus_quest.sh" "Suite VR Meta Quest"
 
     cloture_installation
 }

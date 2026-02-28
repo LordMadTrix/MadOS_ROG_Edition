@@ -60,6 +60,7 @@ class MadOSControlCenter(QMainWindow):
         self.tabs.addTab(self._tab_sys(),    "🧹  Système")
         self.tabs.addTab(self._tab_diag(),   "🏥  Diagnostic")
         self.tabs.addTab(self._tab_update(), "🔄  Mise à jour")
+        self.tabs.addTab(self._tab_vr(),     "🥽  VR & Casque")
 
         self.log_signal.connect(self._append_log)
 
@@ -290,6 +291,23 @@ class MadOSControlCenter(QMainWindow):
         lay.addWidget(self._btn("🔍  Vérifier les versions XanMod disponibles",
                                 "apt-cache policy linux-xanmod 2>/dev/null | head -20 || echo 'Repo XanMod non configuré'",
                                 "#333", async_run=True))
+        lay.addStretch()
+        return w
+
+    # ── Onglet VR & Casques Oculus ───────────────────────────────────────────
+    def _tab_vr(self):
+        w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
+        lay.addWidget(self._label("LANCEMENT DES OUTILS VR"))
+        lay.addWidget(self._btn("🎮  Lancer ALVR (Streaming PCVR Sans-Fil)",
+                                "/opt/MadOS_VR/ALVR.AppImage", "#0055cc", async_run=True))
+        lay.addWidget(self._btn("🥽  Lancer SideQuest (Gestion Casque)",
+                                "/opt/MadOS_VR/SideQuest/sidequest", "#b8690a", async_run=True))
+        lay.addWidget(self._separator())
+        lay.addWidget(self._label("MAINTENANCE ADB (CONNEXION USB)"))
+        lay.addWidget(self._btn("🔄  Redémarrer le service ADB (Si casque non détecté)",
+                                "adb kill-server && adb start-server", "#333", async_run=True))
+        lay.addWidget(self._btn("📱  Liste des casques détectés en USB",
+                                "adb devices", "#333", async_run=True))
         lay.addStretch()
         return w
 
