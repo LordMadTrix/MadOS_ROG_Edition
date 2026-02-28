@@ -59,15 +59,28 @@ export HOME="${HOME:-/home/$(whoami)}"
 
 cd "$HOME/OpenClaw" || exit 1
 
-# Vérifier que node est accessible
+# Démarrer le serveur UI Next.js en arrière-plan
+if [ -d "ui" ]; then
+    echo "Starting UI Server on port 3000..."
+    cd ui && pnpm run start &
+    UI_PID=$!
+    cd ..
+fi
+
+# Démarrer le Gateway Node en arrière-plan
 if command -v node &>/dev/null; then
-    exec node scripts/run-node.mjs gateway --allow-unconfigured
+    node scripts/run-node.mjs gateway --allow-unconfigured &
+    GW_PID=$!
 elif command -v pnpm &>/dev/null; then
-    exec pnpm run start gateway -- --allow-unconfigured
+    pnpm run start gateway -- --allow-unconfigured &
+    GW_PID=$!
 else
     echo "ERROR: node/pnpm not found in PATH: $PATH" >&2
     exit 1
 fi
+
+# Attendre que n'importe lequel des deux processus s'arrête (garder le service systemd actif)
+wait -n $UI_PID $GW_PID
 WRP_EOF
 sudo -u "$REAL_USER" chmod +x "$OC_DIR/start-gateway.sh"
 
