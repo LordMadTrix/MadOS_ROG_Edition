@@ -18,7 +18,7 @@ sudo apt update -q >/dev/null 2>&1
 
 if ! command -v auto-cpufreq >/dev/null 2>&1; then
     TEMP_DIR=$(mktemp -d)
-    git clone https://github.com/AdnanHodzic/auto-cpufreq.git "$TEMP_DIR" >/dev/null 2>&1
+    git clone --depth=1 https://github.com/AdnanHodzic/auto-cpufreq.git "$TEMP_DIR" >/dev/null 2>&1
     cd "$TEMP_DIR"
     sudo ./auto-cpufreq-installer --install >/dev/null 2>&1 || true
     rm -rf "$TEMP_DIR"

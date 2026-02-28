@@ -71,7 +71,7 @@ build_tool() {
     local NAME="$2"
     local REPO_DIR="$BUILD_DIR/$NAME"
     cd "$BUILD_DIR"
-    if [ ! -d "$REPO_DIR" ]; then git clone -q "$REPO" "$REPO_DIR"; else cd "$REPO_DIR" && git pull -q; fi
+    if [ ! -d "$REPO_DIR" ]; then git clone --depth=1 -q "$REPO" "$REPO_DIR"; else cd "$REPO_DIR" && git pull -q; fi
     cd "$REPO_DIR"
     
     # Limitation drastique de la parallélisation pour éviter les "Kernel Panic: Soft Lockup"

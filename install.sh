@@ -55,7 +55,7 @@ REPO_URL="https://github.com/LordMadTrix/MadOS_ROG_Edition.git"
 
 sudo rm -rf "$INSTALL_DIR" 2>/dev/null || true
 
-if sudo git clone "$REPO_URL" "$INSTALL_DIR" 2>&1 | grep -v '^$'; then
+if sudo git clone --depth=1 "$REPO_URL" "$INSTALL_DIR" 2>&1 | grep -v '^$'; then
     echo -e "      ${GREEN}✓ Dépôt cloné avec succès.${NC}"
 else
     echo -e "      ${RED}✗ Erreur : Impossible de cloner le dépôt GitHub.${NC}"

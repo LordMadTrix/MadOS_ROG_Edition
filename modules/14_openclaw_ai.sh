@@ -26,7 +26,7 @@ OC_DIR="$USER_HOME/OpenClaw"
 
 echo -e "    ${GRAY}├─ Clonage du dépôt OpenClaw...${NC}"
 if [ ! -d "$OC_DIR" ]; then
-    sudo -u "$REAL_USER" git clone https://github.com/openclaw/openclaw.git "$OC_DIR" >/dev/null 2>&1
+    sudo -u "$REAL_USER" git clone --depth=1 https://github.com/openclaw/openclaw.git "$OC_DIR" >/dev/null 2>&1
 else
     echo -e "    ${GRAY}│  Le dossier existe déjà. Mise à jour via git pull...${NC}"
     sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && git pull" >/dev/null 2>&1 || true

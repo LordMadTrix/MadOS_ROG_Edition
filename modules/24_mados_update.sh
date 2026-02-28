@@ -22,7 +22,7 @@ echo -e "    ${GREEN}✓ Connexion OK.${NC}"
 
 echo -e "    ${GRAY}├─ Clonage de la dernière version depuis GitHub...${NC}"
 sudo rm -rf "$INSTALL_DIR" 2>/dev/null || true
-if ! sudo git clone "$REPO_URL" "$INSTALL_DIR" >/dev/null 2>&1; then
+if ! sudo git clone --depth=1 "$REPO_URL" "$INSTALL_DIR" >/dev/null 2>&1; then
     echo -e "    ${RED}✗ Impossible de récupérer la mise à jour depuis GitHub.${NC}"
     exit 1
 fi

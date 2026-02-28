@@ -16,7 +16,7 @@ if [ "$CPU_VENDOR" = "AuthenticAMD" ]; then
     
     RYZEN_DIR="/opt/RyzenAdj"
     if [ ! -d "$RYZEN_DIR" ]; then
-        sudo git clone https://github.com/FlyGoat/RyzenAdj.git "$RYZEN_DIR" >/dev/null 2>&1
+        sudo git clone --depth=1 https://github.com/FlyGoat/RyzenAdj.git "$RYZEN_DIR" >/dev/null 2>&1
         sudo bash -c "cd '$RYZEN_DIR' && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make" >/dev/null 2>&1
         sudo cp "$RYZEN_DIR/build/ryzenadj" /usr/local/bin/ryzenadj
     fi
