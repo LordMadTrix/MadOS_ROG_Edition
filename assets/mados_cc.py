@@ -346,7 +346,7 @@ class MadOSControlCenter(QMainWindow):
         lay.addWidget(self._btn("📸  Créer un Point de Restauration Sauvetage",
                                 "pkexec timeshift --create --comments 'Point de sécurité MadOS Control Center'", "#2e7d32", async_run=True))
         lay.addWidget(self._btn("🔄  Ouvrir l'Interface de Restauration",
-                                "pkexec timeshift-launcher &", "#b8690a"))
+                                "timeshift-launcher &", "#b8690a"))
         lay.addWidget(self._separator())
 
         lay.addWidget(self._label("SAUVEGARDES JEUX (LUDUSAVI)"))
