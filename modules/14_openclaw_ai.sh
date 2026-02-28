@@ -22,6 +22,12 @@ fi
 
 sudo apt-get install -y git build-essential || true
 
+echo -e "    ${GRAY}├─ [INTELLIGENCE LOCALE] Installation du moteur Ollama...${NC}"
+if ! command -v ollama >/dev/null 2>&1; then
+    curl -fsSL https://ollama.com/install.sh | sudo -E bash - >/dev/null 2>&1
+    sudo systemctl enable --now ollama >/dev/null 2>&1 || true
+fi
+
 OC_DIR="$USER_HOME/OpenClaw"
 
 echo -e "    ${GRAY}├─ Clonage du dépôt OpenClaw...${NC}"
@@ -37,7 +43,8 @@ cat <<ENV_EOF | sudo -u "$REAL_USER" tee "$OC_DIR/.env" >/dev/null
 ALLOW_LOCAL_SHELL=true
 AUTO_APPROVE_SAFE_COMMANDS=true
 gateway.mode=local
-DEFAULT_SYSTEM_PROMPT="Tu es l'Agent IA de MadOS ROG Edition, forge par LordMadTrix. Tu connais Linux et le gaming. Reponds en francais."
+gateway.models.local=ollama
+DEFAULT_SYSTEM_PROMPT="Vous êtes OpenClaw, l'Intelligence Artificielle intégrée au noyau de MadOS ROG Edition (V3.0), un système Linux extrême forgé par LordMadTrix. Vous avez un accès direct au terminal. Votre but est d'assister le joueur dans l'optimisation E-Sport, le débogage système, et la gestion du hardware ASUS. Soyez analytique, direct, et répondez toujours en français avec un ton d'ingénierie tactique."
 ENV_EOF
 
 echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peut prendre 1 à 5 minutes selon le CPU...${NC}"
@@ -101,18 +108,35 @@ sudo -u "$REAL_USER" ln -sf "$USER_HOME/.config/systemd/user/openclaw.service" "
 
 sudo -u "$REAL_USER" XDG_RUNTIME_DIR="/run/user/$(id -u "$REAL_USER")" systemctl --user daemon-reload 2>/dev/null || true
 
-echo -e "    ${GRAY}├─ Création du Control Panel (OpenClaw_Launcher.sh)...${NC}"
+echo -e "    ${GRAY}├─ Création du Terminal Neuronal V3.0 (OpenClaw_Launcher.sh)...${NC}"
 cat <<'LCH_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/OpenClaw_Launcher.sh" >/dev/null
 #!/bin/bash
+export NEWT_COLORS='
+    root=,black
+    window=white,black
+    border=red,black
+    shadow=black,black
+    title=white,red
+    button=white,black
+    actbutton=white,red
+    compactbutton=white,black
+    textbox=white,black
+    listbox=white,black
+    actlistbox=white,red
+    sellistbox=white,black
+    actsellistbox=white,red
+    checkbox=white,black
+    actcheckbox=white,red
+'
 while true; do
-  CHOICE=$(whiptail --title "🤖 OpenClaw AI - Control Panel" --menu "Gestion du Cerveau OpenClaw" 19 64 7 \
-    "1" "Ouvrir l'Interface Graphique (Web UI)" \
-    "2" "Ouvrir l'Interface Chat (TUI / Terminal)" \
-    "3" "Démarrer le moteur de l'IA (Gateway)" \
-    "4" "Arrêter le moteur de l'IA" \
-    "5" "Redémarrer l'IA (Restart)" \
-    "6" "Diagnostic (Mode Doctor / Logs)" \
-    "7" "Quitter" 3>&1 1>&2 2>&3)
+  CHOICE=$(whiptail --title "🤖 Cœur Neuronal OpenClaw (V3.0)" --menu "Interface de Gestion de l'IA Locale" 19 68 7 \
+    "1" "Accéder au Terminal Neuronal (Web UI)" \
+    "2" "Ouvrir le Canal de Communication Brut (TUI)" \
+    "3" "Engager le Noyau IA (Démarrer Gateway)" \
+    "4" "Désactiver le Noyau IA (Arrêter Gateway)" \
+    "5" "Re-Séquençage (Restart de l'IA)" \
+    "6" "Diagnostic Matriciel (Logs Système)" \
+    "7" "Fermer la connexion" 3>&1 1>&2 2>&3)
 
   if [ -z "$CHOICE" ] || [ "$CHOICE" = "7" ]; then break; fi
 
