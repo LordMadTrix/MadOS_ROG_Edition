@@ -154,13 +154,18 @@ class MadOSControlCenter(QMainWindow):
                            shell=True, capture_output=True, text=True)
         if r.stdout.strip() == "active":
             log_query = subprocess.run(
-                "journalctl --user -u openclaw.service | grep 'Dashboard URL' | tail -n 1",
+                "journalctl --user -u openclaw.service --no-pager | grep 'Dashboard URL' | tail -n 1",
                 shell=True, capture_output=True, text=True
             )
             url_line = log_query.stdout.strip()
             url = "http://localhost:18789"
-            if "http://" in url_line:
-                url = "http" + url_line.split("http")[1]
+            
+            import re
+            # Check for pure http/https pattern, explicitly excluding ANSI and extra chars
+            match = re.search(r'(https?://[^\s\x1b]+)', url_line)
+            if match:
+                url = match.group(1)
+            
             subprocess.Popen(["xdg-open", url])
         else:
             self.log_signal.emit(
