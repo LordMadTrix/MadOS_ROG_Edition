@@ -102,20 +102,6 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 
 ---
 
-## 💿 MadOS V3 ISO Builder (Nouveau)
-
-Envie de distribuer MadOS ou d'installer directement un système parfait sans passer par le script ? Le projet inclut désormais le **MadOS V3 ISO Builder** !
-Cet outil automatisé génère une image `.iso` bootable complète basée sur **Ubuntu 24.10** (incluant **KDE Plasma 6** natif et tous les modules MadOS précompilés).
-
-**Comment forger l'ISO (Sur une machine Ubuntu/Debian) :**
-```bash
-cd MadOS_ISO_Builder
-sudo bash build_mados_iso.sh
-```
-> ⚠️ **Attention** : La création d'ISO nécessite un environnement Linux (pour `chroot` et `mksquashfs`). Le processus dure environ 5 à 15 minutes et générera le fichier `MadOS-ROG-V3-Plasma6-amd64.iso` à la racine, prêt à être flashé via Rufus ou Ventoy.
-
----
-
 ## 🤝 Contribution
 
 Ce projet a été imaginé et propulsé par amour du matériel ASUS et de l'univers Linux. Toute aide est bienvenue !
