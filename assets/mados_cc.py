@@ -206,11 +206,24 @@ class MadOSControlCenter(QMainWindow):
     # ── Onglet Performances ───────────────────────────────────────────────────
     def _tab_perf(self):
         w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
+        
+        lay.addWidget(self._label("MODE JEU EXTRÊME (GAME MODE)"))
+        lay.addWidget(self._btn("🚀  Activer Mode Jeu Extrême (gamemoded)", 
+                                "gamemoded -r && asusctl profile -P Performance && pkexec bash -c 'sync; echo 3 > /proc/sys/vm/drop_caches'", 
+                                "#cc0000", async_run=True))
+        lay.addWidget(self._btn("🛑  Désactiver", "gamemoded -s", "#333", async_run=True))
+        lay.addWidget(self._separator())
+        
+        lay.addWidget(self._label("OVERLAY GAMING (MANGOHUD)"))
+        lay.addWidget(self._btn("📊  Configurer l'Overlay Visuellement (GOverlay)",
+                                "if ! command -v goverlay &> /dev/null; then pkexec apt install -y goverlay; fi && goverlay &", 
+                                "#005599"))
+        lay.addWidget(self._separator())
+
         lay.addWidget(self._label("PROFIL CPU / BATTERIE (asusctl)"))
         lay.addWidget(self._btn("🔇  Mode Silencieux (autonomie max)", "asusctl profile -P Quiet", "#2e7d32"))
         lay.addWidget(self._btn("⚖️  Mode Équilibré", "asusctl profile -P Balanced", "#b8690a"))
         lay.addWidget(self._btn("🔥  Mode Turbo Performance (GAMING)", "asusctl profile -P Performance"))
-        lay.addWidget(self._separator())
         lay.addWidget(self._label("GPU (supergfxctl)"))
         lay.addWidget(self._btn("🌿  GPU Intégré — Mode Éco (Batterie)", "supergfxctl -m Integrated", "#2e7d32"))
         lay.addWidget(self._btn("🎮  GPU Dédié NVIDIA/AMD — Mode Gaming", "supergfxctl -m Dedicated"))
@@ -237,6 +250,12 @@ class MadOSControlCenter(QMainWindow):
         lay.addWidget(self._btn("🖥️  Lancer le TUI OpenClaw (Terminal)",
                                 "x-terminal-emulator -e bash -c 'cd ~/OpenClaw && node scripts/run-node.mjs tui; read'",
                                 "#005599"))
+        lay.addWidget(self._separator())
+
+        lay.addWidget(self._label("ASSISTANT COPILOT GAMING"))
+        lay.addWidget(self._btn("🩺  Copier Infos Hardware du PC (Pour coller à l'IA)",
+                                "inxi -Fxxx | xclip -sel clip || wl-copy < <(inxi -Fxxx) || echo 'Veuillez installer xclip' && notify-send 'OpenClaw Copilot' 'Informations matérielles copiées ! Collez-les dans le chat IA pour diagnostic.'", 
+                                "#b8690a", async_run=True))
         lay.addWidget(self._separator())
         
         # --- CONFIGURATION CLÉS API ---
@@ -322,6 +341,20 @@ class MadOSControlCenter(QMainWindow):
     # ── Onglet Système ────────────────────────────────────────────────────────
     def _tab_sys(self):
         w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
+        
+        lay.addWidget(self._label("TIME MACHINE (TIMESHIFT BTRFS)"))
+        lay.addWidget(self._btn("📸  Créer un Point de Restauration Sauvetage",
+                                "pkexec timeshift --create --comments 'Point de sécurité MadOS Control Center'", "#2e7d32", async_run=True))
+        lay.addWidget(self._btn("🔄  Ouvrir l'Interface de Restauration",
+                                "pkexec timeshift-launcher &", "#b8690a"))
+        lay.addWidget(self._separator())
+
+        lay.addWidget(self._label("SAUVEGARDES JEUX (LUDUSAVI)"))
+        lay.addWidget(self._btn("☁️  Gérer les Sauvegardes Jeux Cloud / Locales",
+                                "if ! command -v ludusavi &> /dev/null; then flatpak install -y flathub com.github.mtkennerly.ludusavi || pkexec apt install -y ludusavi; fi && flatpak run com.github.mtkennerly.ludusavi || ludusavi &", 
+                                "#0055cc"))
+        lay.addWidget(self._separator())
+
         lay.addWidget(self._label("MÉMOIRE & STOCKAGE"))
         lay.addWidget(self._btn("🗑️  Purger le Cache RAM",
                                 "pkexec bash -c 'sync; echo 3 > /proc/sys/vm/drop_caches'", "#555"))
