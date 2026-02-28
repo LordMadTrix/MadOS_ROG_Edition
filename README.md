@@ -6,7 +6,7 @@
   **La transformation ultime pour votre ASUS ROG sous Linux.**
 
   [![Bash](https://img.shields.io/badge/Script-Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
-  [![Ubuntu](https://img.shields.io/badge/OS-Ubuntu_24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+  [![Ubuntu](https://img.shields.io/badge/OS-Ubuntu_25.10-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
   [![KDE Plasma](https://img.shields.io/badge/Desktop-KDE_Plasma_6-1D99F3?style=for-the-badge&logo=kde&logoColor=white)](https://kde.org/)
 
   [![Version](https://img.shields.io/badge/Version-3.0_Expansion-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
@@ -25,7 +25,7 @@
 
 ## ⚡ Fonctionnalités
 
-**MadOS ROG Edition** n'est pas qu'un simple script, c'est une matrice d'installation interactive conçue pour transformer une base Ubuntu Server ou Desktop (24.04 LTS) en une station de combat orientée Gaming, optimisée spécifiquement pour les PC portables **ASUS Republic of Gamers**.
+**MadOS ROG Edition** n'est pas qu'un simple script, c'est une matrice d'installation interactive conçue pour transformer une base Ubuntu Server ou Desktop (25.10) en une station de combat orientée Gaming, optimisée spécifiquement pour les PC portables **ASUS Republic of Gamers**.
 
 - 🧠 **Détection Intelligente GPU** : Scan matériel automatique (`lspci`) pour déployer les pilotes NVIDIA (DKMS), AMD (Mesa/RADV) ou Intel sans la moindre configuration manuelle.
 - 💻 **Noyau XanMod EDGE** : Compilation automatique du kernel orienté gaming avec support AVX2 / AVX512 (selon votre CPU).
@@ -41,7 +41,7 @@
 ## 🛠 Prérequis
 
 1. Un PC (idéalement **ASUS ROG**) avec une connexion internet active.
-2. Une installation fraîche d'**Ubuntu 24.04 LTS (Noble Numbat)**, version **Serveur** de préférence, ou Desktop (le script désinstallera GNOME).
+2. Une installation fraîche d'**Ubuntu 25.10**, version **Serveur** de préférence, ou Desktop (le script désinstallera GNOME).
 3. L'utilisateur courant doit faire partie du groupe `sudo`.
 4. RAM : **8 Go minimum** · Espace disque : **40 Go minimum**
 
