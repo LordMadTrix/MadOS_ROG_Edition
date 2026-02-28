@@ -46,6 +46,7 @@ sudo npm install -g pnpm >/dev/null 2>&1 || true
 # Execution du build STRICTEMENT sous l'utilisateur réel avec affichage (plus de freeze silencieux)
 sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && pnpm install" || true
 sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && pnpm run build" || true
+sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && pnpm ui:build" || true
 
 echo -e "    ${GRAY}├─ Création du service d'arrière-plan système...${NC}"
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/systemd/user"
@@ -59,28 +60,15 @@ export HOME="${HOME:-/home/$(whoami)}"
 
 cd "$HOME/OpenClaw" || exit 1
 
-# Démarrer le serveur UI Next.js en arrière-plan
-if [ -d "ui" ]; then
-    echo "Starting UI Server on port 3000..."
-    cd ui && pnpm run start &
-    UI_PID=$!
-    cd ..
-fi
-
 # Démarrer le Gateway Node en arrière-plan
 if command -v node &>/dev/null; then
-    node scripts/run-node.mjs gateway --allow-unconfigured &
-    GW_PID=$!
+    exec node scripts/run-node.mjs gateway --allow-unconfigured
 elif command -v pnpm &>/dev/null; then
-    pnpm run start gateway -- --allow-unconfigured &
-    GW_PID=$!
+    exec pnpm run start gateway -- --allow-unconfigured
 else
     echo "ERROR: node/pnpm not found in PATH: $PATH" >&2
     exit 1
 fi
-
-# Attendre que n'importe lequel des deux processus s'arrête (garder le service systemd actif)
-wait -n $UI_PID $GW_PID
 WRP_EOF
 sudo -u "$REAL_USER" chmod +x "$OC_DIR/start-gateway.sh"
 
@@ -131,7 +119,7 @@ while true; do
   case $CHOICE in
     1)
       if systemctl --user is-active --quiet openclaw.service; then
-        google-chrome --app=http://localhost:3000 2>/dev/null || xdg-open http://localhost:3000
+        google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
       else
         whiptail --msgbox "⚠️ Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 60
       fi
@@ -146,7 +134,7 @@ while true; do
       ;;
     3)
       systemctl --user start openclaw.service
-      whiptail --msgbox "✅ Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 3000." 9 55
+      whiptail --msgbox "✅ Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 18789." 9 55
       ;;
     4)
       systemctl --user stop openclaw.service

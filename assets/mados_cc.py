@@ -152,7 +152,7 @@ class MadOSControlCenter(QMainWindow):
         r = subprocess.run("systemctl --user is-active openclaw.service",
                            shell=True, capture_output=True, text=True)
         if r.stdout.strip() == "active":
-            subprocess.Popen(["xdg-open", "http://localhost:3000"])
+            subprocess.Popen(["xdg-open", "http://localhost:18789"])
         else:
             self.log_signal.emit(
                 "<span style='color:#ffaa00'>⚠ OpenClaw est arrêté. Démarrez le moteur d'abord (bouton vert).</span>")
@@ -203,7 +203,7 @@ class MadOSControlCenter(QMainWindow):
                                 "systemctl --user stop openclaw.service", "#555"))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("INTERFACE"))
-        lay.addWidget(self._btn("💬  Ouvrir l'interface Web Chat (localhost:3000)",
+        lay.addWidget(self._btn("💬  Ouvrir l'interface Web Chat (localhost:18789)",
                                 self._open_url_if_active, "#0055cc"))
         lay.addWidget(self._btn("🖥️  Lancer le TUI OpenClaw (Terminal)",
                                 "x-terminal-emulator -e bash -c 'cd ~/OpenClaw && node scripts/run-node.mjs tui; read'",
