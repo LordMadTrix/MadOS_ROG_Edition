@@ -43,11 +43,11 @@ sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR
 echo -e "\n${BLUE}[+] Installation de SideQuest (Sideloading & Gestion Casque)...${NC}"
 SQ_PATH="/opt/MadOS_VR/SideQuest-X11.tar.xz"
 echo -e "    ${GRAY}├─ Téléchargement de la dernière version de SideQuest...${NC}"
-# L'URL github de la dernière release Linux
-SQ_LATEST_JSON=$(curl -s "https://api.github.com/repos/SideQuestVR/SideQuest/releases/latest")
-SQ_LATEST_URL=$(echo "$SQ_LATEST_JSON" | grep "browser_download_url" | grep "tar.xz" | head -n 1 | cut -d '"' -f 4)
+# On parse directement la page HTML pour éviter la limite d'API GitHub (60 requêtes/heure)
+SQ_LATEST_REF=$(curl -sL "https://github.com/SideQuestVR/SideQuest/releases/latest" | grep -Eo 'href="[^"]*SideQuest-[0-9.]*\.tar\.xz"' | head -n 1 | cut -d'"' -f2)
+SQ_LATEST_URL="https://github.com${SQ_LATEST_REF}"
 
-if [ -n "$SQ_LATEST_URL" ]; then
+if [ -n "$SQ_LATEST_REF" ]; then
     wget -qO "$SQ_PATH" "$SQ_LATEST_URL"
     echo -e "    ${GRAY}├─ Extraction de SideQuest dans /opt/MadOS_VR/SideQuest...${NC}"
     sudo rm -rf /opt/MadOS_VR/SideQuest
@@ -76,10 +76,10 @@ fi
 echo -e "\n${BLUE}[+] Installation de ALVR (Streaming PCVR Sans Fils)...${NC}"
 ALVR_PATH="/opt/MadOS_VR/ALVR.AppImage"
 echo -e "    ${GRAY}├─ Téléchargement de la dernière version de ALVR...${NC}"
-ALVR_LATEST_JSON=$(curl -s "https://api.github.com/repos/alvr-org/ALVR/releases/latest")
-ALVR_LATEST_URL=$(echo "$ALVR_LATEST_JSON" | grep "browser_download_url" | grep "ALVR_Launcher-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 4)
+ALVR_LATEST_REF=$(curl -sL "https://github.com/alvr-org/ALVR/releases/latest" | grep -Eo 'href="[^"]*ALVR_Launcher-[^-]*-x86_64\.AppImage"' | head -n 1 | cut -d'"' -f2)
+ALVR_LATEST_URL="https://github.com${ALVR_LATEST_REF}"
 
-if [ -n "$ALVR_LATEST_URL" ]; then
+if [ -n "$ALVR_LATEST_REF" ]; then
     wget -qO "$ALVR_PATH" "$ALVR_LATEST_URL"
     sudo chmod +x "$ALVR_PATH"
     sudo chown $REAL_USER:$REAL_USER "$ALVR_PATH"
