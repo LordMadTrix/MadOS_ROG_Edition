@@ -52,7 +52,7 @@ export NC='\033[0m'
 export BOLD='\033[1m'
 
 export NEWT_COLORS='
-    root=,black
+    root=black,black
     window=white,black
     border=red,black
     shadow=black,black
@@ -114,12 +114,12 @@ menu_principal() {
 
     local CHOIX
     CHOIX=$(whiptail --title "⚡ MadOS ROG Edition (v3.0) ⚡" \
-        --cancel-button "Annuler l'Injection" \
+        --cancel-button "Annuler" \
         --ok-button "Engager" \
-        --menu "Sélectionnez le protocole de déploiement matriciel :" 16 75 3 \
-        "1" "Déploiement Total (Expérience E-Sport ROG Optimisée)" \
-        "2" "Déploiement Custom (Ingénieurs et Experts Uniquement)" \
-        "3" "Protocole Destruction (Purge Radicale Canonical)" 3>&1 1>&2 2>&3)
+        --menu "Sélectionnez le protocole de déploiement :" 16 65 3 \
+        "1" "Déploiement Total (Expérience E-Sport)" \
+        "2" "Déploiement Custom (Options Ingénieurs)" \
+        "3" "Protocole Destruction (Purge Ubuntu)" 3>&1 1>&2 2>&3)
     
     if [ $? -eq 0 ]; then
         case $CHOIX in
@@ -128,7 +128,7 @@ menu_principal() {
             3) mode_destruction ;;
         esac
     else
-        echo -e "${GRAY}Désengagement de la matrice... Au revoir.${NC}"
+        echo -e "${RED}Désengagement de la matrice... Au revoir.${NC}"
         exit 0
     fi
 }
@@ -136,8 +136,8 @@ menu_principal() {
 installation_totale() {
     local CHOIX_BONUS
     # Affichage des options facultatives auto-sélectionnées ou non
-    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v2.6)" \
-        --checklist "Utilisez [ESPACE] pour (dés)activer une option, et [ENTRÉE] pour valider.\nLes fonctions essentielles sont cohées par défaut." 24 85 15 \
+    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v3.0)" \
+        --checklist "Espace pour (dés)activer, Entrée pour valider.\nLes fonctions vitales sont cochées par défaut." 20 65 12 \
         "SNAP" "Bouclier Système Timeshift" ON \
         "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
         "NTFS" "Montage NTFS des jeux Windows" OFF \
@@ -163,10 +163,10 @@ installation_totale() {
 
     # Menu Overclocking si le module est coché
     if [[ "$CHOIX_BONUS" == *"VOLT"* ]]; then
-        export MADOS_TDP_PROFILE=$(whiptail --title "Surcadençage & Profils Thermiques" --radiolist "Sélectionnez le comportement énergétique de votre processeur (TDP/Chauffe) :" 18 75 4 \
-            "SILENCE" "Bridage 25W - Autonomie & Calme Absolu" OFF \
-            "EQUILIBRE" "Stock 45W - Performances d'Usine (Défaut)" ON \
-            "EXTREME" "Débridage 65W - E-Sport & FPS Maximum" OFF 3>&1 1>&2 2>&3)
+        export MADOS_TDP_PROFILE=$(whiptail --title "Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+            "SILENCE" "Bridage 25W - Calme Absolu" OFF \
+            "EQUILIBRE" "Stock 45W - Usine (Défaut)" ON \
+            "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3)
         if [ $? -ne 0 ]; then menu_principal; return; fi
     else
         export MADOS_TDP_PROFILE="EQUILIBRE"
@@ -214,7 +214,7 @@ installation_totale() {
 installation_custom() {
     local CHOIX_ALL
     CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
-        --checklist "Sélectionnez les modules individuels à exécuter :" 28 85 21 \
+        --checklist "Espace pour sélectionner, Entrée pour valider :" 20 65 12 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
         "02_gpu" "Pilotes GPU auto (Nvidia/AMD)" OFF \

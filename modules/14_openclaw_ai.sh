@@ -112,7 +112,7 @@ echo -e "    ${GRAY}├─ Création du Terminal Neuronal V3.0 (OpenClaw_Launche
 cat <<'LCH_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/OpenClaw_Launcher.sh" >/dev/null
 #!/bin/bash
 export NEWT_COLORS='
-    root=,black
+    root=black,black
     window=white,black
     border=red,black
     shadow=black,black
