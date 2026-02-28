@@ -44,8 +44,8 @@ echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peu
 sudo npm install -g pnpm >/dev/null 2>&1 || true
 
 # Execution du build STRICTEMENT sous l'utilisateur réel avec affichage (plus de freeze silencieux)
-sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm install" || true
-sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && CI=true pnpm run build" || true
+sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && pnpm install" || true
+sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && pnpm run build" || true
 
 echo -e "    ${GRAY}├─ Création du service d'arrière-plan système...${NC}"
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/systemd/user"

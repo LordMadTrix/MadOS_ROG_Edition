@@ -91,7 +91,9 @@ class MadOSControlCenter(QMainWindow):
             QPushButton:hover {{ background:#ff3333; }}
             QPushButton:pressed {{ background:#990000; }}
         """)
-        if async_run:
+        if callable(cmd):
+            b.clicked.connect(cmd)
+        elif async_run:
             b.clicked.connect(lambda: self._run_async(cmd))
         else:
             b.clicked.connect(lambda: self._run(cmd))
@@ -133,6 +135,27 @@ class MadOSControlCenter(QMainWindow):
                 self.log_signal.emit(
                     f"<span style='color:#ff4444'>ERREUR: {(e.output or '').strip()[:2000]}</span>")
         threading.Thread(target=_worker, daemon=True).start()
+
+    def _open_terminal(self, cmd):
+        """Lance une commande dans le bon terminal (KDE=konsole, sinon xterm)."""
+        for term in ["konsole -e", "xfce4-terminal -e", "gnome-terminal --", "xterm -e", "x-terminal-emulator -e"]:
+            term_bin = term.split()[0]
+            if subprocess.run(f"which {term_bin}", shell=True,
+                              capture_output=True).returncode == 0:
+                full = f"{term} bash -c '{cmd}'"
+                subprocess.Popen(full, shell=True)
+                return
+        self.log_signal.emit("<span style='color:#ff4444'>ERREUR: Aucun terminal trouvé (konsole/xterm/x-terminal-emulator)</span>")
+
+    def _open_url_if_active(self):
+        """Ouvre l'interface web OpenClaw seulement si le service est actif."""
+        r = subprocess.run("systemctl --user is-active openclaw.service",
+                           shell=True, capture_output=True, text=True)
+        if r.stdout.strip() == "active":
+            subprocess.Popen(["xdg-open", "http://localhost:3000"])
+        else:
+            self.log_signal.emit(
+                "<span style='color:#ffaa00'>⚠ OpenClaw est arrêté. Démarrez le moteur d'abord (bouton vert).</span>")
 
     def _refresh_claw_status(self):
         try:
@@ -181,7 +204,7 @@ class MadOSControlCenter(QMainWindow):
         lay.addWidget(self._separator())
         lay.addWidget(self._label("INTERFACE"))
         lay.addWidget(self._btn("💬  Ouvrir l'interface Web Chat (localhost:3000)",
-                                "xdg-open http://localhost:3000", "#0055cc"))
+                                self._open_url_if_active, "#0055cc"))
         lay.addWidget(self._btn("🖥️  Lancer le TUI OpenClaw (Terminal)",
                                 "x-terminal-emulator -e bash -c 'cd ~/OpenClaw && node scripts/run-node.mjs tui; read'",
                                 "#005599"))
@@ -219,11 +242,11 @@ class MadOSControlCenter(QMainWindow):
         w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
         lay.addWidget(self._label("DIAGNOSTIC SYSTÈME COMPLET"))
         lay.addWidget(self._btn("🏥  Lancer le Diagnostic de Santé MadOS",
-                                "x-terminal-emulator -e bash -c "
-                                "'wget -qO /tmp/mados_diag.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/25_sante_systeme.sh "
-                                "&& sudo bash /tmp/mados_diag.sh; "
-                                "read -p \"Appuyez sur Entree pour fermer...\"'",
-                                "#005599"))
+                                "wget -qO /tmp/mados_diag.sh "
+                                "https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/25_sante_systeme.sh "
+                                "&& konsole -e bash /tmp/mados_diag.sh 2>/dev/null "
+                                "|| xterm -e bash /tmp/mados_diag.sh",
+                                "#005599", async_run=True))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("INFORMATIONS SYSTÈME"))
         lay.addWidget(self._btn("🐧  Version du Kernel", "uname -r", "#333", async_run=True))
@@ -241,11 +264,11 @@ class MadOSControlCenter(QMainWindow):
         w = QWidget(); lay = QVBoxLayout(w); lay.setSpacing(8); lay.setContentsMargins(16,16,16,16)
         lay.addWidget(self._label("MISE À JOUR MADOS"))
         lay.addWidget(self._btn("🔄  Mettre à jour MadOS depuis GitHub",
-                                "x-terminal-emulator -e bash -c "
-                                "'wget -qO /tmp/mados_update.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/24_mados_update.sh "
-                                "&& sudo bash /tmp/mados_update.sh; "
-                                "read -p \"Appuyez sur Entree pour fermer...\"'",
-                                "#005599"))
+                                "wget -qO /tmp/mados_update.sh "
+                                "https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/modules/24_mados_update.sh "
+                                "&& konsole -e bash -c 'sudo bash /tmp/mados_update.sh; read -p Done' 2>/dev/null "
+                                "|| xterm -e bash -c 'sudo bash /tmp/mados_update.sh; read -p Done'",
+                                "#005599", async_run=True))
         lay.addWidget(self._separator())
         lay.addWidget(self._label("PAQUETS SYSTÈME"))
         lay.addWidget(self._btn("📦  Mettre à jour APT (apt upgrade)",
