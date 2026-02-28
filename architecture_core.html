@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Architecture Backend du Script Principal MadOS V2">
+    <title>Architecture Core — MadOS V2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --rog-red: #e8003d;
+            --rog-dark: #080808;
+            --rog-panel: rgba(15, 15, 15, 0.9);
+            --rog-border: rgba(232, 0, 61, 0.5);
+            --cyan: #00e5ff;
+            --green: #00ff88;
+            --text: #ffffff;
+            --text-dim: #999;
+        }
+
+        body {
+            background: var(--rog-dark);
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(232, 0, 61, 0.15) 0%, transparent 70%);
+        }
+
+        nav {
+            padding: 1.2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(232, 0, 61, 0.2);
+            background: rgba(8, 8, 8, 0.7);
+        }
+
+        .nav-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-logo span {
+            color: var(--rog-red);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--rog-red);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--rog-border);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h3 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            color: var(--cyan);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        strong {
+            color: #fff;
+        }
+
+        .code-block {
+            background: #111;
+            border: 1px solid #333;
+            border-left: 3px solid var(--rog-red);
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--green);
+            margin: 1rem 0 2rem;
+            overflow-x: auto;
+        }
+
+        .notice {
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 2rem 0;
+            font-size: 1.05rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 6px;
+        }
+
+        .module-card h4 {
+            color: var(--rog-red);
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-dim);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="nav-logo">MadOS <span>ROG V2</span></a>
+        <div>
+            <a href="index.html"
+                style="color:var(--text); text-decoration:none; font-family:'Orbitron',sans-serif; text-transform:uppercase; font-size:0.9rem;">➔
+                Retour au Hub</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Architecture Core : Le Script d'Installation MadOS</h1>
+        <p>Plongée au cœur de la conception logicielle de <strong>MadOS ROG Edition</strong>. Le déploiement du système
+            repose sur une architecture modulaire et paramétrique en bash, conçue pour transformer un <a
+                href="https://ubuntu.com/download/server" style="color:var(--cyan);">Ubuntu Server</a> en machine de
+            guerre Gaming, de manière 100% automatisée ou sélective (Menu interactif).</p>
+
+        <div class="notice">
+            <strong>🚀 L'Orchestrateur Principal :</strong> <code>Menu_Installation_ROG.sh</code> n'installe quasiment
+            rien de lui-même. C'est un chef d'orchestre ultra-rapide qui lit, appelle et coordonne les 26 sous-modules
+            isolés selon les choix de l'utilisateur.
+        </div>
+
+        <h2>🏗️ 1. L'Interface TUI (Text User Interface)</h2>
+        <p>Plutôt qu'un simple script défilant à l'aveugle, MadOS s'interface via <code>whiptail</code>. Ce module
+            génère nativement des fenêtres de dialogue (menus, cases à cocher, barres de progression) directement dans
+            le framebuffer du terminal de la machine, créant l'illusion d'une interface graphique avant même
+            l'installation du Serveur X11 ou Wayland.</p>
+        <div class="code-block">
+            if ! command -v whiptail &> /dev/null; then
+            apt-get install -y whiptail
+            fi
+        </div>
+
+        <h2>⚙️ 2. L'Architecture "Sub-Modules" (Séparation des préoccupations)</h2>
+        <p>Le code est strictement découpé en respectant le principe S.O.L.I.D. Chaque sous-script a une fonction et une
+            seule. Si un module échoue, l'orchestrateur gère l'erreur (via <code>set -e</code> trappé), enregistre la
+            trace dans <code>/tmp/mados_install.log</code>, et vous en informe.</p>
+
+        <div class="grid">
+            <div class="module-card">
+                <h4>01_systeme_base.sh</h4>
+                <p>Noyau de l'OS. Installation de Xorg, sddm, et conversion de la timezone système (Asia/Seoul >
+                    Europe/Paris by default).</p>
+            </div>
+            <div class="module-card">
+                <h4>02_pilotes_gpu_auto.sh</h4>
+                <p>Détection Hardware Intelligente via <code>ubuntu-drivers autoinstall</code> pour forger le driver
+                    NVIDIA/Radeon parfait pour votre puce.</p>
+            </div>
+            <div class="module-card">
+                <h4>05_bureau_kde_plasma.sh</h4>
+                <p>La magie graphique. Installe <code>kde-plasma-desktop</code> et configure le Wayland display server.
+                </p>
+            </div>
+            <div class="module-card">
+                <h4>22_cpu_undervolt.sh</h4>
+                <p>Ingénierie matérielle bas-niveau pour les CPU Intel/AMD, manipulant les registres de tension pour
+                    réduire la température de 15%. (RyzenAdj).</p>
+            </div>
+        </div>
+
+        <h2>🔬 3. Transmission d'États (Variables Multi-Modules)</h2>
+        <p>Les variables globales (comme le nom de l'utilisateur <code>$REAL_USER</code> ou le chemin
+            <code>$USER_HOME</code>) sont passées dynamiquement de l'orchestrateur vers les modules <code>.sh</code> en
+            tant qu'arguments (via <code>$1</code>). Cela sécurise les droits d'écriture et empêche un module de polluer
+            l'espace Root s'il n'en a pas besoin.</p>
+
+        <h3>Exemple de mécanique de lancement isolé :</h3>
+        <div class="code-block">
+            # Dans Menu_Installation_ROG.sh
+            bash "$INSTALL_DIR/modules/04_arsenal_logiciel.sh" "$REAL_USER"
+        </div>
+
+        <h2>🔥 4. La Personnalisation "Zero-Touch" et le Python</h2>
+        <p>Le module de sécurité et de nettoyage de syntaxe (<code>format_scripts.py</code>) est un utilitaire natif
+            codé en Python. Son rôle est de parcourir l'ensemble du dépôt local avant chaque lancement pour effacer les
+            dangereux retours chariots Windows (<code>\r\n</code> en <code>\n</code>). Cela garantit que le script MadOS
+            ne plantera <b>jamais</b>, même si l'utilisateur l'a édité depuis un Bloc-Notes Microsoft.</p>
+        <p>L'optimisation des temps de réponse et du nettoyage de l'OS est quant à elle déléguée à
+            <code>00_nettoyage_ubuntu.sh</code>, qui désactive violemment les daemons de télémétrie Snap Canonical.</p>
+
+        <h2>🛡️ 5. L'Intelligence "OpenClaw AI"</h2>
+        <p>Le système n'est plus un simple script. Il englobe une instance locale d'intelligence artificielle légère,
+            activable par <code>03_intelligence_openclaw.sh</code>, agissant comme un co-pilote terminal surveillant la
+            santé de vos paquets en temps réel.</p>
+    </div>
+
+    <div class="footer">
+        <p>Coded with pride by LordMadTrix for ASUS ROG | Bash Modular Architecture</p>
+    </div>
+</body>
+
+</html>
