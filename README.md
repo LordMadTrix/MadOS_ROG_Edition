@@ -9,7 +9,7 @@
   [![Ubuntu](https://img.shields.io/badge/OS-Ubuntu_24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
   [![KDE Plasma](https://img.shields.io/badge/Desktop-KDE_Plasma_6-1D99F3?style=for-the-badge&logo=kde&logoColor=white)](https://kde.org/)
 
-  [![Version](https://img.shields.io/badge/Version-2.8-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
+  [![Version](https://img.shields.io/badge/Version-3.0_Expansion-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
   <p align="center">
@@ -30,8 +30,9 @@
 - 🧠 **Détection Intelligente GPU** : Scan matériel automatique (`lspci`) pour déployer les pilotes NVIDIA (DKMS), AMD (Mesa/RADV) ou Intel sans la moindre configuration manuelle.
 - 💻 **Noyau XanMod EDGE** : Compilation automatique du kernel orienté gaming avec support AVX2 / AVX512 (selon votre CPU).
 - ⚙️ **Contrôle Hardware ASUS** : Intégration CLI native de `asusctl` et `supergfxctl` (compilés via Rust) pour la gestion du MUX Switch, des ventilateurs et du clavier RGB.
+- 🎛️ **MadOS Control Center V3.0** : Interface GUI native (PyQt6) pour gérer le Mode Jeu Extrême, Aura Sync (RGB), les limiteurs de batterie matériels, Ludusavi (Cloud Saves), Timeshift (BTRFS), et un diagnostic thermique complet.
 - 🎨 **Esthétique ROG Immersive** : Thème sombre, accents rouges, SDDM Wallpaper animé, Neofetch exclusif, et terminal ZSH (Powerlevel10k).
-- 🤖 **Assistant IA [OpenClaw](https://openclaw.ai/)** : Agent IA local intégré (Node.js / systemd), panneau de contrôle whiptail, démarrage automatique à la connexion.
+- 🤖 **Assistant IA [OpenClaw](https://openclaw.ai/)** : Agent IA local intégré (Node.js / systemd), injecteur matériel copilot, démarrage automatique à la connexion.
 - 🧹 **Purge Anti-Bloatware** : Suppression radicale de Snapd, GNOME, et de la télémétrie Ubuntu.
 - 🛡️ **Fiabilité Accrue** : Gestion moderne des clés GPG (`/etc/apt/keyrings`), logs d'installation tracés, et détection GPU sécurisée.
 
