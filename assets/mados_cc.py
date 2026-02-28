@@ -153,17 +153,33 @@ class MadOSControlCenter(QMainWindow):
         r = subprocess.run("systemctl --user is-active openclaw.service",
                            shell=True, capture_output=True, text=True)
         if r.stdout.strip() == "active":
-            log_query = subprocess.run(
-                "journalctl --user -u openclaw.service --no-pager | grep '?token=' | tail -n 1",
-                shell=True, capture_output=True, text=True
-            )
-            url_line = log_query.stdout.strip()
+            import os, json, re
             url = "http://localhost:18789"
+            token = ""
             
-            import re
-            match = re.search(r'(https?://[^\s\x1b]+)', url_line)
-            if match:
-                url = match.group(1)
+            # Methode 1: Forcer la lecture du Token depuis la config persistante (survit aux redemarrages)
+            config_path = os.path.expanduser("~/.openclaw/openclaw.json")
+            if os.path.exists(config_path):
+                try:
+                    with open(config_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        if "gateway" in data and "auth" in data["gateway"]:
+                            token = data["gateway"]["auth"].get("token", "")
+                except Exception:
+                    pass
+            
+            if token:
+                url = f"http://localhost:18789/?token={token}"
+            else:
+                # Methode 2 (Fallback) : Lire les logs systemd
+                log_query = subprocess.run(
+                    "journalctl --user -u openclaw.service --no-pager | grep '?token=' | tail -n 1",
+                    shell=True, capture_output=True, text=True
+                )
+                url_line = log_query.stdout.strip()
+                match = re.search(r'(https?://[^\s\x1b]+)', url_line)
+                if match:
+                    url = match.group(1)
             
             subprocess.Popen(["xdg-open", url])
         else:
