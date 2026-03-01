@@ -7,6 +7,14 @@
 
 set -uo pipefail
 
+# ==========================================
+# GESTION RÉSEAU : Forcer IPv4 pour éviter les crashs "Connection reset" 
+# et les échecs de résolution "be.archive.ubuntu.com" sur les VMs/IPv6 instables
+if [ ! -f /etc/apt/apt.conf.d/99force-ipv4 ]; then
+    echo -e "\033[0;33m[!] Sécurisation de la connexion APT (Forçage IPv4)...\033[0m"
+    echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4 > /dev/null
+fi
+
 # S'assurer que whiptail est installé
 if ! command -v whiptail >/dev/null 2>&1; then
     sudo apt-get update && sudo apt-get install -y whiptail dialog
