@@ -111,33 +111,19 @@ sudo -u "$REAL_USER" XDG_RUNTIME_DIR="/run/user/$(id -u "$REAL_USER")" systemctl
 echo -e "    ${GRAY}├─ Création du Terminal Neuronal V3.0 (OpenClaw_Launcher.sh)...${NC}"
 cat <<'LCH_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/OpenClaw_Launcher.sh" >/dev/null
 #!/bin/bash
-export NEWT_COLORS='
-    root=black,black
-    window=white,black
-    border=red,black
-    shadow=black,black
-    title=white,red
-    button=white,black
-    actbutton=white,red
-    compactbutton=white,black
-    textbox=white,black
-    listbox=white,black
-    actlistbox=white,red
-    sellistbox=white,black
-    actsellistbox=white,red
-    checkbox=white,black
-    actcheckbox=white,red
-'
+export NEWT_COLORS="root=black,black window=white,black border=red,black shadow=black,black title=white,red button=white,black actbutton=white,red compactbutton=white,black textbox=white,black listbox=white,black actlistbox=white,red sellistbox=white,black actsellistbox=white,red checkbox=white,black actcheckbox=white,red"
 while true; do
-  CHOICE=$(whiptail --title "🤖 Cœur Neuronal OpenClaw (V3.0)" --menu "Interface de Gestion de l'IA Locale" 19 68 7 \
+  if ! CHOICE=$(whiptail --title "🤖 Cœur Neuronal OpenClaw (V3.0)" --menu "Interface de Gestion de l'IA Locale" 19 68 7 \
     "1" "Accéder au Terminal Neuronal (Web UI)" \
     "2" "Ouvrir le Canal de Communication Brut (TUI)" \
     "3" "Engager le Noyau IA (Démarrer Gateway)" \
     "4" "Désactiver le Noyau IA (Arrêter Gateway)" \
     "5" "Re-Séquençage (Restart de l'IA)" \
     "6" "Diagnostic Matriciel (Logs Système)" \
-    "7" "Fermer la connexion" 3>&1 1>&2 2>&3)
-
+    "7" "Fermer la connexion" 3>&1 1>&2 2>&3); then
+    break
+  fi
+  
   if [ -z "$CHOICE" ] || [ "$CHOICE" = "7" ]; then break; fi
 
   case $CHOICE in

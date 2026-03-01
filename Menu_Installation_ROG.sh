@@ -51,23 +51,7 @@ export YELLOW='\033[0;33m'
 export NC='\033[0m'
 export BOLD='\033[1m'
 
-export NEWT_COLORS='
-    root=black,black
-    window=white,black
-    border=red,black
-    shadow=black,black
-    title=white,red
-    button=white,black
-    actbutton=white,red
-    compactbutton=white,black
-    textbox=white,black
-    listbox=white,black
-    actlistbox=white,red
-    sellistbox=white,black
-    actsellistbox=white,red
-    checkbox=white,black
-    actcheckbox=white,red
-'
+export NEWT_COLORS="root=black,black window=white,black border=red,black shadow=black,black title=white,red button=white,black actbutton=white,red compactbutton=white,black textbox=white,black listbox=white,black actlistbox=white,red sellistbox=white,black actsellistbox=white,red checkbox=white,black actcheckbox=white,red"
 
 run_module() {
     local SCRIPT="$1"
@@ -112,16 +96,14 @@ menu_principal() {
     echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝"
     echo -e "${NC}${WHITE}${BOLD}         --- CŒUR MATRICIEL ROG EDITION ---${NC}\n"
 
-    local CHOIX
-    CHOIX=$(whiptail --title "⚡ MadOS ROG Edition (v3.0) ⚡" \
+    if CHOIX=$(whiptail --title "⚡ MadOS ROG Edition (v3.0) ⚡" \
         --cancel-button "Annuler" \
         --ok-button "Engager" \
         --menu "Sélectionnez le protocole de déploiement :" 16 65 3 \
         "1" "Déploiement Total (Expérience E-Sport)" \
         "2" "Déploiement Custom (Options Ingénieurs)" \
-        "3" "Protocole Destruction (Purge Ubuntu)" 3>&1 1>&2 2>&3)
-    
-    if [ $? -eq 0 ]; then
+        "3" "Protocole Destruction (Purge Ubuntu)" 3>&1 1>&2 2>&3); then
+        
         case $CHOIX in
             1) installation_totale ;;
             2) installation_custom ;;
@@ -136,7 +118,7 @@ menu_principal() {
 installation_totale() {
     local CHOIX_BONUS
     # Affichage des options facultatives auto-sélectionnées ou non
-    CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v3.0)" \
+    if ! CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v3.0)" \
         --checklist "Espace pour (dés)activer, Entrée pour valider.\nLes fonctions vitales sont cochées par défaut." 20 65 12 \
         "SNAP" "Bouclier Système Timeshift" ON \
         "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
@@ -157,17 +139,21 @@ installation_totale() {
         "GUI"  "MadOS Control Center (Bureau)" ON \
         "UPD"  "Mise à jour automatique MadOS" OFF \
         "SAN"  "Diagnostic Santé Système" ON \
-        "VR"   "Suite VR (Meta Quest 3, ALVR, SideQuest)" OFF 3>&1 1>&2 2>&3)
-    
-    if [ $? -ne 0 ]; then menu_principal; return; fi
+        "VR"   "Suite VR (Meta Quest 3, ALVR, SideQuest)" OFF 3>&1 1>&2 2>&3); then
+        
+        menu_principal
+        return
+    fi
 
     # Menu Overclocking si le module est coché
     if [[ "$CHOIX_BONUS" == *"VOLT"* ]]; then
-        export MADOS_TDP_PROFILE=$(whiptail --title "Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+        if ! export MADOS_TDP_PROFILE=$(whiptail --title "Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
             "SILENCE" "Bridage 25W - Calme Absolu" OFF \
             "EQUILIBRE" "Stock 45W - Usine (Défaut)" ON \
-            "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3)
-        if [ $? -ne 0 ]; then menu_principal; return; fi
+            "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
+            menu_principal
+            return
+        fi
     else
         export MADOS_TDP_PROFILE="EQUILIBRE"
     fi
@@ -213,7 +199,7 @@ installation_totale() {
 
 installation_custom() {
     local CHOIX_ALL
-    CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
+    if ! CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
         --checklist "Espace pour sélectionner, Entrée pour valider :" 20 65 12 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
@@ -233,24 +219,28 @@ installation_custom() {
         "15_net" "Optimisation Réseau TCP" OFF \
         "16_zrm" "Compression Mémoire ZRAM" OFF \
         "17_ads" "Bouclier Anti-Pub" OFF \
-        "18_dev" "Pack Professionnel" OFF \
-        "19_ssd" "Auto Trim NVMe" OFF \
-        "20_usb" "Latence USB E-Sport" OFF \
-        "21_bot" "Démarrage LZ4 Éclair" OFF \
-        "22_cpu" "Undervolt CPU (Intel/AMD)" OFF \
-        "23_gui" "Interface Graphique MadOS" OFF \
-        "24_upd" "Mise à jour Auto MadOS" OFF \
-        "25_san" "Diagnostic Santé Système" OFF \
-        "26_vr"  "Casque VR (Meta Quest)" OFF 3>&1 1>&2 2>&3)
-    
-    if [ $? -ne 0 ]; then menu_principal; return; fi
+        "18_dev" "Pack Développeur (VSCode, Docker)" OFF \
+        "19_ssd" "Auto-Trim NVMe" OFF \
+        "20_usb" "Polling Rate USB 1000Hz" OFF \
+        "21_bot" "Fix Boot Ultra-Rapide (LZ4)" OFF \
+        "22_vlt" "Undervolt CPU Auto" OFF \
+        "23_gui" "MadOS Control Center" OFF \
+        "24_upd" "Updater GitHub" OFF \
+        "25_san" "Diagnostics Système" OFF \
+        "26_vr" "Casque VR (Meta Quest, ALVR)" OFF 3>&1 1>&2 2>&3); then
+        
+        menu_principal
+        return
+    fi
 
-    if [[ "$CHOIX_ALL" == *"22_cpu"* ]]; then
-        export MADOS_TDP_PROFILE=$(whiptail --title "Surcadençage & Profils Thermiques" --radiolist "Sélectionnez le comportement énergétique de votre processeur (TDP/Chauffe) :" 18 75 4 \
-            "SILENCE" "Bridage 25W - Autonomie & Calme Absolu" OFF \
-            "EQUILIBRE" "Stock 45W - Performances d'Usine (Défaut)" ON \
-            "EXTREME" "Débridage 65W - E-Sport & FPS Maximum" OFF 3>&1 1>&2 2>&3)
-        if [ $? -ne 0 ]; then menu_principal; return; fi
+    if [[ "$CHOIX_ALL" == *"22_vlt"* ]]; then
+        if ! export MADOS_TDP_PROFILE=$(whiptail --title "Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+            "SILENCE" "Bridage 25W - Calme Absolu" OFF \
+            "EQUILIBRE" "Stock 45W - Normal (Défaut)" ON \
+            "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
+            menu_principal
+            return
+        fi
     else
         export MADOS_TDP_PROFILE="EQUILIBRE"
     fi
