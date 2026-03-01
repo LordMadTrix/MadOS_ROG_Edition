@@ -22,7 +22,7 @@ if [ "$CPU_VENDOR" = "AuthenticAMD" ]; then
     fi
     
     if command -v ryzenadj &>/dev/null; then
-        local AMD_ARGS="--tctl-temp=85"
+        AMD_ARGS="--tctl-temp=85"
         case "${MADOS_TDP_PROFILE:-EQUILIBRE}" in
             "SILENCE") AMD_ARGS="--tctl-temp=70 --stapm-limit=25000 --fast-limit=25000" ;;
             "EXTREME") AMD_ARGS="--tctl-temp=95 --stapm-limit=65000 --fast-limit=65000 --slow-limit=54000 --max-performance" ;;
@@ -53,9 +53,9 @@ elif [ "$CPU_VENDOR" = "GenuineIntel" ]; then
     sudo apt install -y intel-undervolt || true
     
     if command -v intel-undervolt &>/dev/null; then
-        local CORE_UV="-50"
-        local CACHE_UV="-50"
-        local TDP_LIMITS=""
+        CORE_UV="-50"
+        CACHE_UV="-50"
+        TDP_LIMITS=""
         case "${MADOS_TDP_PROFILE:-EQUILIBRE}" in
             "SILENCE") TDP_LIMITS="tdp 25000 25000" ;;
             "EXTREME") CORE_UV="-20"; CACHE_UV="-20"; TDP_LIMITS="tdp 65000 65000" ;;

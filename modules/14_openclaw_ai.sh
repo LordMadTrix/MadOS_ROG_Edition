@@ -129,7 +129,7 @@ while true; do
   case $CHOICE in
     1)
       if systemctl --user is-active --quiet openclaw.service; then
-        echo -e "\n${BLUE}[+] Ouverture automatique de l'interface OpenClaw via le navigateur...${NC}"
+        echo -e "\n${CYAN}[+] Ouverture automatique de l'interface OpenClaw via le navigateur...${NC}"
         # 1. Tenter de lire le token depuis la configuration JSON persistante (Bypass suppression des logs systemd)
         OC_CONFIG="$HOME/.openclaw/openclaw.json"
         TOKEN=""

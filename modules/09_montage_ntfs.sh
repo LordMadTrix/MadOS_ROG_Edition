@@ -21,6 +21,9 @@ if [ -z "$NTFS_DRIVES" ]; then
     exit 0
 fi
 
+# Réattacher stdin au terminal pour les commandes interactives (read)
+exec < /dev/tty 2>/dev/null || true
+
 echo -e "    ${CYAN}Disques NTFS détectés :${NC}"
 echo "$NTFS_DRIVES" | awk -F: '{print "       - "$1}'
 
@@ -46,7 +49,8 @@ if sudo blkid | grep -q "$TARGET_DRIVE"; then
         echo -e "    ${RED}⚠️  [ATTENTION] Le disque est déjà configuré dans /etc/fstab.${NC}"
     else
         echo -e "    ${GRAY}├─ Ajout de l'entrée fstab optimisée Steam...${NC}"
-        echo "UUID=$UUID $MOUNT_POINT ntfs-3g uid=$USER_UID,gid=$USER_GID,rw,user,exec,umask=000,utf8 0 0" | sudo tee -a /etc/fstab >/dev/null
+        sudo apt install -y ntfs-3g > /dev/null 2>&1 || true
+        echo "UUID=$UUID $MOUNT_POINT ntfs-3g uid=$USER_UID,gid=$USER_GID,rw,user,exec,umask=000,utf8 0 0" | sudo tee -a /etc/fstab > /dev/null
         sudo mount -a || echo -e "    ${RED}⚠️  [ATTENTION] Erreur lors du montage automatique.${NC}"
         echo -e "    ${GREEN}✅ [SUCCÈS] Disque monté avec succès dans $MOUNT_POINT !${NC}"
     fi

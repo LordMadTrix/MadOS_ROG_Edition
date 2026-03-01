@@ -5,7 +5,7 @@
 # Script de Post-Installation - Interface Graphique
 # ==========================================
 
-set -euo pipefail
+set -uo pipefail
 
 # S'assurer que whiptail est installé
 if ! command -v whiptail >/dev/null 2>&1; then
@@ -271,7 +271,7 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"19_ssd"* ]] && run_module "19_donnees_fstrim.sh" "SSD Auto Trim"
     [[ "$CHOIX_ALL" == *"20_usb"* ]] && run_module "20_esport_usb_1000hz.sh" "USB Mod E-Sport"
     [[ "$CHOIX_ALL" == *"21_bot"* ]] && run_module "21_boot_eclair.sh" "GRUB Initramfs Lz4"
-    [[ "$CHOIX_ALL" == *"22_cpu"* ]] && run_module "22_cpu_undervolt.sh" "Undervolt & Thermiques"
+    [[ "$CHOIX_ALL" == *"22_vlt"* ]] && run_module "22_cpu_undervolt.sh" "Undervolt & Thermiques"
     [[ "$CHOIX_ALL" == *"23_gui"* ]] && run_module "23_control_center.sh" "Interface Control Center"
     [[ "$CHOIX_ALL" == *"24_upd"* ]] && run_module "24_mados_update.sh" "Mise à jour depuis GitHub"
     [[ "$CHOIX_ALL" == *"25_san"* ]] && run_module "25_sante_systeme.sh" "Diagnostic Santé"

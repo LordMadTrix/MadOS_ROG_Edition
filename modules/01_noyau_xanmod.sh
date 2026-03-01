@@ -33,8 +33,8 @@ else
 fi
 
 echo -e "    ${WHITE}├─ [HEADERS] Construction des en-têtes (Prérequis DKMS GPU)...${NC}"
-if sudo apt install -y "linux-headers-${CPU_LEVEL}" 2>/dev/null; then
-    echo -e "    ${GRAY}✅ [SUCCÈS] linux-headers-${CPU_LEVEL} déployés.${NC}"
+if sudo apt install -y "linux-headers-xanmod-edge-${CPU_LEVEL}" 2>/dev/null; then
+    echo -e "    ${GRAY}✅ [SUCCÈS] linux-headers-xanmod-edge-${CPU_LEVEL} déployés.${NC}"
 elif sudo apt install -y linux-headers-xanmod-edge 2>/dev/null; then
     echo -e "    ${GRAY}✅ [SUCCÈS] linux-headers-xanmod-edge déployés.${NC}"
 fi

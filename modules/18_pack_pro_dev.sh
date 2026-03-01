@@ -43,21 +43,9 @@ echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https:/
 sudo apt-get update -q
 sudo apt-get install -y codium || true
 
-# Antigravity (Google AI Assistant)
-echo -e "    ${GRAY}├─ Déploiement de l'assistant IA Google Antigravity...${NC}"
-ANTIGRAVITY_TEMP_DIR=$(mktemp -d)
-wget --timeout=5 --tries=1 -qO "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" https://antigravity.google/download/linux || true
-
-if [ -f "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" ] && dpkg-deb -I "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" >/dev/null 2>&1; then
-    sudo apt-get install -y "$ANTIGRAVITY_TEMP_DIR/antigravity.deb" >/dev/null 2>&1 || true
-    rm -rf "$ANTIGRAVITY_TEMP_DIR"
-else
-    echo -e "    ${RED}    [!] Le serveur Antigravity AI est inaccessible... Simulation d'intégration.${NC}"
-    echo '#!/bin/bash' | sudo tee /usr/local/bin/antigravity >/dev/null
-    echo 'echo "Google Antigravity AI (Agent Système) - En Ligne."' | sudo tee -a /usr/local/bin/antigravity >/dev/null
-    sudo chmod +x /usr/local/bin/antigravity
-    rm -rf "$ANTIGRAVITY_TEMP_DIR"
-fi
+# Google Antigravity AI n'est pas disponible publiquement comme paquet Linux.
+# Si vous avez accès à une version interne, placez le .deb dans le répertoire assets/
+echo -e "    ${GRAY}├─ [Antigravity] Package non disponible publiquement — ignoré.${NC}"
 
 echo -e "    ${CYAN}✅ [SUCCÈS] Environnement Docker, Virtualisation KVM, Éditeur Code et Antigravity prêts.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 18 Terminée.${NC}"
