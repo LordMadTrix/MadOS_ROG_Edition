@@ -53,6 +53,13 @@ export BOLD='\033[1m'
 
 export NEWT_COLORS="root=black,black window=white,black border=red,black shadow=black,black title=white,red button=white,black actbutton=white,red compactbutton=white,black textbox=white,black listbox=white,black actlistbox=white,red sellistbox=white,black actsellistbox=white,red checkbox=white,black actcheckbox=white,red"
 
+# Vide le buffer clavier TTY pour éviter que les séquences parasites (^[[A/^[[B)
+# générées par les touches fléchées ne contaminent le texte des prochains menus whiptail
+flush_tty() {
+    stty sane </dev/tty 2>/dev/null || true
+    while IFS= read -r -t 0.05 -n 1 _discard </dev/tty 2>/dev/null; do :; done
+}
+
 run_module() {
     local SCRIPT="$1"
     local DESCRIPTION="${2:-}"
@@ -96,6 +103,7 @@ menu_principal() {
     echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝"
     echo -e "${NC}${WHITE}${BOLD}         --- CŒUR MATRICIEL ROG EDITION ---${NC}\n"
 
+    flush_tty
     if CHOIX=$(whiptail --title "⚡ MadOS ROG Edition (v3.0) ⚡" \
         --cancel-button "Annuler" \
         --ok-button "Engager" \
@@ -117,6 +125,7 @@ menu_principal() {
 
 installation_totale() {
     local CHOIX_BONUS
+    flush_tty
     # Affichage des options facultatives auto-sélectionnées ou non
     if ! CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v3.0)" \
         --checklist "Espace pour (dés)activer, Entrée pour valider.\nLes fonctions vitales sont cochées par défaut." 20 65 12 \
@@ -199,6 +208,7 @@ installation_totale() {
 
 installation_custom() {
     local CHOIX_ALL
+    flush_tty
     if ! CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
         --checklist "Espace pour sélectionner, Entrée pour valider :" 20 65 12 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
@@ -281,6 +291,7 @@ installation_custom() {
 }
 
 mode_destruction() {
+    flush_tty
     if whiptail --title "⚠️ MODE DESTRUCTION ⚠️" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 60; then
         clear
         run_module "00_nettoyage_ubuntu.sh" "Purification Extrême de l'Hôte"
