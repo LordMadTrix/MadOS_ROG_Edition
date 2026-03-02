@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# MadOS ROG V2.3 - Menu Principal TUI (Whiptail)
+# MadOS ROG V3.0 - Menu Principal TUI (Whiptail)
 # ==========================================
 # Script de Post-Installation - Interface Graphique
 # ==========================================
@@ -112,7 +112,7 @@ menu_principal() {
     echo -e "${NC}${WHITE}${BOLD}         --- CŒUR MATRICIEL ROG EDITION ---${NC}\n"
 
     flush_tty
-    if CHOIX=$(whiptail --title "⚡ MadOS ROG Edition (v3.0) ⚡" \
+    if CHOIX=$(whiptail --title "MadOS ROG Edition (v3.0) - Installation" \
         --cancel-button "Annuler" \
         --ok-button "Engager" \
         --menu "Sélectionnez le protocole de déploiement :" 16 65 3 \

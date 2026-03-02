@@ -32,9 +32,9 @@
 - ⚙️ **Contrôle Hardware ASUS** : Intégration CLI native de `asusctl` et `supergfxctl` (compilés via Rust) pour la gestion du MUX Switch, des ventilateurs et du clavier RGB.
 - 🎛️ **MadOS Control Center V3.0** : Interface GUI native (PyQt6) pour gérer le Mode Jeu Extrême, Aura Sync (RGB), les limiteurs de batterie matériels, Ludusavi (Cloud Saves), Timeshift (BTRFS), et un diagnostic thermique complet.
 - 🎨 **Esthétique ROG Immersive** : Thème sombre, accents rouges, SDDM Wallpaper animé, Neofetch exclusif, et terminal ZSH (Powerlevel10k).
-- 🤖 **Assistant IA [OpenClaw](https://openclaw.ai/)** : Agent IA local intégré (Node.js / systemd), injecteur matériel copilot, démarrage automatique à la connexion.
+- 🤖 **Assistant IA [OpenClaw](https://openclaw.ai/)** : Agent IA local intégré (Node.js / systemd), injecteur matériel copilot, démarrage automatique à la connexion, et **Control Panel Interactif (GUI)** pour gérer le Gateway.
 - 🧹 **Purge Anti-Bloatware** : Suppression radicale de Snapd, GNOME, et de la télémétrie Ubuntu.
-- 🛡️ **Fiabilité Accrue** : Gestion moderne des clés GPG (`/etc/apt/keyrings`), logs d'installation tracés, et détection GPU sécurisée.
+- 🛡️ **Diagnostic Intelligent** : Upload automatique et sécurisé du journal d'installation via `termbin` en fin de déploiement pour un débogage instantané. Gestion moderne des clés GPG et détection GPU blindée.
 
 ---
 
@@ -86,7 +86,7 @@ Le déploiement est découpé logiquement. Chaque script dans le dossier `module
 | `11_batterie_extreme.sh` | 🔋 Déploiement de `auto-cpufreq` pour doubler l'autonomie sur batterie. |
 | `12_mangohud_rog.sh`     | 📊 Création d'un profil agressif Rouge/Noir pour surveiller vos FPS en jeu. |
 | `13_pack_streamer.sh`    | 🎥 Installation massive d'OBS, `obs-vkcapture` (Wayland), et IA `NoiseTorch`. |
-| `14_openclaw_ai.sh`      | 🤖 Compilation et démarrage automatique de l'IA `OpenClaw` (service systemd). |
+| `14_openclaw_ai.sh`      | 🤖 IA `OpenClaw` (service systemd) + Control Panel Interactif sur le Bureau. |
 | `15_reseau_antilag.sh`   | 🌐 Profil noyau TCP BBR & _fq_codel_ pour réduire le ping multijoueur. |
 | `16_zram_memoire.sh`     | 🧠 Swap ZRAM compressée (zstd) pour augmenter la capacité mémoire vive en jeu. |
 | `17_bouclier_antipub.sh` | 🛡️ Injection _StevenBlack Hosts_ bloquant traqueurs et malwares au niveau noyau. |

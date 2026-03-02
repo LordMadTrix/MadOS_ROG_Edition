@@ -15,8 +15,8 @@ set "SSH_PORT=22"
 set "IP_FOUND="
 
 :: Option 1: Recherche par nom d'hote
-echo [1/2] Recherche du nom d'hote "mados-rog"...
-for /f "tokens=2 delims=[]" %%i in ('ping -n 1 -w 1000 mados-rog 2^>nul') do (
+echo [1/2] Recherche du nom d'hote "mados"...
+for /f "tokens=2 delims=[]" %%i in ('ping -n 1 -w 1000 ubuntu 2^>nul') do (
     set "IP_FOUND=%%i"
 )
 
