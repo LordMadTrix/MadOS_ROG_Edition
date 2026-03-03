@@ -59,7 +59,23 @@ export YELLOW='\033[0;33m'
 export NC='\033[0m'
 export BOLD='\033[1m'
 
-export NEWT_COLORS="root=black,black;window=white,black;border=red,black;shadow=black,black;title=white,red;button=white,black;actbutton=white,red;compactbutton=white,black;textbox=white,black;listbox=white,black;actlistbox=white,red;sellistbox=white,black;actsellistbox=white,red;checkbox=white,black;actcheckbox=white,red"
+export NEWT_COLORS='
+root=black,black
+window=white,black
+border=red,black
+shadow=black,black
+title=white,red
+button=white,black
+actbutton=white,red
+compactbutton=white,black
+textbox=white,black
+listbox=white,black
+actlistbox=white,red
+sellistbox=white,black
+actsellistbox=white,red
+checkbox=white,black
+actcheckbox=white,red
+'
 
 
 run_module() {
