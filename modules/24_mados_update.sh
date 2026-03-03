@@ -47,7 +47,7 @@ echo -e "    ${GRAY}├─ Application des permissions...${NC}"
 sudo chmod +x "$INSTALL_DIR/Menu_Installation_ROG.sh" "$INSTALL_DIR/modules/"*.sh
 
 # Demander quels modules relancer
-CHOICE=$(whiptail --title "🔄 MadOS Update Launcher" --menu \
+CHOICE=$(whiptail --title "MadOS 3.0 - 🔄 Update Launcher" --menu \
     "Quelle mise à jour souhaitez-vous appliquer ?" 18 65 5 \
     "1" "Mise à jour Totale (tous les modules)" \
     "2" "Mise à jour Sélective (choisir les modules)" \

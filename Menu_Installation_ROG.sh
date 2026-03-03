@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# MadOS ROG V3.0 - Menu Principal TUI (Whiptail)
+# MadOS 3.0 - Menu Principal TUI (Whiptail)
 # ==========================================
 # Script de Post-Installation - Interface Graphique
 # ==========================================
@@ -22,7 +22,7 @@ if ! command -v whiptail >/dev/null 2>&1; then
 fi
 
 if [ "$EUID" -ne 0 ]; then
-    whiptail --title "ERREUR DE PRIVILÈGES" --msgbox "La matrice refuse votre accès.\n\nVeuillez lancer le script avec sudo :\n\nsudo bash Menu_Installation_ROG.sh" 10 60
+    whiptail --title "MadOS 3.0 - ERREUR DE PRIVILÈGES" --msgbox "La matrice refuse votre accès.\n\nVeuillez lancer le script avec sudo :\n\nsudo bash Menu_Installation_ROG.sh" 10 65
     exit 1
 fi
 
@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export MODULES_DIR="$SCRIPT_DIR/modules"
 
 if [ ! -d "$MODULES_DIR" ]; then
-    whiptail --title "ERREUR FATALE" --msgbox "Le dossier 'modules/' est introuvable." 8 45
+    whiptail --title "MadOS 3.0 - ERREUR FATALE" --msgbox "Le dossier 'modules/' est introuvable." 8 45
     exit 1
 fi
 
@@ -95,7 +95,7 @@ run_module() {
         else
             # Échec
             local CHOICE
-            CHOICE=$(whiptail --title "ERREUR MODULE" --menu "Le script $SCRIPT a échoué.\nConsultez les logs : /var/log/mados_install.log" 15 65 3 \
+            CHOICE=$(whiptail --title "MadOS 3.0 - ERREUR MODULE" --menu "Le script $SCRIPT a échoué.\nConsultez les logs : /var/log/mados_install.log" 15 65 3 \
                 "1" "Réessayer (Relancer le module)" \
                 "2" "Ignorer l'erreur et continuer" \
                 "3" "Arrêter l'installation" 3>&1 1>&2 2>&3)
@@ -114,21 +114,21 @@ run_module() {
 menu_principal() {
     clear
     echo -e "${RED}${BOLD}"
-    echo "  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗"
-    echo "  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝"
-    echo "  ██╔████╔██║███████║██║  ██║██║   ██║███████╗"
-    echo "  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║"
-    echo "  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║"
-    echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝"
-    echo -e "${NC}${WHITE}${BOLD}         --- CŒUR MATRICIEL ROG EDITION ---${NC}\n"
+    echo "  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗    ██████╗   ██████╗ "
+    echo "  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝    ╚════██╗ ██╔═████╗"
+    echo "  ██╔████╔██║███████║██║  ██║██║   ██║███████╗     █████╔╝ ██║██╔██║"
+    echo "  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║     ╚═══██╗ ████╔╝██║"
+    echo "  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║    ██████╔╝ ╚██████╔╝"
+    echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝    ╚═════╝   ╚═════╝ "
+    echo -e "${NC}${WHITE}${BOLD}           --- INSTALLATEUR SYSTÈME ROG EDITION ---${NC}\n"
 
-        if CHOIX=$(whiptail --title "MadOS ROG Edition (v3.0) - Installation" \
-        --cancel-button "Annuler" \
-        --ok-button "Engager" \
-        --menu "Sélectionnez le protocole de déploiement :" 16 65 3 \
-        "1" "Déploiement Total (Expérience E-Sport)" \
-        "2" "Déploiement Custom (Options Ingénieurs)" \
-        "3" "Protocole Destruction (Purge Ubuntu)" 3>&1 1>&2 2>&3); then
+    if CHOIX=$(whiptail --title "MadOS 3.0 - Menu Principal" \
+        --cancel-button "Quitter" \
+        --ok-button "Sélectionner" \
+        --menu "Choisissez le profil d'installation pour votre machine ROG :" 16 75 3 \
+        "1" "Installation Totale (Recommandée : E-Sport & Gamers)" \
+        "2" "Installation Personnalisée (Avancée : Sélection Manuelle)" \
+        "3" "Purge du Système (Nettoyage agressif d'Ubuntu)" 3>&1 1>&2 2>&3); then
         
         case $CHOIX in
             1) installation_totale ;;
@@ -143,8 +143,8 @@ menu_principal() {
 
 installation_totale() {
     local CHOIX_BONUS
-        # Affichage des options facultatives auto-sélectionnées ou non
-    if ! CHOIX_BONUS=$(whiptail --title "Déploiement Total - Options Bonus (v3.0)" \
+    # Affichage des options facultatives auto-sélectionnées ou non
+    if ! CHOIX_BONUS=$(whiptail --title "MadOS 3.0 - Options Bonus (Déploiement Total)" \
         --checklist "Espace pour (dés)activer, Entrée pour valider.\nLes fonctions vitales sont cochées par défaut." 20 65 12 \
         "SNAP" "Bouclier Système Timeshift" ON \
         "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
@@ -173,7 +173,7 @@ installation_totale() {
 
     # Menu Overclocking si le module est coché
     if [[ "$CHOIX_BONUS" == *"VOLT"* ]]; then
-        if ! export MADOS_TDP_PROFILE=$(whiptail --title "Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+        if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 3.0 - Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
             "SILENCE" "Bridage 25W - Calme Absolu" OFF \
             "EQUILIBRE" "Stock 45W - Usine (Défaut)" ON \
             "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
@@ -225,7 +225,7 @@ installation_totale() {
 
 installation_custom() {
     local CHOIX_ALL
-        if ! CHOIX_ALL=$(whiptail --title "Déploiement Custom (Expert)" \
+    if ! CHOIX_ALL=$(whiptail --title "MadOS 3.0 - Déploiement Custom (Expert)" \
         --checklist "Espace pour sélectionner, Entrée pour valider :" 20 65 12 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
@@ -260,7 +260,7 @@ installation_custom() {
     fi
 
     if [[ "$CHOIX_ALL" == *"22_vlt"* ]]; then
-        if ! export MADOS_TDP_PROFILE=$(whiptail --title "Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+        if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 3.0 - Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 70 4 \
             "SILENCE" "Bridage 25W - Calme Absolu" OFF \
             "EQUILIBRE" "Stock 45W - Normal (Défaut)" ON \
             "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
@@ -307,7 +307,7 @@ installation_custom() {
 }
 
 mode_destruction() {
-        if whiptail --title "⚠️ MODE DESTRUCTION ⚠️" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 60; then
+    if whiptail --title "MadOS 3.0 - MODE DESTRUCTION" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 70; then
         clear
         run_module "00_nettoyage_ubuntu.sh" "Purification Extrême de l'Hôte"
         sleep 2
@@ -324,8 +324,8 @@ cloture_installation() {
         LOG_URL="Aucun log généré."
     fi
 
-    whiptail --title "MAD OS ROG TERMINÉ 🎉" --msgbox "Déploiement Terminé avec Succès !\n\nLien de Diagnostic (Copiez-le pour le dev) :\n$LOG_URL\n\nAu prochain redémarrage, vous entrerez dans la Matrice :\n - Kernel XanMod EDGE\n - Interface Wayland / KDE\n - Modules Avancés Actifs" 16 68
-    if whiptail --title "REDÉMARRAGE" --yesno "Voulez-vous redémarrer le système maintenant pour savourer le fruit de votre travail ?" 10 50; then
+    whiptail --title "MadOS 3.0 - DÉPLOIEMENT TERMINÉ 🎉" --msgbox "Déploiement Terminé avec Succès !\n\nLien de Diagnostic (Copiez-le pour le dev) :\n$LOG_URL\n\nAu prochain redémarrage, vous profiterez de MadOS 3.0 :\n - Kernel XanMod EDGE\n - Interface Wayland / KDE Plasma 6\n - Modules Avancés Actifs" 16 70
+    if whiptail --title "MadOS 3.0 - REDÉMARRAGE" --yesno "Voulez-vous redémarrer le système maintenant pour savourer MadOS 3.0 ?" 10 55; then
         clear
         echo -e "${RED}Initiation de la séquence de reboot...${NC}"
         sleep 2

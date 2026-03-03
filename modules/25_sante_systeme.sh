@@ -126,8 +126,8 @@ fi
 echo -e "\n    ${GRAY}Rapport complet sauvegardé dans : ${WHITE}$REPORT_FILE${NC}"
 
 # Proposer d'afficher le rapport complet
-whiptail --title "🏥 MadOS Health Check" \
+whiptail --title "MadOS 3.0 - 🏥 Health Check" \
     --yesno "Score de Santé : $SCORE/$TOTAL ($PERCENT%)\n\nVoulez-vous consulter le rapport complet ?" 10 55 && \
-    whiptail --title "Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
+    whiptail --title "MadOS 3.0 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 25 Terminée.${NC}"
