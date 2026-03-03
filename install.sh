@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==========================================
-# MadOS 3.0 - Bootstrap (Phase 1)
-# Usage: sudo wget -qO- https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh | sudo bash
+# MadOS 3.0 - Bootstrap (Phase 1) - v3.0.1
+# Usage: wget -qO install.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh && sudo bash install.sh
 # ==========================================
 
 # Envelopper dans une fonction main permet d'éviter que wget | bash
@@ -35,11 +35,10 @@ main() {
     echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${CYAN}  [1/4] Vérification des privilèges...${NC}"
     echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-
     if [ "$EUID" -ne 0 ]; then
         echo -e "\n${RED}[!] ERREUR CRITIQUE : Privilèges Root manquants.${NC}"
-        echo -e "${WHITE}La matrice refuse votre accès. Veuillez lancer le script avec SUDO :${NC}\n"
-        echo -e "${GREEN}sudo wget -qO- https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh | sudo bash${NC}\n"
+        echo -e "${WHITE}La matrice refuse votre accès. Relancez avec SUDO :${NC}\n"
+        echo -e "${GREEN}sudo bash install.sh${NC}\n"
         exit 1
     fi
 
