@@ -14,6 +14,7 @@ if [ ! -f /etc/apt/apt.conf.d/99force-ipv4 ]; then
     echo -e "\033[0;33m[!] Sécurisation de la connexion APT (Forçage IPv4)...\033[0m"
     echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4 > /dev/null
 fi
+export TERM=xterm-256color
 
 # S'assurer que whiptail est installé
 if ! command -v whiptail >/dev/null 2>&1; then
