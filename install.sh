@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==========================================
 # MadOS 3.0 - Bootstrap & Menu Principal TUI (Whiptail)
-# Usage: wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition | bash
+# Usage: wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition/install.sh | bash
 # ==========================================
 
 # Envelopper dans une fonction main permet d'éviter que wget | bash
