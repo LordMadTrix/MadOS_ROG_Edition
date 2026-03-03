@@ -86,21 +86,9 @@ main() {
     chmod +x "$INSTALL_DIR/modules"/*.sh 2>/dev/null || true
 
     echo ""
-    echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${CYAN}  [4/4] Transition vers le terminal local interactif...${NC}"
-    echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    sleep 2
-
-    # ==========================================
-    # LA RUSTINE MAGIQUE TTY
-    # ==========================================
-    # Étant donné que wget | bash pompe le flux STDIN, le menu Whiptail ne capte pas le clavier.
-    # Ici, nous basculons toute l'exécution sur le VRAI terminal attaché au processus (/dev/tty).
-    # La commande 'exec' remplace le script actuel par la suite, tout étant isolé du wget.
-    export TERM=xterm-256color
-    
-    # On garantit que sudo ne flingue pas le TTY interactif en le relançant sous la console tty locale
-    exec bash -c "exec < /dev/tty > /dev/tty 2>&1; bash '$INSTALL_DIR/install_local.sh'"
+    echo -e "${RED}⚠️  IMPORTANT : L'assistant d'installation tactile MadOS requiert un clavier propre !${NC}"
+    echo -e "${WHITE}Pour éviter le bug des touches directionnelles (flèches), tapez ou copiez-collez cette commande finale :${NC}\n"
+    echo -e "${GREEN}sudo /tmp/mados_install_bootstrap/install_local.sh${NC}\n"
 }
 
 main
