@@ -96,8 +96,9 @@ main() {
     fi
     export TERM=xterm-256color
 
-    # Réattacher stdin au terminal et nettoyer l'affichage (indispensable avec wget pipe)
-    exec < /dev/tty
+    # Récupérer l'entrée standard du terminal, même si exécuté via wget | bash
+    exec </dev/tty >/dev/tty 2>&1
+    stty sane 2>/dev/null || true
     tput reset 2>/dev/null || true
 
     # Empêcher sudo de réinitialiser les variables cruciales pour l'installation silencieuse
