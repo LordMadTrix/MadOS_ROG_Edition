@@ -24,6 +24,11 @@ sudo dpkg --configure -a 2>/dev/null || true
 
 echo -e "${RED}>>> ${WHITE}[Phase 0] ${BOLD}Purification du Système & Préparation...${NC}"
 
+# 0. Installation des outils de base requis pour la suite
+echo -e "    ${WHITE}├─ [PREREQUIS] Installation des outils de dépôts...${NC}"
+sudo apt update -qq >/dev/null 2>&1
+sudo apt install -y software-properties-common dirmngr gpg curl wget 2>/dev/null || true
+
 # 1. Nettoyage des Bloatwares Serveur (Cloud-Init, Multipathd)
 echo -e "    ${WHITE}├─ [NETTOYAGE] Suppression des services serveur inutiles...${NC}"
 sudo apt purge -y cloud-init multipath-tools snapd 2>/dev/null || true
@@ -82,6 +87,6 @@ sudo apt upgrade -y -q
 
 # 5. Dépendances de base
 echo -e "    ${WHITE}├─ [BASE] Utilitaires fondamentaux...${NC}"
-sudo apt install -y build-essential git curl wget cmake pkg-config unzip p7zip-full htop vim nano pipx zsh gamemode software-properties-common ca-certificates gcc g++ make file
+sudo apt install -y build-essential git cmake pkg-config unzip p7zip-full htop vim nano pipx zsh gamemode ca-certificates gcc g++ make file
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 0 Terminée.${NC}"

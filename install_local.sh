@@ -42,16 +42,31 @@ main() {
     echo -e "${YELLOW}[!] Optimisation du réseau et des miroirs Ubuntu...${NC}"
     
     # 1. DNS Fix : Forcer temporairement Google DNS si la VM galère
-    if ! ping -c 1 google.com >/dev/null 2>&1; then
+    if ! ping -c 1 -W 2 google.com >/dev/null 2>&1; then
         echo -e "${GRAY}    Injecteur DNS de secours (8.8.8.8)...${NC}"
         echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
     fi
 
-    # 2. Mirror Switch : Remplacer les miroirs régionaux instables (ex: be.archive) par le miroir global
-    if grep -q "be.archive.ubuntu.com" /etc/apt/sources.list; then
-        echo -e "${GRAY}    Bascule du miroir belge vers l'archive globale (plus stable)...${NC}"
-        sudo sed -i 's/be.archive.ubuntu.com/archive.ubuntu.com/g' /etc/apt/sources.list
+    # 2. Mirror Switch Global : Remplacer TOUS les miroirs régionaux par l'archive principale
+    # Supporte l'ancien format /etc/apt/sources.list et le nouveau format DEB822 (24.04+)
+    echo -e "${GRAY}    Bascule vers les serveurs de l'archive globale (Stabilité Max)...${NC}"
+    
+    # Backup
+    sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak 2>/dev/null || true
+    [ -f /etc/apt/sources.list.d/ubuntu.sources ] && sudo cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak 2>/dev/null || true
+
+    # Remplacement dans l'ancien format .list
+    sudo sed -i 's|http://[a-z][a-z]\.archive\.ubuntu\.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list 2>/dev/null || true
+    
+    # Remplacement dans le nouveau format DEB822 (utilisé par Ubuntu 24.10+)
+    if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+        sudo sed -i 's|[a-z][a-z]\.archive\.ubuntu\.com|archive.ubuntu.com|g' /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
     fi
+
+    # 3. Installation immédiate des propriétés logicielles (requis pour add-apt-repository)
+    echo -e "${GRAY}    Préparation des outils de dépôts (software-properties-common)...${NC}"
+    sudo apt-get update -o Acquire::Retries=3 -qq >/dev/null 2>&1
+    sudo apt-get install -y software-properties-common dirmngr gpg curl wget 2>/dev/null || true
 
 
     # Empêcher sudo de réinitialiser les variables cruciales pour l'installation silencieuse
