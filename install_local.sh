@@ -39,6 +39,21 @@ main() {
 
     export MODULES_DIR="/tmp/mados_install_bootstrap/modules"
 
+    echo -e "${YELLOW}[!] Optimisation du réseau et des miroirs Ubuntu...${NC}"
+    
+    # 1. DNS Fix : Forcer temporairement Google DNS si la VM galère
+    if ! ping -c 1 google.com >/dev/null 2>&1; then
+        echo -e "${GRAY}    Injecteur DNS de secours (8.8.8.8)...${NC}"
+        echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+    fi
+
+    # 2. Mirror Switch : Remplacer les miroirs régionaux instables (ex: be.archive) par le miroir global
+    if grep -q "be.archive.ubuntu.com" /etc/apt/sources.list; then
+        echo -e "${GRAY}    Bascule du miroir belge vers l'archive globale (plus stable)...${NC}"
+        sudo sed -i 's/be.archive.ubuntu.com/archive.ubuntu.com/g' /etc/apt/sources.list
+    fi
+
+
     # Empêcher sudo de réinitialiser les variables cruciales pour l'installation silencieuse
     echo 'Defaults env_keep += "DEBIAN_FRONTEND NEEDRESTART_MODE"' | sudo tee /etc/sudoers.d/mados-apt-env >/dev/null
     sudo chmod 0440 /etc/sudoers.d/mados-apt-env
