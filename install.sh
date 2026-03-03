@@ -57,7 +57,7 @@ main() {
     fi
 
     if [ "$EUID" -ne 0 ]; then
-        whiptail --title "MadOS 3.0 - ERREUR DE PRIVILÈGES" --msgbox "La matrice refuse votre accès.\n\nVeuillez lancer le script avec sudo :\n\nsudo bash install.sh" 10 65
+        whiptail --title "MadOS 3.0 - ERREUR DE PRIVILÈGES" --msgbox "La matrice refuse votre accès.\n\nVeuillez lancer le script avec sudo :\n\nsudo wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition/install.sh | sudo bash" 10 70
         exit 1
     fi
 
@@ -165,12 +165,12 @@ run_module() {
 menu_principal() {
     clear
     echo -e "${RED}${BOLD}"
-    echo "  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗    ██████╗   ██████╗ "
-    echo "  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝    ╚════██╗ ██╔═████╗"
-    echo "  ██╔████╔██║███████║██║  ██║██║   ██║███████╗     █████╔╝ ██║██╔██║"
-    echo "  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║     ╚═══██╗ ████╔╝██║"
-    echo "  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║    ██████╔╝ ╚██████╔╝"
-    echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝    ╚═════╝   ╚═════╝ "
+    echo "  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗ "
+    echo "  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝ "
+    echo "  ██╔████╔██║███████║██║  ██║██║   ██║███████╗ "
+    echo "  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║ "
+    echo "  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║ "
+    echo "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝ "
     echo -e "${NC}${WHITE}${BOLD}           --- INSTALLATEUR SYSTÈME MadOS ---${NC}\n"
 
     if CHOIX=$(whiptail --title "MadOS 3.0 - Menu Principal" \
