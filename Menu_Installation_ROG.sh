@@ -59,13 +59,14 @@ export YELLOW='\033[0;33m'
 export NC='\033[0m'
 export BOLD='\033[1m'
 
-export NEWT_COLORS="root=black,black window=white,black border=red,black shadow=black,black title=white,red button=white,black actbutton=white,red compactbutton=white,black textbox=white,black listbox=white,black actlistbox=white,red sellistbox=white,black actsellistbox=white,red checkbox=white,black actcheckbox=white,red"
+export NEWT_COLORS="root=black,black;window=white,black;border=red,black;shadow=black,black;title=white,red;button=white,black;actbutton=white,red;compactbutton=white,black;textbox=white,black;listbox=white,black;actlistbox=white,red;sellistbox=white,black;actsellistbox=white,red;checkbox=white,black;actcheckbox=white,red"
 
 # Vide le buffer clavier TTY pour éviter que les séquences parasites (^[[A/^[[B)
 # générées par les touches fléchées ne contaminent le texte des prochains menus whiptail
 flush_tty() {
-    stty sane </dev/tty 2>/dev/null || true
-    while IFS= read -r -t 0.05 -n 1 _discard </dev/tty 2>/dev/null; do :; done
+    # On utilise -s pour bloquer l'écho à l'écran, et on retire stty sane
+    # pour ne pas interférer avec le mode raw configuré par newt/whiptail.
+    while IFS= read -r -s -t 0.05 -n 1 _discard </dev/tty 2>/dev/null; do :; done
 }
 
 run_module() {
