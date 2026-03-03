@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==========================================
 # MadOS 3.0 - Bootstrap & Menu Principal TUI (Whiptail)
-# Usage: wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition/install.sh | bash
+# Usage: wget -qO- https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh | sudo bash
 # ==========================================
 
 # Envelopper dans une fonction main permet d'éviter que wget | bash
@@ -57,7 +57,7 @@ main() {
     fi
 
     if [ "$EUID" -ne 0 ]; then
-        whiptail --title "MadOS 3.0 - ERREUR DE PRIVILÈGES" --msgbox "La matrice refuse votre accès.\n\nVeuillez lancer le script avec sudo :\n\nsudo wget -qO- lordmadtrix.github.io/MadOS_ROG_Edition/install.sh | sudo bash" 10 70
+        whiptail --title "MadOS 3.0 - ERREUR DE PRIVILÈGES" --msgbox "La matrice refuse votre accès.\n\nVeuillez relancer le script tel quel :\n\nsudo wget -qO- https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh | sudo bash" 10 70
         exit 1
     fi
 
