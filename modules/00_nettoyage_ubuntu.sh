@@ -1,12 +1,23 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2 - 00_nettoyage_ubuntu.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 00_nettoyage_ubuntu.sh
+# ==============================================================================
 # Phase: 0 - Purification & Dépôts
 # Nettoie les composants serveur et prépare l'environnement.
-# ==========================================
-
 # Enlever 'set -e' pour éviter qu'une simple erreur réseau/apt update ne fasse crasher tout le script
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
@@ -22,7 +33,9 @@ sudo rm /var/cache/apt/archives/lock 2>/dev/null || true
 sudo rm /var/lib/dpkg/lock* 2>/dev/null || true
 sudo dpkg --configure -a 2>/dev/null || true
 
-echo -e "${RED}>>> ${WHITE}[Phase 0] ${BOLD}Purification du Système & Préparation...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 0 Purification du Système & Préparation${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 0. Installation des outils de base requis pour la suite
 echo -e "    ${WHITE}├─ [PREREQUIS] Installation des outils de dépôts...${NC}"

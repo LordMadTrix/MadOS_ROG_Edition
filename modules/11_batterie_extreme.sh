@@ -1,13 +1,27 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2.3 - 11_batterie_extreme.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 11_batterie_extreme.sh
+# ==============================================================================
 # Phase: 11 - Batterie Extrême (auto-cpufreq)
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
-echo -e "${RED}>>> ${WHITE}[Phase 11] ${BOLD}Installation du gestionnaire Batterie Extrême...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 11 Installation du gestionnaire Batterie Extrême${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # auto-cpufreq est particulièrement efficace pour les PC portables
 sudo apt update -q >/dev/null 2>&1

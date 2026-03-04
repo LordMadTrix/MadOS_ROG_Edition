@@ -1,14 +1,28 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2 - 02_pilotes_gpu_auto.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 02_pilotes_gpu_auto.sh
+# ==============================================================================
 # Phase: 2 - Détection et Installation GPU
 # Cherche la carte dédiée et installe les pilotes appropriés.
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
-echo -e "${RED}>>> ${WHITE}[Phase 2] ${BOLD}Scan & Déploiement des Pilotes Graphiques...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 2 Scan & Déploiement des Pilotes Graphiques${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Identifier le GPU dédié
 if command -v lspci >/dev/null; then

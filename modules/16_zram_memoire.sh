@@ -1,15 +1,28 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2.5 - 16_zram_memoire.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 16_zram_memoire.sh
+# ==============================================================================
 # Phase: 16 - Compression Mémoire (ZRAM zstd)
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
-CYAN='\033[0;36m'
 
-echo -e "${RED}>>> ${WHITE}[Phase 16] ${BOLD}Configuration ZRAM (Compression Mémoire Ultra-Rapide)...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 16 Configuration ZRAM (Compression Mémoire Ultra-Rapide)${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 sudo apt-get update -q >/dev/null 2>&1
 sudo apt-get install -y zram-tools >/dev/null 2>&1 || true

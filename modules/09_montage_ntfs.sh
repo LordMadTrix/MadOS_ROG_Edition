@@ -1,16 +1,29 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2.1 - 09_montage_ntfs.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 09_montage_ntfs.sh
+# ==============================================================================
 # Phase: 9 - Montage Automatique des jeux NTFS
-# ==========================================
+# ==============================================================================
 
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
 CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
 REAL_USER=${SUDO_USER:-$USER}
 USER_UID=$(id -u "$REAL_USER")
 USER_GID=$(id -g "$REAL_USER")
 
-echo -e "${RED}>>> ${WHITE}[Phase 9] ${BOLD}Recherche de disques Windows (NTFS)...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 9 Recherche de disques Windows (NTFS)${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Trouver les disques NTFS
 NTFS_DRIVES=$(sudo blkid | grep -i ntfs || true)

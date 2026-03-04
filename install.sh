@@ -1,6 +1,20 @@
 #!/bin/bash
-# ==========================================
-# MadOS 3.0 - Bootstrap (Phase 1) - v3.0.1
+# ==============================================================================
+# MadOS ROG Edition 3.0 - install.sh
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
 # Usage: wget -qO install.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh && sudo bash install.sh
 # ==========================================
 
@@ -10,12 +24,6 @@ main() {
     export DEBIAN_FRONTEND=noninteractive
     set -uo pipefail
 
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    CYAN='\033[0;36m'
-    WHITE='\033[1;37m'
-    GRAY='\033[0;37m'
-    NC='\033[0m'
 
     clear
     echo ""

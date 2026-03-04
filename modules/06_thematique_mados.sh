@@ -1,10 +1,22 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2 - 06_thematique_mados.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 06_thematique_mados.sh
+# ==============================================================================
 # Phase: 6 - Identité OS complète + Visuals
 # Transforme le rendu pour correspondre au style ROG
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -20,7 +32,9 @@ echo -e "${RED}║${NC}   ${WHITE}${BOLD}MadOS ROG V2 — APPLICATION DE LA CHAR
 echo -e "${RED}╚══════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. OS Identity
-echo -e "${RED}>>> ${WHITE}[1/5] ${BOLD}Configuration de l'identité système...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}1/5 Configuration de l'identité système${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 cat > /etc/os-release <<'OSRELEASE'
 NAME="MadOS ROG Edition"
 VERSION="2.6 (Noble)"
@@ -38,8 +52,6 @@ hostname mados-rog 2>/dev/null || true
 
 cat > /etc/update-motd.d/00-mados-header <<'MOTD'
 #!/bin/bash
-CYAN='\033[0;36m'
-BOLD='\033[1m'
 RESET='\033[0m'
 echo -e "${RED}${BOLD}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗${RESET}"
 echo -e "${RED}${BOLD}  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝${RESET}"

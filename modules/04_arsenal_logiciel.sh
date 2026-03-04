@@ -1,17 +1,31 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2 - 04_arsenal_logiciel.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 04_arsenal_logiciel.sh
+# ==============================================================================
 # Phase: 4 - Arsenal Logiciel & IA (OpenClaw)
 # Installe Chrome, Steam, Lutris, et les outils Gaming.
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
-echo -e "${RED}>>> ${WHITE}[Phase 4] ${BOLD}Installation de l'Arsenal Logiciel...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 4 Installation de l'Arsenal Logiciel${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 install_pkg() {
     for pkg in "$@"; do

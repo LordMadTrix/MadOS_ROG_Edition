@@ -1,9 +1,21 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2 - 05_bureau_kde_plasma.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 05_bureau_kde_plasma.sh
+# ==============================================================================
 # Phase: 5 - KDE Plasma Desktop & Élimination Bloatware
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
@@ -11,7 +23,9 @@ export NEEDRESTART_MODE=a
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
-echo -e "${RED}>>> ${WHITE}[Phase 5] ${BOLD}Déploiement du Bureau KDE Plasma...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 5 Déploiement du Bureau KDE Plasma${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # PPA Plasma 6
 if ! grep -r "kubuntu-ppa/backports" /etc/apt/sources.list.d/ &>/dev/null; then

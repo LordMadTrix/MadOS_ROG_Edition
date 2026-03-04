@@ -1,17 +1,30 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2.5 - 18_pack_pro_dev.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 18_pack_pro_dev.sh
+# ==============================================================================
 # Phase: 18 - Pack Professionnel / Virt / Dev
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
-CYAN='\033[0;36m'
 
 REAL_USER=${SUDO_USER:-$USER}
 
-echo -e "${RED}>>> ${WHITE}[Phase 18] ${BOLD}Installation de l'écosystème Pro Dev & Virtualisation...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 18 Installation de l'écosystème Pro Dev & Virtualisation${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Docker
 echo -e "    ${GRAY}├─ Installation de Docker...${NC}"

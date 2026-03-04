@@ -1,9 +1,21 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2 - 24_mados_update.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 24_mados_update.sh
+# ==============================================================================
 # Phase: 24 - Mise à jour automatique MadOS
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -11,7 +23,9 @@ REAL_USER=${SUDO_USER:-$USER}
 INSTALL_DIR="/tmp/mados_update_$(date +%s)"
 REPO_URL="https://github.com/LordMadTrix/MadOS_ROG_Edition.git"
 
-echo -e "${RED}>>> ${WHITE}[Phase 24] ${BOLD}Mise à jour de MadOS ROG Edition...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 24 Mise à jour de MadOS ROG Edition${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 echo -e "    ${GRAY}├─ Vérification de la connexion internet...${NC}"
 if ! ping -c 1 github.com &>/dev/null; then

@@ -1,15 +1,29 @@
 #!/bin/bash
-# ==========================================
-# MadOS ROG V2 - 03_integration_rog.sh
-# ==========================================
+# ==============================================================================
+# MadOS ROG Edition 3.0 - 03_integration_rog.sh
+# ==============================================================================
 # Phase: 3 - ASUS ROG Laptop Full Integration
-# ==========================================
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
 
-echo -e "${RED}>>> ${WHITE}[Phase 3] ${BOLD}Intégration Matérielle Complète (ASUS ROG)...${NC}"
+echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 3 Intégration Matérielle Complète (ASUS ROG)${NC}"
+echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Détection du modèle exact
 if command -v dmidecode >/dev/null; then

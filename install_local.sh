@@ -1,22 +1,28 @@
 #!/bin/bash
-# ==========================================
-# MadOS 3.0 - Bootstrap & Menu Principal TUI (Whiptail)
+# ==============================================================================
+# MadOS ROG Edition 3.0 - install_local.sh
+# ==============================================================================
 # Usage: Ce script est appelé automatiquement par le bootstrapper install.sh
 # Ne pas lancer manuellement avec wget !
-# ==========================================
 # ne coupe le script en plein milieu si l'entrée standard est consommée.
+# ==============================================================================
+
+# ==============================================================================
+# Variables de Couleurs pour UI Terminal
+# ==============================================================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
 main() {
     export DEBIAN_FRONTEND=noninteractive
     set -uo pipefail
 
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    CYAN='\033[0;36m'
-    WHITE='\033[1;37m'
-    GRAY='\033[0;37m'
-    NC='\033[0m'
-    export BOLD='\033[1m'
-    export YELLOW='\033[0;33m'
 
     clear
     echo ""
