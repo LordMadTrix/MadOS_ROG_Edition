@@ -1,45 +1,63 @@
-# MadOS ROG Edition - Gitignore
+# MadOS ROG Edition — .gitignore
+# Règle : Garder SEULEMENT les scripts .sh, le site web, les assets/images et la doc.
 
-# Systèmes de fichiers / OS
+# ==========================================
+# FICHIERS AUTORISÉS (whitelist conceptuelle)
+# ==========================================
+# ✅ modules/*.sh
+# ✅ install.sh, install_local.sh
+# ✅ index.html, architecture_core.html
+# ✅ assets/ (images, logos, wallpapers)
+# ✅ *.md (documentation)
+# ✅ .gitignore, .gitattributes
+
+# ==========================================
+# EXCLUSIONS - Systèmes / OS
+# ==========================================
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-# Dossiers d'éditeurs & IDE
+# IDE
 .vscode/
 .idea/
 *.swp
 *~
-# Logs et fichiers temporaires
+
+# Logs & temporaires
 *.log
 /tmp/
 /temp/
 test_*.sh
 *mados_error.log
-
-# Outils de build perso (s'il y en a)
 /build/
 /rog_v2_build/
 
-# Ignorer d'éventuels clés gpg ou fichiers secrets par accident
+# Clés / secrets
 *.gpg
 *.key
 *.pem
 .env
 secret/
 
-# === Fichiers VM & ISO (Ne jamais pousser sur GitHub) ===
+# ==========================================
+# EXCLUSIONS - Machines Virtuelles & ISO
+# ==========================================
 MadOS_3.0_AutoVM/
 *.vmdk
 *.vmx
 *.vmxf
 *.vmsd
+*.vmem
 *.nvram
 *.iso
 MadOS_VMware.ps1
 user-data
 
-# Fichiers de scripts temporaires / helpers Python
-harmonize.py
-tmp_fix_crlf.py
+# ==========================================
+# EXCLUSIONS - Scripts helpers & divers
+# ==========================================
 *.py
+*.ps1
+*.bat
+connect_mados_ssh.bat
