@@ -27,3 +27,19 @@ test_*.sh
 *.pem
 .env
 secret/
+
+# === Fichiers VM & ISO (Ne jamais pousser sur GitHub) ===
+MadOS_3.0_AutoVM/
+*.vmdk
+*.vmx
+*.vmxf
+*.vmsd
+*.nvram
+*.iso
+MadOS_VMware.ps1
+user-data
+
+# Fichiers de scripts temporaires / helpers Python
+harmonize.py
+tmp_fix_crlf.py
+*.py
