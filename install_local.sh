@@ -191,7 +191,8 @@ installation_totale() {
         "GUI"  "MadOS Control Center (Bureau)" ON \
         "UPD"  "Mise à jour automatique MadOS" OFF \
         "SAN"  "Diagnostic Santé Système" ON \
-        "VR"   "Suite VR (Meta Quest 3, ALVR, SideQuest)" OFF 3>&1 1>&2 2>&3); then
+        "VR"   "Suite VR (Meta Quest 3, ALVR, SideQuest)" OFF \
+        "MAK"  "Station Maker (Imprimante 3D & Graveur Laser)" OFF 3>&1 1>&2 2>&3); then
         
         menu_principal
         return
@@ -245,6 +246,7 @@ installation_totale() {
     [[ "$CHOIX_BONUS" == *"UPD"* ]]  && run_module "24_mados_update.sh" "Mise à jour MadOS depuis GitHub"
     [[ "$CHOIX_BONUS" == *"SAN"* ]]  && run_module "25_sante_systeme.sh" "Diagnostic Santé du Système"
     [[ "$CHOIX_BONUS" == *"VR"* ]]   && run_module "26_vr_oculus_quest.sh" "Intégration VR (Meta Quest)"
+    [[ "$CHOIX_BONUS" == *"MAK"* ]]  && run_module "27_creation_maker.sh" "Station Maker (Imprimante 3D & Laser)"
 
     cloture_installation
 }
@@ -279,7 +281,8 @@ installation_custom() {
         "23_gui" "MadOS Control Center" OFF \
         "24_upd" "Updater GitHub" OFF \
         "25_san" "Diagnostics Système" OFF \
-        "26_vr" "Casque VR (Meta Quest, ALVR)" OFF 3>&1 1>&2 2>&3); then
+        "26_vr" "Casque VR (Meta Quest, ALVR)" OFF \
+        "27_mak" "Station Maker (3D & Laser)" OFF 3>&1 1>&2 2>&3); then
         
         menu_principal
         return
@@ -328,6 +331,7 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"24_upd"* ]] && run_module "24_mados_update.sh" "Mise à jour depuis GitHub"
     [[ "$CHOIX_ALL" == *"25_san"* ]] && run_module "25_sante_systeme.sh" "Diagnostic Santé"
     [[ "$CHOIX_ALL" == *"26_vr"* ]] && run_module "26_vr_oculus_quest.sh" "Suite VR Meta Quest"
+    [[ "$CHOIX_ALL" == *"27_mak"* ]] && run_module "27_creation_maker.sh" "Station Maker (Imprimante 3D & Laser)"
 
     cloture_installation
 }
