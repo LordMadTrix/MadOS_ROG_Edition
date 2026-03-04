@@ -85,9 +85,11 @@ main() {
     chmod +x "$INSTALL_DIR/modules"/*.sh 2>/dev/null || true
 
     echo ""
-    echo -e "${RED}⚠️  IMPORTANT : L'assistant d'installation tactile MadOS requiert un clavier propre !${NC}"
-    echo -e "${WHITE}Pour éviter le bug des touches directionnelles (flèches), tapez ou copiez-collez cette commande finale :${NC}\n"
-    echo -e "${GREEN}sudo /tmp/mados_install_bootstrap/install_local.sh${NC}\n"
+    echo -e "${RED}⚠️  Lancement automatique de l'assistant d'installation dans quelques secondes...${NC}"
+    sleep 2
+    
+    # On s'assure que le script suivant a bien un terminal propre pour Whiptail
+    exec /tmp/mados_install_bootstrap/install_local.sh < /dev/tty
 }
 
 main
