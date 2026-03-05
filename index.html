@@ -514,6 +514,7 @@
         <div class="nav-links">
             <a href="#features">Fonctionnalités</a>
             <a href="#specs">Specs</a>
+            <a href="#changelog">Historique</a>
             <a href="architecture_core.html">Architecture Script</a>
             <a href="https://github.com/LordMadTrix/MadOS_ROG_Edition" target="_blank">GitHub</a>
         </div>
@@ -521,7 +522,7 @@
 
     <!-- HERO -->
     <section class="hero">
-        <div class="badge">Version 3.0 Ultimate — Stable &amp; Réseau Renforcé</div>
+        <div class="badge">Version 3.1 — VMware AutoDeploy &amp; Réseau Ultra-Stable</div>
 
         <h1>
             MadOS
@@ -764,7 +765,72 @@
             <div class="feature-card">
                 <div class="feature-icon">🌐</div>
                 <div class="feature-title">Réseau Haute Stabilité</div>
-                <div class="feature-desc">Forçage IPv4 APT, 5 tentatives automatiques, DNS failsafe (8.8.8.8 + 1.1.1.1). Zéro timeout réseau pendant l'installation, même en VM.</div>
+                <div class="feature-desc">Forçage IPv4 APT, 5 tentatives auto, DNS failsafe (8.8.8.8 + 1.1.1.1). Zéro
+                    timeout réseau même en VM.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💨</div>
+                <div class="feature-title">ZRAM Turbo Mémoire</div>
+                <div class="feature-desc">Compression RAM zstd en temps réel. Jusqu'à 2× plus de mémoire effective sans
+                    overhead. Le swap devient obsolète.
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <div class="feature-title">Bouclier Anti-Pub</div>
+                <div class="feature-desc">Blocage DNS des serveurs publicitaires & trackers au niveau système (Pi-hole
+                    style). Toutes les apps sont protégées.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⌨️</div>
+                <div class="feature-title">USB E-Sport 1000 Hz</div>
+                <div class="feature-desc">Repollage de tous les périphériques USB à 1000 Hz via usbhid. Souris et
+                    claviers gamers à leur plein potentiel.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <div class="feature-title">Boot Éclair</div>
+                <div class="feature-desc">Désactivation services inutiles, optimisation Systemd-analyze, démarrage de
+                    15s à 4s. Prêt à jouer en un instant.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⬇️</div>
+                <div class="feature-title">CPU Undervolting</div>
+                <div class="feature-desc">Undervolting Intel/AMD automatique via intel-undervolt & RyzenAdj.
+                    Températures réduites, performances boostées.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎬</div>
+                <div class="feature-title">Pack Streamer Pro</div>
+                <div class="feature-desc">OBS Studio, obs-vkcapture (capture GPU directe sans overhead), Kdenlive pour
+                    le montage. Studio prêt en 5 min.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">Pack Dev Pro</div>
+                <div class="feature-desc">Node.js, Python, Git, VS Code, Docker, Postman. Environnement de développement
+                    complet installé et configuré auto.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">Pack Maker & Créateur</div>
+                <div class="feature-desc">Blender, Inkscape, GIMP, Kdenlive, FreeCAD. Suite créative complète pour
+                    artistes 3D, graphistes et makers.</div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💻</div>
+                <div class="feature-title">VMware AutoDeploy</div>
+                <div class="feature-desc">Script PowerShell qui crée et configure automatiquement une VM MadOS sur
+                    VMware Workstation/Player en 1 commande.</div>
             </div>
 
         </div>
@@ -848,15 +914,15 @@
         <div class="specs-grid">
             <div class="spec-item">
                 <span class="spec-label">Base</span>
-                <span class="spec-value">Ubuntu 22.04 LTS</span>
+                <span class="spec-value">Ubuntu Server 25.10</span>
             </div>
             <div class="spec-item">
                 <span class="spec-label">Noyau</span>
-                <span class="spec-value">XanMod Edge</span>
+                <span class="spec-value">XanMod Edge (BORE, 1000Hz)</span>
             </div>
             <div class="spec-item">
                 <span class="spec-label">Interface</span>
-                <span class="spec-value">KDE Plasma 6 ROG</span>
+                <span class="spec-value">KDE Plasma 6 ROG Custom</span>
             </div>
             <div class="spec-item">
                 <span class="spec-label">GPU Support</span>
@@ -868,7 +934,11 @@
             </div>
             <div class="spec-item">
                 <span class="spec-label">IA intégrée</span>
-                <span class="spec-value">OpenClaw v2026.2</span>
+                <span class="spec-value">OpenClaw (Gemini 2.0 Flash)</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Modules d'installation</span>
+                <span class="spec-value">28 modules automatisés</span>
             </div>
             <div class="spec-item">
                 <span class="spec-label">RAM requise</span>
@@ -878,6 +948,10 @@
                 <span class="spec-label">Espace disque</span>
                 <span class="spec-value">40 GB minimum</span>
             </div>
+            <div class="spec-item">
+                <span class="spec-label">Déploiement VM</span>
+                <span class="spec-value">VMware AutoDeploy PowerShell</span>
+            </div>
         </div>
     </section>
 
@@ -886,53 +960,78 @@
         <div class="section-header">
             <div class="section-tag">// Journal des Mises à Jour</div>
             <h2 class="section-title">Historique des Versions</h2>
+            <p style="color:var(--text-dim); font-size:1.05rem; max-width:650px; margin:1rem auto 0; line-height:1.6;">
+                Chaque version amène de nouvelles couches de puissance et de stabilité à l'expérience MadOS.</p>
         </div>
-        <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:1rem;">
+        <div style="max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:1rem;">
 
+            <!-- v3.1 LATEST -->
             <div
-                style="background:var(--rog-panel); border-left:3px solid var(--rog-red); border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                style="background:var(--rog-panel); border:1px solid var(--rog-border); border-left:4px solid var(--rog-red); border-radius:0 8px 8px 0; padding:1.8rem 2rem; box-shadow: 0 0 30px rgba(232,0,61,0.08);">
                 <div
-                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; flex-wrap:wrap; gap:0.5rem;">
-                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700;">v3.0 Expansion —
-                        2026-02-28</span>
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1.1rem; font-weight:700;">v3.1 Réseau
+                        Ultra-Stable — 2026-03-05</span>
                     <span
-                        style="background:var(--rog-red); color:white; font-size:0.7rem; padding:0.2rem 0.7rem; border-radius:100px; font-weight:700; letter-spacing:0.1em;">LATEST</span>
+                        style="background:var(--rog-red); color:white; font-size:0.7rem; padding:0.25rem 0.8rem; border-radius:100px; font-weight:700; letter-spacing:0.1em; box-shadow: 0 0 12px rgba(232,0,61,0.5);">LATEST</span>
                 </div>
-                <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
-                    <li>🌈 <strong>Contrôle Aura Sync Natif</strong> : Gérez les LEDs du clavier ROG depuis le Control
-                        Center</li>
-                    <li>🔋 <strong>Battery Preserver</strong> : Limiteurs matériels de charge (60/80/100%)</li>
-                    <li>🧹 <strong>Deep Clean Nucléaire</strong> : Purge massive des caches système et logs</li>
-                    <li>🔥 <strong>Stress Test Intégré</strong> : Lanceur s-tui pour valider l'Undervolting</li>
-                    <li>🩹 <strong>Correctif UI Control Center</strong> : Ajout de barres de défilement pour adapter
-                        l'affichage aux petits écrans.</li>
-                    <li>🩹 <strong>Correctif Diagnostic Santé</strong> : Validation native étendue pour KDE Plasma 5.27
-                        LTS.</li>
-                    <li>💿 <strong>MadOS V3 ISO Builder</strong> : Nouvel outil de compilation d'OS (Branche
-                        expérimentale `feature/iso-builder-v3`).</li>
+                <ul style="color:var(--text-dim); line-height:2; padding-left:1.2rem; font-size:0.95rem;">
+                    <li>💻 <strong>VMware AutoDeploy</strong> : Script PowerShell <code
+                            style="color:var(--cyan)">MadOS_VMware.ps1</code> — VM 8GB RAM / 8 Cœurs, autoinstall Ubuntu
+                        complet</li>
+                    <li>🌐 <strong>Réseau Béton</strong> : Forçage IPv4 APT, 5 retentatives auto, DNS failsafe
+                        8.8.8.8+1.1.1.1, correction timeout VM</li>
+                    <li>🖥️ <strong>Fix Menus Whiptail</strong> : Correction navigation clavier (touches fléchées),
+                        crash loop set -e résolu, dimensions UI sécurisées</li>
+                    <li>🆕 Module <code style="color:var(--cyan)">27_creation_maker.sh</code> — Pack Maker/Créateur
+                        (Blender, GIMP, Inkscape, FreeCAD)</li>
+                    <li>🩹 Correction clés GPG Node.js, suppression paquets obsolètes (spectacle, gamescope legacy)</li>
+                    <li>🤖 OpenClaw IA : Extraction token zero-clic améliorée &amp; connexion SSH automatisée</li>
                 </ul>
             </div>
 
+            <!-- v3.0 -->
             <div
-                style="background:var(--rog-panel); border-left:3px solid #666; border-radius:0 6px 6px 0; padding:1.5rem 2rem; margin-top:1rem;">
-                <div style="margin-bottom:0.8rem;">
-                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#aaa;">v2.9
-                        Ultimate —
-                        2026-02-28</span>
+                style="background:var(--rog-panel); border-left:3px solid #555; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; flex-wrap:wrap; gap:0.5rem;">
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#ccc;">v3.0
+                        Expansion — 2026-02-28</span>
+                    <span
+                        style="background:rgba(255,255,255,0.08); color:#aaa; font-size:0.7rem; padding:0.2rem 0.7rem; border-radius:100px; font-weight:700; letter-spacing:0.1em;">STABLE</span>
                 </div>
                 <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
-                    <li>🚀 <strong>Mode Jeu Extrême</strong> : Activation GameMode et Purge RAM en un clic</li>
+                    <li>🌈 <strong>Contrôle Aura Sync Natif</strong> : LEDs clavier ROG gérées depuis le Control Center
+                    </li>
+                    <li>🔋 <strong>Battery Preserver</strong> : Limiteurs matériels de charge (60/80/100%)</li>
+                    <li>🧹 <strong>Deep Clean Nucléaire</strong> : Purge massive des caches système et logs</li>
+                    <li>🔥 <strong>Stress Test Intégré</strong> : Lanceur s-tui pour valider l'Undervolting</li>
+                    <li>🩹 <strong>Correctif UI Control Center</strong> : Barres de défilement sur petits écrans</li>
+                    <li>💿 <strong>MadOS V3 ISO Builder</strong> : Outil de compilation d'OS (branche expérimentale)
+                    </li>
+                </ul>
+            </div>
+
+            <!-- v2.9 -->
+            <div
+                style="background:var(--rog-panel); border-left:3px solid #444; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                <div style="margin-bottom:0.8rem;">
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#aaa;">v2.9
+                        Ultimate — 2026-02-28</span>
+                </div>
+                <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
+                    <li>🚀 <strong>Mode Jeu Extrême</strong> : Activation GameMode et Purge RAM en 1 clic</li>
                     <li>☁️ <strong>Ludusavi</strong> : Gestionnaire visuel de sauvegardes Cloud</li>
                     <li>⏳ <strong>Time Machine BTRFS</strong> : Snapshots Timeshift natifs dans MadOS Control Center
                     </li>
                     <li>📊 <strong>MangoHud GUI</strong> : Configuration visuelle via GOverlay</li>
-                    <li>🧠 <strong>Copilot Gaming IA</strong> : Injecteur de spécifications matérielles vers OpenClaw
-                    </li>
+                    <li>🧠 <strong>Copilot Gaming IA</strong> : Injecteur de specs matérielles vers OpenClaw</li>
                 </ul>
             </div>
 
+            <!-- v2.8 -->
             <div
-                style="background:var(--rog-panel); border-left:3px solid #666; border-radius:0 6px 6px 0; padding:1.5rem 2rem; margin-top:1rem;">
+                style="background:var(--rog-panel); border-left:3px solid #444; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
                 <div style="margin-bottom:0.8rem;">
                     <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#aaa;">v2.8 —
                         2026-02-28</span>
@@ -940,15 +1039,17 @@
                 <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
                     <li>🥽 <strong>Intégration VR native</strong> : Module Meta Quest 3, ALVR et SideQuest</li>
                     <li>⚡ <strong>OpenClaw IA "Zéro-Clic"</strong> : Extraction automatique du token de sécurité</li>
-                    <li>🆕 Module <code style="color:var(--cyan)">24_mados_update.sh</code> — Mise à jour automatique
+                    <li>🆕 Module <code style="color:var(--cyan)">24_mados_update.sh</code> — Mise à jour automatique du
+                        système</li>
+                    <li>🆕 Module <code style="color:var(--cyan)">25_sante_systeme.sh</code> — Diagnostic santé complet
                     </li>
-                    <li>🆕 Module <code style="color:var(--cyan)">25_sante_systeme.sh</code> — Diagnostic santé</li>
                     <li>🔴 MadOS Control Center étendu avec Onglet Casques VR</li>
                 </ul>
             </div>
 
+            <!-- v2.7 -->
             <div
-                style="background:var(--rog-panel); border-left:3px solid #444; border-radius:0 6px 6px 0; padding:1.5rem 2rem; margin-top:1rem;">
+                style="background:var(--rog-panel); border-left:3px solid #333; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
                 <div style="margin-bottom:0.8rem;">
                     <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#888;">v2.7 —
                         2026-02-26</span>
@@ -960,27 +1061,29 @@
                 </ul>
             </div>
 
+            <!-- v2.4 -->
             <div
-                style="background:var(--rog-panel); border-left:3px solid #444; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                style="background:var(--rog-panel); border-left:3px solid #333; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
                 <div style="margin-bottom:0.8rem;">
                     <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#888;">v2.4 —
                         2026-02-23</span>
                 </div>
                 <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
-                    <li>🔧 Correction pilotes NVIDIA/AMD détection GPU auto</li>
+                    <li>🔧 Correction pilotes NVIDIA/AMD détection GPU automatique</li>
                     <li>🤖 Intégration initiale OpenClaw AI (service systemd)</li>
                     <li>🔑 Gestion clés GPG via <code style="color:var(--cyan)">/etc/apt/keyrings</code></li>
                     <li>🎨 Thème Plymouth ROG animé (écran de démarrage)</li>
                 </ul>
             </div>
 
+            <!-- v2.0 -->
             <div
-                style="background:var(--rog-panel); border-left:3px solid #444; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
+                style="background:rgba(255,255,255,0.02); border-left:3px solid #222; border-radius:0 6px 6px 0; padding:1.5rem 2rem;">
                 <div style="margin-bottom:0.8rem;">
-                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#888;">v2.0 —
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:#666;">v2.0 —
                         2026-02-19</span>
                 </div>
-                <ul style="color:var(--text-dim); line-height:1.9; padding-left:1.2rem; font-size:0.95rem;">
+                <ul style="color:#555; line-height:1.9; padding-left:1.2rem; font-size:0.9rem;">
                     <li>⚡ Passage à Ubuntu 24.04 LTS (Noble Numbat)</li>
                     <li>💻 Noyau XanMod avec sélection automatique du profil CPU</li>
                     <li>🎮 Intégration asusctl + supergfxctl (compilés Rust)</li>
