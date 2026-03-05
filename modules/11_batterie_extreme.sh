@@ -24,7 +24,7 @@ echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 11 Installation du gestionnair
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # auto-cpufreq est particulièrement efficace pour les PC portables
-sudo apt update -q >/dev/null 2>&1
+# Note: apt update centralisé déjà effectué dans install_local.sh - pas besoin ici
 # Il est préférable de l'installer via snap sur ubuntu 24.04 pour éviter les conflits pythons capricieux,
 # mais vu que nous avons purgé snap, nous allons l'installer manuellement via git/python-installer.
 # Cependant, une version APT communautaire ou le script officiel est mieux.

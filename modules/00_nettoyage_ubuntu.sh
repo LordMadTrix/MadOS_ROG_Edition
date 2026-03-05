@@ -38,8 +38,8 @@ echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 0 Purification du Système & P
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 0. Installation des outils de base requis pour la suite
+# Note: apt update centralisé déjà effectué dans install_local.sh avant le lancement des modules
 echo -e "    ${WHITE}├─ [PREREQUIS] Installation des outils de dépôts...${NC}"
-sudo apt update -qq >/dev/null 2>&1
 sudo apt install -y software-properties-common dirmngr gpg curl wget 2>/dev/null || true
 
 # 1. Nettoyage des Bloatwares Serveur (Cloud-Init, Multipathd)

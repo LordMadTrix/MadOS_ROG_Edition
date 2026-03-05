@@ -47,13 +47,34 @@ main() {
 
     echo -e "${YELLOW}[!] Optimisation du réseau et des miroirs Ubuntu...${NC}"
     
-    # 1. DNS Fix : Forcer temporairement Google DNS si la VM galère
-    if ! ping -c 1 -W 2 google.com >/dev/null 2>&1; then
-        echo -e "${GRAY}    Injecteur DNS de secours (8.8.8.8)...${NC}"
-        echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+    # 1. DNS Fix : Config APT - Forcer IPv4 + Retries (fix VM DNS timeout)
+    echo -e "${GRAY}    Config APT : Force IPv4 + 5 tentatives (fix DNS VM)...${NC}"
+    cat <<'APTCONF' | sudo tee /etc/apt/apt.conf.d/99mados-network > /dev/null
+// MadOS - Fix DNS & stabilité réseau en VM
+Acquire::ForceIPv4 "true";
+Acquire::Retries "5";
+Acquire::http::Timeout "30";
+Acquire::https::Timeout "30";
+APTCONF
+
+    # 2. DNS Fix : Forcer DNS stables si la VM galère
+    if ! ping -c 1 -W 3 archive.ubuntu.com >/dev/null 2>&1; then
+        echo -e "${GRAY}    Injecteur DNS de secours (8.8.8.8 + 1.1.1.1)...${NC}"
+        # Backup resolv.conf
+        sudo cp /etc/resolv.conf /etc/resolv.conf.bak 2>/dev/null || true
+        printf 'nameserver 8.8.8.8\nnameserver 1.1.1.1\nnameserver 8.8.4.4\n' | sudo tee /etc/resolv.conf > /dev/null
+        # Aussi configurer systemd-resolved si disponible
+        if systemctl is-active --quiet systemd-resolved 2>/dev/null; then
+            sudo mkdir -p /etc/systemd/resolved.conf.d/
+            printf '[Resolve]\nDNS=8.8.8.8 1.1.1.1\nFallbackDNS=8.8.4.4\n' | sudo tee /etc/systemd/resolved.conf.d/mados-dns.conf > /dev/null
+            sudo systemctl restart systemd-resolved 2>/dev/null || true
+        fi
+        echo -e "${GRAY}    DNS de secours injectés.${NC}"
+    else
+        echo -e "${GRAY}    Réseau OK, pas de fix DNS nécessaire.${NC}"
     fi
 
-    # 2. Mirror Switch Global : Remplacer TOUS les miroirs régionaux par l'archive principale
+    # 3. Mirror Switch Global : Remplacer TOUS les miroirs régionaux par l'archive principale
     # Supporte l'ancien format /etc/apt/sources.list et le nouveau format DEB822 (24.04+)
     echo -e "${GRAY}    Bascule vers les serveurs de l'archive globale (Stabilité Max)...${NC}"
     
