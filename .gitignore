@@ -5,12 +5,12 @@
 # FICHIERS AUTORISÉS (whitelist conceptuelle)
 # ==========================================
 # ✅ modules/*.sh
-# ✅ install.sh, install_local.sh, start.sh
+# ✅ install.sh, install_local.sh
 # ✅ index.html, architecture_core.html
 # ✅ assets/ (images, logos, wallpapers)
 # ✅ *.md (documentation)
 # ✅ .gitignore, .gitattributes
-# ✅ create_mados_usb.ps1 (USB maker)
+# ✅ usb/ (create_mados_usb.bat, .ps1, start.sh)
 
 # ==========================================
 # EXCLUSIONS - Systèmes / OS
@@ -68,7 +68,8 @@ user-data
 # ==========================================
 *.py
 *.ps1
-!create_mados_usb.ps1
 *.bat
-!create_mados_usb.bat
 connect_mados_ssh.bat
+# Exceptions : dossier usb/ entierement suivi
+!usb/
+!usb/**
