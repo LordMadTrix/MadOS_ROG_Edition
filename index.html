@@ -522,7 +522,7 @@
 
     <!-- HERO -->
     <section class="hero">
-        <div class="badge">Version 3.1 — VMware AutoDeploy &amp; Réseau Ultra-Stable</div>
+        <div class="badge">Version 3.2 — Clé USB Offline Install</div>
 
         <h1>
             MadOS
@@ -827,6 +827,13 @@
             </div>
 
             <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <div class="feature-title">Clé USB Offline Install</div>
+                <div class="feature-desc">Préparez une clé USB "MADOS" depuis Windows en 1 clic. Insérez-la après Ubuntu
+                    Server et tapez une commande — le menu apparait sans Internet.</div>
+            </div>
+
+            <div class="feature-card">
                 <div class="feature-icon">💻</div>
                 <div class="feature-title">VMware AutoDeploy</div>
                 <div class="feature-desc">Script PowerShell qui crée et configure automatiquement une VM MadOS sur
@@ -965,7 +972,30 @@
         </div>
         <div style="max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:1rem;">
 
-            <!-- v3.1 LATEST -->
+            <!-- v3.2 LATEST -->
+            <div
+                style="background:var(--rog-panel); border:1px solid var(--rog-border); border-left:4px solid var(--rog-red); border-radius:0 8px 8px 0; padding:1.8rem 2rem; box-shadow: 0 0 30px rgba(232,0,61,0.08);">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                    <span style="font-family:'Orbitron',sans-serif; font-size:1.1rem; font-weight:700;">v3.2 Clé USB
+                        Offline — 2026-03-06</span>
+                    <span
+                        style="background:var(--rog-red); color:white; font-size:0.7rem; padding:0.25rem 0.8rem; border-radius:100px; font-weight:700; letter-spacing:0.1em; box-shadow: 0 0 12px rgba(232,0,61,0.5);">LATEST</span>
+                </div>
+                <ul style="color:var(--text-dim); line-height:2; padding-left:1.2rem; font-size:0.95rem;">
+                    <li>💾 <strong>Clé USB MadOS Offline</strong> : Script <code
+                            style="color:var(--cyan)">create_mados_usb.ps1</code> — Formate la clé, copie les 28
+                        modules, icône MadOS automatique</li>
+                    <li>🚀 <strong>Lanceur USB auto-détection</strong> : <code style="color:var(--cyan)">start.sh</code>
+                        détecte la clé via 3 méthodes (label, blkid, manuel) et lance le menu</li>
+                    <li>🎨 <strong>Icône personnalisée</strong> : Logo MadOS converti en .ico, affiché dans
+                        l'Explorateur Windows sur la clé</li>
+                    <li>📴 <strong>Installation 100% Offline</strong> : Zéro Internet requis pour lancer l'installateur
+                        depuis la clé</li>
+                </ul>
+            </div>
+
+            <!-- v3.1 -->
             <div
                 style="background:var(--rog-panel); border:1px solid var(--rog-border); border-left:4px solid var(--rog-red); border-radius:0 8px 8px 0; padding:1.8rem 2rem; box-shadow: 0 0 30px rgba(232,0,61,0.08);">
                 <div
