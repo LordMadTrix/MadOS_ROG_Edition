@@ -105,15 +105,30 @@ if ($confirm -ne "MADOS") {
 }
 
 # ==============================================================================
-# ETAPE 2 : Formatage FAT32
+# ETAPE 2 : Formatage (FAT32 <=32GB, exFAT pour les grandes cles)
 # ==============================================================================
 Write-Host ""
-Write-Host "  [2/4] Formatage de $TargetDrive en FAT32 (label: MADOS)..." -ForegroundColor Yellow
 
 $diskLetter = $TargetDrive.TrimEnd(":")
+
+# Choisir le systeme de fichiers selon la taille (FAT32 limite a 32 GB sous Windows)
+$selectedDisk = $removableDrives | Where-Object { $_.DeviceID -eq $TargetDrive }
+$sizeSelected = [double]$selectedDisk.Size
+if ($sizeSelected -le 32GB) {
+    $fsType = "FAT32"
+}
+else {
+    $fsType = "exFAT"   # Ubuntu 25.10 monte exFAT nativement
+}
+
+Write-Host "  [2/4] Formatage de $TargetDrive en $fsType (label: MADOS)..." -ForegroundColor Yellow
+if ($fsType -eq "exFAT") {
+    Write-Host "  (cle > 32 GB : exFAT utilisé, supporte par Ubuntu 25.10)" -ForegroundColor Cyan
+}
+
 try {
-    Format-Volume -DriveLetter $diskLetter -FileSystem FAT32 -NewFileSystemLabel "MADOS" -Force -Confirm:$false | Out-Null
-    Write-Host "  OK Formatage termine." -ForegroundColor Green
+    Format-Volume -DriveLetter $diskLetter -FileSystem $fsType -NewFileSystemLabel "MADOS" -Force -Confirm:$false -ErrorAction Stop | Out-Null
+    Write-Host "  OK Formatage termine ($fsType)." -ForegroundColor Green
 }
 catch {
     Write-Host "  [ERREUR] Echec du formatage : $_" -ForegroundColor Red

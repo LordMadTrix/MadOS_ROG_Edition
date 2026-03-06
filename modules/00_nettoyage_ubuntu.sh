@@ -52,18 +52,28 @@ sudo rm -rf /etc/cloud/ /var/lib/cloud/ 2>/dev/null || true
 
 # Assurer que NetworkManager prend le relais du réseau
 echo -e "    ${GRAY}├─ Basculement réseau vers NetworkManager...${NC}"
+# Installer NetworkManager EN PREMIER (avant de toucher au réseau actuel)
 sudo apt install -y network-manager 2>/dev/null || true
+
+# Sauvegarder l'ancienne config avant de la supprimer
 if [ -f /etc/netplan/50-cloud-init.yaml ]; then
+    sudo cp /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.bak 2>/dev/null || true
     sudo rm /etc/netplan/50-cloud-init.yaml 2>/dev/null || true
 fi
+
 # Créer un fichier netplan simple géré par NM
 sudo tee /etc/netplan/01-network-manager-all.yaml > /dev/null <<'EOF'
 network:
   version: 2
   renderer: NetworkManager
 EOF
+sudo chmod 600 /etc/netplan/01-network-manager-all.yaml
 sudo netplan generate 2>/dev/null || true
+sudo netplan apply 2>/dev/null || true   # APPLIQUE la nouvelle config
 sudo systemctl enable NetworkManager 2>/dev/null || true
+sudo systemctl restart NetworkManager 2>/dev/null || true
+# Attendre que le reseau revienne
+sleep 5
 
 # 2. Ajout de l'Architecture i386 (pour Steam/Wine)
 sudo dpkg --add-architecture i386

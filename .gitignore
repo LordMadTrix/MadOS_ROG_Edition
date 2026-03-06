@@ -6,7 +6,7 @@
 # ==========================================
 # ✅ modules/*.sh
 # ✅ install.sh, install_local.sh
-# ✅ index.html, architecture_core.html
+# ✅ docs/ (index.html, architecture_core.html)
 # ✅ assets/ (images, logos, wallpapers)
 # ✅ *.md (documentation)
 # ✅ .gitignore, .gitattributes
@@ -53,6 +53,7 @@ secret/
 # EXCLUSIONS - Machines Virtuelles & ISO
 # ==========================================
 MadOS_3.0_AutoVM/
+vm/MadOS_3.0_AutoVM/
 *.vmdk
 *.vmx
 *.vmxf
@@ -60,8 +61,6 @@ MadOS_3.0_AutoVM/
 *.vmem
 *.nvram
 *.iso
-MadOS_VMware.ps1
-user-data
 
 # ==========================================
 # EXCLUSIONS - Scripts helpers & divers
