@@ -45,17 +45,28 @@ fi
 USB_MOUNT=""
 MOUNTED_BY_SCRIPT=false
 
-# Methode 1 : start.sh est a la racine de la cle -> cherche mados/ a cote de lui
+# Methode 1 : Environnement de developpement (QEMU avec dossier Windows partage)
+# start.sh est dans usb/, install_local.sh est juste au-dessus
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -d "$SELF_DIR/mados" ] && [ -f "$SELF_DIR/mados/install_local.sh" ]; then
-    USB_MOUNT="$SELF_DIR"
+if [ -f "$SELF_DIR/../install_local.sh" ] && [ -d "$SELF_DIR/../modules" ]; then
+    USB_MOUNT="$(dirname "$SELF_DIR")"
+    MADOS_DIR="$USB_MOUNT"
 fi
 
-# Methode 2 : Chemins de montage standard
+# Methode 2 : start.sh est a la racine de la cle -> cherche mados/ a cote de lui
+if [ -z "$USB_MOUNT" ]; then
+    if [ -d "$SELF_DIR/mados" ] && [ -f "$SELF_DIR/mados/install_local.sh" ]; then
+        USB_MOUNT="$SELF_DIR"
+        MADOS_DIR="$USB_MOUNT/mados"
+    fi
+fi
+
+# Methode 3 : Chemins de montage standard (Ubuntu Desktop/Serveur)
 if [ -z "$USB_MOUNT" ]; then
     for MNTPOINT in /media/*/MADOS /media/root/MADOS /mnt/MADOS /run/media/*/MADOS; do
         if [ -d "$MNTPOINT/mados" ] && [ -f "$MNTPOINT/mados/install_local.sh" ]; then
             USB_MOUNT="$MNTPOINT"
+            MADOS_DIR="$USB_MOUNT/mados"
             break
         fi
     done
@@ -77,7 +88,7 @@ if [ -z "$USB_MOUNT" ]; then
     fi
 fi
 
-# Methode 4 : Saisie manuelle
+# Methode 5 : Saisie manuelle
 if [ -z "$USB_MOUNT" ]; then
     echo -e "${YELLOW}  [USB] Cle MADOS non detectee automatiquement.${NC}"
     echo ""
@@ -85,13 +96,15 @@ if [ -z "$USB_MOUNT" ]; then
     echo ""
     echo -e "${CYAN}  Point de montage de la cle USB (ex: /media/user/MADOS) :${NC}"
     read -r USB_MOUNT
-    if [ ! -f "$USB_MOUNT/mados/install_local.sh" ]; then
-        echo -e "${RED}  [ERREUR] mados/install_local.sh introuvable dans $USB_MOUNT${NC}"
+    if [ -f "$USB_MOUNT/install_local.sh" ]; then
+        MADOS_DIR="$USB_MOUNT"
+    elif [ -f "$USB_MOUNT/mados/install_local.sh" ]; then
+        MADOS_DIR="$USB_MOUNT/mados"
+    else
+        echo -e "${RED}  [ERREUR] install_local.sh introuvable dans $USB_MOUNT ou $USB_MOUNT/mados${NC}"
         exit 1
     fi
 fi
-
-MADOS_DIR="$USB_MOUNT/mados"
 echo -e "${GREEN}  OK Cle USB MADOS : $USB_MOUNT${NC}"
 echo -e "${GRAY}     Scripts dans  : $MADOS_DIR${NC}"
 echo ""
