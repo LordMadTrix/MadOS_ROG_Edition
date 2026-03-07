@@ -110,11 +110,21 @@ echo -e "${GRAY}     Scripts dans  : $MADOS_DIR${NC}"
 echo ""
 
 # ==============================================================================
-# Installation de whiptail si absent
+# Installation de whiptail si absent et ajustement LVM (Espace disque)
 # ==============================================================================
 if ! command -v whiptail &>/dev/null; then
     echo -e "${YELLOW}  [INFO] Installation de whiptail...${NC}"
     sudo apt-get install -y whiptail > /dev/null 2>&1
+fi
+
+# Extension automatique de l'espace disque (Bug fréquent Ubuntu Server LVM)
+if command -v lvextend >/dev/null 2>&1 && command -v resize2fs >/dev/null 2>&1; then
+    LVM_ROOT=$(df / | awk 'NR==2 {print $1}')
+    if [[ "$LVM_ROOT" == "/dev/mapper/"* ]]; then
+        echo -e "${YELLOW}  [INFO] Verification de l'espace disque (LVM)...${NC}"
+        sudo lvextend -l +100%FREE "$LVM_ROOT" >/dev/null 2>&1 || true
+        sudo resize2fs "$LVM_ROOT" >/dev/null 2>&1 || true
+    fi
 fi
 
 # ==============================================================================
