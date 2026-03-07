@@ -56,7 +56,10 @@ secret/
 MadOS_3.0_AutoVM/
 vm/MadOS_3.0_AutoVM/
 vm/VMwarePortable/
+vm/QemuPortable/
+vm/MadOS_3.0_QemuVM/
 *.vmdk
+*.qcow2
 *.vmx
 *.vmxf
 *.vmsd
