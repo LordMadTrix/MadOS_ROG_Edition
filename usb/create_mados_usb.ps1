@@ -7,6 +7,7 @@
 # Structure USB generee :
 #   USB MADOS/
 #   |-- start.sh            <- commande rapide
+#   |-- _LIRE_TUTORIEL_.html <- tutoriel automatique d'aide
 #   |-- LISEZ_MOI.txt
 #   |-- logo.ico (cache)
 #   |-- autorun.inf (cache)
@@ -164,6 +165,12 @@ Copy-Item "$SourceDir\modules\*.sh" $UsbModules -Force
 Write-Host "  -> start.sh (racine cle)" -ForegroundColor Cyan
 Copy-Item "$UsbScriptDir\start.sh" "${UsbRoot}start.sh" -Force
 
+# Tutoriel HTML interactif
+Write-Host "  -> _LIRE_TUTORIEL_.html" -ForegroundColor Cyan
+if (Test-Path "$UsbScriptDir\TUTORIEL_MADOS.html") {
+    Copy-Item "$UsbScriptDir\TUTORIEL_MADOS.html" "${UsbRoot}_LIRE_TUTORIEL_.html" -Force
+}
+
 # LISEZ_MOI.txt
 Write-Host "  -> LISEZ_MOI.txt" -ForegroundColor Cyan
 $readmeLines = @(
@@ -239,9 +246,10 @@ if (Test-Path $logoPng) {
 }
 
 $autorunPath = "${UsbRoot}autorun.inf"
-"[autorun]`r`nlabel=MadOS ROG Edition`r`nicon=logo.ico" | Out-File -FilePath $autorunPath -Encoding ascii -Force
+$autorunContent = "[autorun]`r`nlabel=MadOS ROG Edition`r`nicon=logo.ico`r`naction=LIRE LE TUTORIEL MADOS`r`nshellexecute=_LIRE_TUTORIEL_.html"
+$autorunContent | Out-File -FilePath $autorunPath -Encoding ascii -Force
 try { (Get-Item $autorunPath).Attributes = 'Hidden,System' } catch {}
-Write-Host "  -> autorun.inf cree" -ForegroundColor Cyan
+Write-Host "  -> autorun.inf cree (avec lien Tutoriel)" -ForegroundColor Cyan
 
 # ==============================================================================
 # SUCCES
@@ -253,7 +261,7 @@ Write-Host "  ===================================================" -ForegroundCo
 Write-Host ""
 Write-Host "  Drive   : $TargetDrive (MADOS)" -ForegroundColor White
 Write-Host "  Modules : $($moduleFiles.Count) scripts dans mados/modules/" -ForegroundColor White
-Write-Host "  Icone   : logo.ico + autorun.inf" -ForegroundColor White
+Write-Host "  Icone   : logo.ico + autorun.inf + _LIRE_TUTORIEL_.html" -ForegroundColor White
 Write-Host ""
 Write-Host "  Sous Ubuntu Server, tapez :" -ForegroundColor Yellow
 Write-Host '  bash /media/$USER/MADOS/start.sh' -ForegroundColor Green
