@@ -28,6 +28,7 @@ Desktop.ini
 
 # Logs & temporaires
 *.log
+*.tmp
 /tmp/
 /temp/
 test_*.sh
