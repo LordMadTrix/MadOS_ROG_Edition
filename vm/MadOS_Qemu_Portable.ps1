@@ -11,7 +11,7 @@ Set-Location $PSScriptRoot
 $VMName = "MadOS_3.0_QemuVM"
 $VMPath = Join-Path $PSScriptRoot $VMName
 $DiskPath = Join-Path $VMPath "$VMName.qcow2"
-$UsbFolderPath = Resolve-Path (Join-Path $PSScriptRoot "..\usb") | Select-Object -ExpandProperty Path
+$ProjectFolderPath = Resolve-Path (Join-Path $PSScriptRoot "..") | Select-Object -ExpandProperty Path
 
 # --- 1. LOCALISATION DE QEMU ---
 $QemuDir = Join-Path $PSScriptRoot "QemuPortable"
@@ -99,8 +99,8 @@ $QemuArgs = @(
     # Controleur USB virtuel
     "-device", "qemu-xhci,id=usb",
     
-    # Partage du dossier physique "usb" comme une cle USB FAT rw
-    "-drive", "file=fat:rw:$UsbFolderPath,format=raw,if=none,id=usbdrive",
+    # Partage du DOSSIER PROJET COMPLET comme une cle USB FAT rw
+    "-drive", "file=fat:rw:$ProjectFolderPath,format=raw,if=none,id=usbdrive",
     "-device", "usb-storage,bus=usb.0,drive=usbdrive"
 )
 
