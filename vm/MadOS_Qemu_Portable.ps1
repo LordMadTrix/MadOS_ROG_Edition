@@ -91,7 +91,7 @@ $QemuArgs = @(
     "-accel", "tcg",             # Fallback si whpx n'est pas actif
     "-vga", "virtio",            # GPU virtuel basique
     "-display", "gtk,gl=off",    # Interface graphique standard
-    "-netdev", "user,id=n1",     # Reseau 100% utilisateur (NAT) sans driver
+    "-netdev", "user,id=n1,hostfwd=tcp::2222-:22", # Reseau NAT + Forward SSH port 2222
     "-device", "e1000,netdev=n1",
     "-drive", "file=$DiskPath,format=qcow2,if=virtio", # Disque dur principal SSD
     "-cdrom", "$IsoPath",        # L'ISO d'insallation
