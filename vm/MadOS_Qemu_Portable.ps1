@@ -11,7 +11,7 @@ Set-Location $PSScriptRoot
 $VMName = "MadOS_3.0_QemuVM"
 $VMPath = Join-Path $PSScriptRoot $VMName
 $DiskPath = Join-Path $VMPath "$VMName.qcow2"
-$ProjectFolderPath = Resolve-Path (Join-Path $PSScriptRoot "..") | Select-Object -ExpandProperty Path
+$ShareFolderPath = Join-Path $PSScriptRoot "Qemu_USB_Share"
 
 # --- 1. LOCALISATION DE QEMU ---
 $QemuDir = Join-Path $PSScriptRoot "QemuPortable"
@@ -76,7 +76,18 @@ else {
     Write-Host "    Pour repartir de zero, supprimez le dossier $VMName" -ForegroundColor DarkGray
 }
 
-# --- 5. LANCEMENT DE LA VM QEMU ---
+# --- 5. GENERATION DE LA CLE USB VIRTUELLE ---
+Write-Host "`n[!] Etape 3 : Generation de la cle USB virtuelle (Garantit l'absence de fichiers de 2Go)..." -ForegroundColor Cyan
+if (Test-Path $ShareFolderPath) { Remove-Item -Path "$ShareFolderPath\*" -Recurse -Force -ErrorAction SilentlyContinue }
+New-Item -ItemType Directory -Force -Path $ShareFolderPath | Out-Null
+Copy-Item -Path "$PSScriptRoot\..\usb\*" -Destination $ShareFolderPath -Recurse -Force
+New-Item -ItemType Directory -Force -Path "$ShareFolderPath\mados" | Out-Null
+Copy-Item -Path "$PSScriptRoot\..\install_local.sh" -Destination "$ShareFolderPath\mados\" -Force
+Copy-Item -Path "$PSScriptRoot\..\modules" -Destination "$ShareFolderPath\mados\" -Recurse -Force
+Write-Host "    [+] Dossier USB generé dans : $ShareFolderPath" -ForegroundColor Green
+
+
+# --- 6. LANCEMENT DE LA VM QEMU ---
 Write-Host "`n[🚀] LANCEMENT DE LA MATRICE QEMU (MADOS)..." -ForegroundColor Red
 Write-Host "INFO : Le dossier 'usb' de votre projet est directement partage" -ForegroundColor Cyan
 Write-Host "       avec la VM comme s'il s'agissait d'une vraie cle USB !" -ForegroundColor Cyan
@@ -99,8 +110,8 @@ $QemuArgs = @(
     # Controleur USB virtuel
     "-device", "qemu-xhci,id=usb",
     
-    # Partage du DOSSIER PROJET COMPLET comme une cle USB FAT rw
-    "-drive", "file=fat:rw:$ProjectFolderPath,format=raw,if=none,id=usbdrive",
+    # Partage du DOSSIER GENERE comme une cle USB FAT rw
+    "-drive", "file=fat:rw:$ShareFolderPath,format=raw,if=none,id=usbdrive",
     "-device", "usb-storage,bus=usb.0,drive=usbdrive"
 )
 
