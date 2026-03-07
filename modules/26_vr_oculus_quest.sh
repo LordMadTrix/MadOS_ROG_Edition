@@ -58,17 +58,17 @@ SQ_NUM_VERSION=${SQ_LATEST_TAG#v}
 SQ_LATEST_URL="https://github.com/SideQuestVR/SideQuest/releases/download/${SQ_LATEST_TAG}/SideQuest-${SQ_NUM_VERSION}.tar.xz"
 
 if [ -n "$SQ_LATEST_TAG" ]; then
-    wget -qO "$SQ_PATH" "$SQ_LATEST_URL"
-    echo -e "    ${GRAY}├─ Extraction de SideQuest dans /opt/MadOS_VR/SideQuest...${NC}"
-    sudo rm -rf /opt/MadOS_VR/SideQuest
-    sudo mkdir -p /opt/MadOS_VR/SideQuest
-    sudo tar -xf "$SQ_PATH" -C /opt/MadOS_VR/SideQuest --strip-components=1
-    sudo rm -f "$SQ_PATH"
-    sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/SideQuest
-    
-    # Création du raccourci
-    echo -e "    ${GRAY}├─ Création du raccourci Bureau pour SideQuest...${NC}"
-    cat <<EOF | sudo tee "/usr/share/applications/sidequest.desktop" >/dev/null
+    if wget -qO "$SQ_PATH" "$SQ_LATEST_URL"; then
+        echo -e "    ${GRAY}├─ Extraction de SideQuest dans /opt/MadOS_VR/SideQuest...${NC}"
+        sudo rm -rf /opt/MadOS_VR/SideQuest
+        sudo mkdir -p /opt/MadOS_VR/SideQuest
+        if sudo tar -xf "$SQ_PATH" -C /opt/MadOS_VR/SideQuest --strip-components=1 2>/dev/null; then
+            sudo rm -f "$SQ_PATH"
+            sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/SideQuest
+            
+            # Création du raccourci
+            echo -e "    ${GRAY}├─ Création du raccourci Bureau pour SideQuest...${NC}"
+            cat <<EOF | sudo tee "/usr/share/applications/sidequest.desktop" >/dev/null
 [Desktop Entry]
 Name=SideQuest
 Comment=Sideload apps to Oculus Quest
@@ -78,6 +78,12 @@ Type=Application
 Icon=/opt/MadOS_VR/SideQuest/resources/app/icon.png
 Categories=Utility;Game;
 EOF
+        else
+            echo -e "${RED}    [!] Fichier SideQuest corrompu ou invalide.${NC}"
+        fi
+    else
+        echo -e "${RED}    [!] Echec du téléchargement (Erreur réseau/Github).${NC}"
+    fi
 else
     echo -e "${RED}[!] Impossible de récupérer le lien de SideQuest.${NC}"
 fi
@@ -90,22 +96,22 @@ ALVR_LATEST_TAG=$(curl -sS -o /dev/null -w "%{url_effective}" -I -L https://gith
 ALVR_LATEST_URL="https://github.com/alvr-org/ALVR/releases/download/${ALVR_LATEST_TAG}/alvr_launcher_linux.tar.gz"
 
 if [ -n "$ALVR_LATEST_TAG" ]; then
-    wget -qO "$ALVR_PATH" "$ALVR_LATEST_URL"
-    echo -e "    ${GRAY}├─ Extraction de ALVR dans /opt/MadOS_VR/ALVR...${NC}"
-    sudo rm -rf /opt/MadOS_VR/ALVR
-    sudo mkdir -p /opt/MadOS_VR/ALVR
-    sudo tar -xf "$ALVR_PATH" -C /opt/MadOS_VR/ALVR --strip-components=1
-    sudo rm -f "$ALVR_PATH"
-    
-    # Renommer l'exécutable qui contient un espace chiant "ALVR Launcher"
-    if [ -f "/opt/MadOS_VR/ALVR/ALVR Launcher" ]; then
-        sudo mv "/opt/MadOS_VR/ALVR/ALVR Launcher" "/opt/MadOS_VR/ALVR/alvr_launcher"
-    fi
-    sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/ALVR
-    
-    # Création du raccourci
-    echo -e "    ${GRAY}├─ Création du raccourci Bureau pour ALVR Launcher...${NC}"
-    cat <<EOF | sudo tee "/usr/share/applications/alvr.desktop" >/dev/null
+    if wget -qO "$ALVR_PATH" "$ALVR_LATEST_URL"; then
+        echo -e "    ${GRAY}├─ Extraction de ALVR dans /opt/MadOS_VR/ALVR...${NC}"
+        sudo rm -rf /opt/MadOS_VR/ALVR
+        sudo mkdir -p /opt/MadOS_VR/ALVR
+        if sudo tar -xf "$ALVR_PATH" -C /opt/MadOS_VR/ALVR --strip-components=1 2>/dev/null; then
+            sudo rm -f "$ALVR_PATH"
+            
+            # Renommer l'exécutable qui contient un espace chiant "ALVR Launcher"
+            if [ -f "/opt/MadOS_VR/ALVR/ALVR Launcher" ]; then
+                sudo mv "/opt/MadOS_VR/ALVR/ALVR Launcher" "/opt/MadOS_VR/ALVR/alvr_launcher"
+            fi
+            sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/ALVR
+            
+            # Création du raccourci
+            echo -e "    ${GRAY}├─ Création du raccourci Bureau pour ALVR Launcher...${NC}"
+            cat <<EOF | sudo tee "/usr/share/applications/alvr.desktop" >/dev/null
 [Desktop Entry]
 Name=ALVR Launcher
 Comment=Wireless PCVR for Standalone Headsets
@@ -115,6 +121,12 @@ Type=Application
 Icon=steam
 Categories=Game;VR;
 EOF
+        else
+            echo -e "${RED}    [!] Fichier ALVR corrompu ou invalide.${NC}"
+        fi
+    else
+        echo -e "${RED}    [!] Echec du téléchargement (Erreur réseau/Github).${NC}"
+    fi
 else
     echo -e "${RED}[!] Impossible de récupérer le lien de ALVR.${NC}"
 fi
