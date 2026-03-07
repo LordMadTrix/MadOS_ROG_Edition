@@ -55,6 +55,7 @@ secret/
 # ==========================================
 MadOS_3.0_AutoVM/
 vm/MadOS_3.0_AutoVM/
+vm/VMwarePortable/
 *.vmdk
 *.vmx
 *.vmxf
