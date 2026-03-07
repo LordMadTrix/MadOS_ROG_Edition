@@ -6,7 +6,6 @@
 # ==========================================
 # ✅ modules/*.sh
 # ✅ install.sh, install_local.sh
-# ✅ docs/ (index.html, architecture_core.html)
 # ✅ assets/ (images, logos, wallpapers)
 # ✅ *.md (documentation)
 # ✅ .gitignore, .gitattributes
@@ -25,6 +24,7 @@ Desktop.ini
 *.swp
 *~
 *.code-workspace
+__pycache__/
 
 # Logs & temporaires
 *.log
