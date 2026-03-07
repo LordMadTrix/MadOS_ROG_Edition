@@ -96,9 +96,12 @@ $QemuArgs = @(
     "-drive", "file=$DiskPath,format=qcow2,if=virtio", # Disque dur principal SSD
     "-cdrom", "$IsoPath",        # L'ISO d'insallation
     
+    # Controleur USB virtuel
+    "-device", "qemu-xhci,id=usb",
+    
     # Partage du dossier physique "usb" comme une cle USB FAT rw
     "-drive", "file=fat:rw:$UsbFolderPath,format=raw,if=none,id=usbdrive",
-    "-device", "usb-storage,drive=usbdrive"
+    "-device", "usb-storage,bus=usb.0,drive=usbdrive"
 )
 
 Write-Host "`nCommande a l'execution :" -ForegroundColor DarkGray
