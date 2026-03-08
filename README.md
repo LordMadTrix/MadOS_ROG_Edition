@@ -1,4 +1,4 @@
-<div align="center">
+<div align="center" markdown="1">
   <img src="assets/logo.png" alt="MadOS ROG Logo" width="300" />
 
   # MadOS ROG Edition — Framework Post-Install
