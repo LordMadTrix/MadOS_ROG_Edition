@@ -115,6 +115,15 @@ chmod +x Menu_Installation_ROG.sh
 sudo ./Menu_Installation_ROG.sh
 ```
 
+> ⚠️ **ASTUCE CLÉ USB / MACHINE VIRTUELLE (Offline) :**
+> Si vous utilisez la version "Clé USB" partagée sur votre réseau local ou dans une VM (QEMU/VMware) et que le montage automatique échoue, forcez-le manuellement :
+> ```bash
+> sudo mkdir -p /mnt/usb
+> sudo mount /dev/sda1 /mnt/usb  # Remplacer sda1 par sdb1 si besoin
+> cd /mnt/usb/mados
+> sudo ./install_local.sh
+> ```
+
 ---
 
 ## 🎮 PHASE 5 : LA MATRICE PREND LE CONTRÔLE (TUI WHIPTAIL)

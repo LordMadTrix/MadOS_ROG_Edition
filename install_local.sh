@@ -21,8 +21,23 @@ NC='\033[0m'
 
 main() {
     export DEBIAN_FRONTEND=noninteractive
+    export NEEDRESTART_MODE=a
     set -uo pipefail
-
+    
+    # ==============================================================================
+    # Charger les fonctions communes
+    # ==============================================================================
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
+        source "$SCRIPT_DIR/lib/common.sh"
+    else
+        echo "ERREUR CRITIQUE: lib/common.sh non trouvé!"
+        exit 1
+    fi
+    
+    # Initialiser les pièges d'erreur et logs
+    setup_error_traps
+    init_mados_logging
 
     clear
     echo ""
@@ -40,10 +55,41 @@ main() {
     echo ""
 
     echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${CYAN}  [1/1] Démarrage de l'Interface Interactive...${NC}"
+    echo -e "${CYAN}  [1/1] Vérifications Pré-Installation...${NC}"
+    echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Vérifications critiques
+    check_sudo_access || exit 1
+    check_disk_space 40 || exit 1
+    check_internet_connection || exit 1
+    
+    log_info "Toutes les vérifications pré-installation réussies"
+    
+    # ==============================================================================
+    # Détection de l'hyperviseur et installation des drivers
+    # ==============================================================================
+    echo ""
+    echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  [1.5/4] Détection Hyperviseur & Installation Drivers...${NC}"
+    echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    log_info "Détection de l'hyperviseur..."
+    local DETECTED_HYPERVISOR=$(detect_hypervisor)
+    
+    if [ "$DETECTED_HYPERVISOR" != "none" ]; then
+        log_success "Hyperviseur détecté: $DETECTED_HYPERVISOR"
+        install_hypervisor_drivers "$DETECTED_HYPERVISOR" || {
+            log_warning "Installation des drivers hyperviseur échouée - continuant l'installation"
+        }
+    else
+        log_info "Installation sur matériel physique détectée"
+    fi
+
+    echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  [2/4] Démarrage de l'Interface Interactive...${NC}"
     echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-    export MODULES_DIR="/tmp/mados_install_bootstrap/modules"
+    export MODULES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/modules"
 
     echo -e "${YELLOW}[!] Optimisation du réseau et des miroirs Ubuntu...${NC}"
     
@@ -130,28 +176,69 @@ run_module() {
     local SCRIPT="$1"
     local DESCRIPTION="${2:-}"
     
-    while true; do
+    export CURRENT_MODULE="$SCRIPT"
+    
+    # Vérifier si module déjà exécuté avec succès
+    if skip_if_completed "$SCRIPT"; then
+        return 0
+    fi
+    
+    local attempt=1
+    local max_attempts=3
+    
+    while [ $attempt -le $max_attempts ]; do
         echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════╗${NC}"
         echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Injection : ${SCRIPT}${NC}"
         echo -e "${RED}║${NC} 📌 ${GRAY}${DESCRIPTION}${NC}"
+        echo -e "${RED}║${NC} 📊 ${GRAY}Tentative ${attempt}/${max_attempts}${NC}"
         echo -e "${RED}╚══════════════════════════════════════════════════════════════════╝${NC}\n"
         
-        echo -e "\n--- Exécution: $SCRIPT ---" >> "$LOG_FILE"
-        if bash "$MODULES_DIR/$SCRIPT" 2>&1 | tee -a "$LOG_FILE"; then
-            break # Succès, on sort de la boucle
+        log_info "Exécution du module: $SCRIPT (tentative $attempt/$max_attempts)"
+        
+        if bash "$MODULES_DIR/$SCRIPT" 2>&1 | tee -a "$MADOS_LOG_DIR/mados_install.log"; then
+            # Succès - enregistrer le checkpoint
+            save_checkpoint "$SCRIPT" "OK"
+            log_success "Module $SCRIPT complété avec succès"
+            return 0
         else
             # Échec
-            local CHOICE
-            CHOICE=$(whiptail --title "MadOS 3.0 - ERREUR MODULE" --menu "Le script $SCRIPT a échoué.\nConsultez les logs : /var/log/mados_install.log" 15 65 3 \
-                "1" "Réessayer (Relancer le module)" \
-                "2" "Ignorer l'erreur et continuer" \
-                "3" "Arrêter l'installation" 3>&1 1>&2 2>&3)
+            local exit_code=$?
+            log_error "Échec du module $SCRIPT (code: $exit_code)"
             
-            if [ -z "$CHOICE" ]; then CHOICE="3"; fi
-            
-            case $CHOICE in
-                1) echo -e "\n${YELLOW}Relance du module $SCRIPT...${NC}" ;;
-                2) echo -e "\n${YELLOW}Ignorance de l'erreur sur $SCRIPT. L'installation continue.${NC}"; break ;;
+            if [ $attempt -lt $max_attempts ]; then
+                log_warning "Nouvelle tentative du module $SCRIPT dans 10 secondes..."
+                sleep 10
+            else
+                # Max tentatives atteintes - demander à l'utilisateur
+                local CHOICE
+                CHOICE=$(whiptail --title "MadOS 3.0 - ERREUR MODULE" --menu "Le script $SCRIPT a échoué après $max_attempts tentatives.\n\nConsultez les logs: $MADOS_LOG_DIR/mados_install.log" 15 65 3 \
+                    "1" "Réessayer encore une fois" \
+                    "2" "Ignorer l'erreur et continuer" \
+                    "3" "Arrêter l'installation" 3>&1 1>&2 2>&3)
+                
+                if [ -z "$CHOICE" ]; then CHOICE="3"; fi
+                
+                case $CHOICE in
+                    1) 
+                        ((attempt--))  # Relancer une fois
+                        ;;
+                    2) 
+                        log_warning "Ignorance de l'erreur sur $SCRIPT. L'installation continue."
+                        save_checkpoint "$SCRIPT" "SKIPPED_ERROR"
+                        return 0
+                        ;;
+                    3) 
+                        log_error "Installation arrêtée par l'utilisateur"
+                        print_installation_report
+                        exit 1
+                        ;;
+                esac
+            fi
+        fi
+        
+        ((attempt++))
+    done
+}
                 *) echo -e "${RED}Arrêt critique du déploiement suite à l'échec de $SCRIPT.${NC}"; exit 1 ;;
             esac
         fi

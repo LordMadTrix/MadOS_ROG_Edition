@@ -1,0 +1,535 @@
+#!/bin/bash
+# ==============================================================================
+# MadOS ROG Edition 3.0 - lib/common.sh
+# ==============================================================================
+# Fonctions communes, logging, gestion d'erreurs et rollback
+# ==============================================================================
+
+# ==============================================================================
+# Variables Globales
+# ==============================================================================
+
+# Couleurs
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# Chemins critiques
+export MADOS_LOG_DIR="/var/log/mados"
+export MADOS_BACKUP_DIR="/var/lib/mados_backup"
+export MADOS_CHECKPOINT_FILE="/tmp/mados_checkpoint.log"
+export MADOS_ERRORS_FILE="${MADOS_LOG_DIR}/mados_errors.log"
+export MADOS_STATUS_FILE="/tmp/mados_status.txt"
+
+# Compteurs de tentatives
+export RETRY_COUNT=3
+export RETRY_DELAY=5
+
+# ==============================================================================
+# Initialisation
+# ==============================================================================
+
+init_mados_logging() {
+    # Créer répertoires de logs et backups
+    sudo mkdir -p "$MADOS_LOG_DIR" "$MADOS_BACKUP_DIR" 2>/dev/null || true
+    sudo chmod 755 "$MADOS_LOG_DIR" "$MADOS_BACKUP_DIR" 2>/dev/null || true
+    
+    # Initialiser les fichiers
+    touch "$MADOS_CHECKPOINT_FILE" "$MADOS_STATUS_FILE" 2>/dev/null || true
+    
+    log_info "═══════════════════════════════════════════════════════════"
+    log_info "MadOS ROG Edition 3.0 - Démarrage Installation"
+    log_info "Date: $(date '+%Y-%m-%d %H:%M:%S')"
+    log_info "Utilisateur: $USER"
+    log_info "═══════════════════════════════════════════════════════════"
+}
+
+# ==============================================================================
+# Fonctions de Logging
+# ==============================================================================
+
+log_info() {
+    local msg="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    echo -e "${CYAN}[${timestamp}]${NC} ${GREEN}[INFO]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo "[${timestamp}] [INFO] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
+}
+
+log_error() {
+    local msg="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    echo -e "${RED}[${timestamp}]${NC} ${RED}[ERREUR]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo "[${timestamp}] [ERREUR] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" "$MADOS_ERRORS_FILE" >/dev/null 2>&1 || true
+}
+
+log_warning() {
+    local msg="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    echo -e "${YELLOW}[${timestamp}]${NC} ${YELLOW}[ATTENTION]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo "[${timestamp}] [ATTENTION] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
+}
+
+log_success() {
+    local msg="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    echo -e "${GREEN}[${timestamp}]${NC} ${GREEN}[✓ SUCCÈS]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo "[${timestamp}] [SUCCÈS] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
+}
+
+# ==============================================================================
+# Gestion des Erreurs & Pièges
+# ==============================================================================
+
+setup_error_traps() {
+    trap 'handle_error $? $LINENO' ERR
+    trap 'handle_interrupt' INT TERM
+    set -o pipefail
+}
+
+handle_error() {
+    local exit_code=$1
+    local line_number=$2
+    
+    log_error "Erreur à la ligne ${line_number} (code: ${exit_code})"
+    log_error "Module actuel: ${CURRENT_MODULE:-unknown}"
+    
+    # Sauvegarder l'état d'erreur
+    echo "FAILED:${CURRENT_MODULE}:line_${line_number}" >> "$MADOS_CHECKPOINT_FILE"
+    
+    # NE PAS EXIT - continuer le script
+    return 0
+}
+
+handle_interrupt() {
+    log_warning "Installation interrompue par l'utilisateur"
+    log_info "Checkpoints sauvegardés dans: $MADOS_CHECKPOINT_FILE"
+    exit 130
+}
+
+# ==============================================================================
+# Exécution de Commandes avec Retry
+# ==============================================================================
+
+run_command_retry() {
+    local cmd="$1"
+    local description="${2:-Commande}"
+    local max_retries="${3:-$RETRY_COUNT}"
+    local attempt=1
+    
+    log_info "Exécution: ${description}"
+    
+    while [ $attempt -le $max_retries ]; do
+        if eval "$cmd" >/dev/null 2>&1; then
+            log_success "${description} (tentative $attempt/$max_retries)"
+            return 0
+        else
+            if [ $attempt -lt $max_retries ]; then
+                log_warning "${description} échouée (tentative $attempt/$max_retries) - Nouvelle tentative dans ${RETRY_DELAY}s..."
+                sleep "$RETRY_DELAY"
+            else
+                log_error "${description} échouée après $max_retries tentatives"
+                return 1
+            fi
+        fi
+        ((attempt++))
+    done
+    
+    return 1
+}
+
+# ==============================================================================
+# Sauvegarde & Restauration (Checkpoints)
+# ==============================================================================
+
+save_checkpoint() {
+    local module="$1"
+    local status="${2:-OK}"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    echo "[${timestamp}] ${status}:${module}" >> "$MADOS_CHECKPOINT_FILE"
+    log_info "Checkpoint sauvegardé: ${module} (${status})"
+}
+
+get_completed_modules() {
+    grep "OK:" "$MADOS_CHECKPOINT_FILE" 2>/dev/null | cut -d: -f2 | sort -u
+}
+
+skip_if_completed() {
+    local module="$1"
+    
+    if grep -q "OK:${module}" "$MADOS_CHECKPOINT_FILE" 2>/dev/null; then
+        log_warning "${module} déjà exécuté - SKIP"
+        return 0
+    fi
+    return 1
+}
+
+# ==============================================================================
+# Sauvegarde des fichiers importants
+# ==============================================================================
+
+backup_file() {
+    local file="$1"
+    local backup_name="${2:-$(basename $file).bak.$(date +%s)}"
+    
+    if [ -f "$file" ]; then
+        sudo cp "$file" "${MADOS_BACKUP_DIR}/${backup_name}" 2>/dev/null || true
+        log_info "Fichier sauvegardé: ${file} → ${backup_name}"
+    fi
+}
+
+restore_file() {
+    local original="$1"
+    local backup_file="$2"
+    
+    if [ -f "$backup_file" ]; then
+        sudo cp "$backup_file" "$original" 2>/dev/null || true
+        log_success "Fichier restauré: ${original}"
+        return 0
+    else
+        log_error "Backup non trouvé: ${backup_file}"
+        return 1
+    fi
+}
+
+# ==============================================================================
+# Vérifications Pré-Exécution
+# ==============================================================================
+
+check_disk_space() {
+    local required_gb="${1:-40}"
+    local available_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    
+    if [ "$available_gb" -lt "$required_gb" ]; then
+        log_error "Espace disque insuffisant: ${available_gb}GB disponibles (${required_gb}GB requis)"
+        return 1
+    fi
+    
+    log_success "Espace disque OK: ${available_gb}GB disponibles"
+    return 0
+}
+
+check_internet_connection() {
+    log_info "Vérification de la connexion Internet..."
+    
+    if run_command_retry "ping -c 1 -W 3 archive.ubuntu.com" "Ping archive.ubuntu.com" 2 >/dev/null; then
+        log_success "Connexion Internet OK"
+        return 0
+    else
+        log_error "Pas de connexion Internet détectée"
+        return 1
+    fi
+}
+
+check_sudo_access() {
+    if [ "$EUID" -ne 0 ]; then
+        log_error "Privilèges root requis"
+        return 1
+    fi
+    
+    log_success "Privilèges root confirmés"
+    return 0
+}
+
+# ==============================================================================
+# Utilitaires APT
+# ==============================================================================
+
+apt_update_safe() {
+    log_info "Mise à jour des listes de paquets..."
+    
+    run_command_retry \
+        "sudo apt-get update -o Acquire::Retries=3 -qq" \
+        "apt-get update" \
+        3 || return 1
+}
+
+apt_install_safe() {
+    local packages="$1"
+    local description="${2:-Installation de paquets}"
+    
+    log_info "${description}: ${packages}"
+    
+    run_command_retry \
+        "sudo apt-get install -y --no-install-recommends ${packages}" \
+        "${description}" \
+        2 || return 1
+}
+
+# ==============================================================================
+# Rapport d'Installation
+# ==============================================================================
+
+print_installation_report() {
+    local total_time=$SECONDS
+    local minutes=$((total_time / 60))
+    local seconds=$((total_time % 60))
+    
+    clear
+    echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║${NC} ${GREEN}✓${NC} ${WHITE}${BOLD}Installation MadOS 3.0 Terminée${NC}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
+    
+    echo -e "${CYAN}📊 Rapport de l'Installation:${NC}"
+    echo -e "  ${GRAY}├─ Durée: ${minutes}m ${seconds}s${NC}"
+    echo -e "  ${GRAY}├─ Logs complets: ${MADOS_LOG_DIR}/mados_install.log${NC}"
+    echo -e "  ${GRAY}├─ Backups: ${MADOS_BACKUP_DIR}${NC}"
+    echo -e "  ${GRAY}├─ Checkpoints: ${MADOS_CHECKPOINT_FILE}${NC}"
+    
+    if [ -f "$MADOS_ERRORS_FILE" ] && [ -s "$MADOS_ERRORS_FILE" ]; then
+        echo -e "  ${RED}├─ Erreurs: $(wc -l < $MADOS_ERRORS_FILE) erreur(s) enregistrée(s)${NC}"
+        echo -e "  ${GRAY}└─ Détails: ${MADOS_ERRORS_FILE}${NC}"
+    else
+        echo -e "  ${GREEN}└─ ✓ Aucune erreur détectée${NC}"
+    fi
+    
+    echo ""
+    echo -e "${YELLOW}📁 Prochaines étapes:${NC}"
+    echo -e "  1. Redémarrez le système: ${GREEN}sudo reboot${NC}"
+    echo -e "  2. Consultez les logs: ${GREEN}sudo cat ${MADOS_LOG_DIR}/mados_install.log${NC}"
+    echo -e "  3. En cas de problème: ${GREEN}sudo cat ${MADOS_CHECKPOINT_FILE}${NC}"
+    echo ""
+}
+
+# ==============================================================================
+# Détection d'Hyperviseur & Installation de Drivers
+# ==============================================================================
+
+detect_hypervisor() {
+    local hypervisor="none"
+    
+    # Détection QEMU/KVM
+    if grep -q "QEMU" /proc/cpuinfo 2>/dev/null || \
+       lspci 2>/dev/null | grep -iq "qemu"; then
+        hypervisor="qemu"
+    fi
+    
+    # Détection VMware
+    if dmidecode 2>/dev/null | grep -iq "vmware" || \
+       grep -q "VMware" /sys/class/dmi/id/sys_vendor 2>/dev/null || \
+       lspci 2>/dev/null | grep -iq "vmware"; then
+        hypervisor="vmware"
+    fi
+    
+    # Détection VirtualBox
+    if grep -q "VirtualBox" /sys/devices/virtual/dmi/id/product_name 2>/dev/null || \
+       lspci 2>/dev/null | grep -iq "virtualbox"; then
+        hypervisor="virtualbox"
+    fi
+    
+    # Détection Hyper-V
+    if grep -q "Hyper-V" /sys/hypervisor/properties/identity 2>/dev/null || \
+       systemd-detect-virt 2>/dev/null | grep -q "hyperv"; then
+        hypervisor="hyperv"
+    fi
+    
+    echo "$hypervisor"
+}
+
+install_hypervisor_drivers() {
+    local hypervisor="$1"
+    
+    if [ -z "$hypervisor" ] || [ "$hypervisor" = "none" ]; then
+        log_warning "Aucun hyperviseur détecté - Installation de drivers physiques"
+        return 0
+    fi
+    
+    log_info "Hyperviseur détecté: ${hypervisor} - Installation des drivers optimisés..."
+    
+    case "$hypervisor" in
+        qemu)
+            install_qemu_drivers
+            ;;
+        vmware)
+            install_vmware_drivers
+            ;;
+        virtualbox)
+            install_virtualbox_drivers
+            ;;
+        hyperv)
+            install_hyperv_drivers
+            ;;
+        *)
+            log_warning "Hyperviseur inconnu: $hypervisor"
+            ;;
+    esac
+}
+
+install_qemu_drivers() {
+    log_info "Installation drivers QEMU/KVM..."
+    
+    # Mettre à jour les listes de paquets
+    apt_update_safe || return 1
+    
+    # Paquets requis pour QEMU
+    local packages=(
+        "qemu-guest-agent"           # Agent invité QEMU
+        "spice-vdagent"              # Agent SPICE pour le clipboard/souris
+        "virtio-win"                 # Drivers VirtIO (optionnel)
+        "acpid"                      # ACPI daemon pour gestion d'événements
+        "open-vm-tools"              # Support cross-hypervisor
+    )
+    
+    # Installer les paquets
+    for pkg in "${packages[@]}"; do
+        if ! dpkg -l | grep -q "^ii  $pkg"; then
+            apt_install_safe "$pkg" "Installation $pkg (QEMU)" || log_warning "$pkg non disponible"
+        fi
+    done
+    
+    # Démarrer et activer le service QEMU Guest Agent
+    if systemctl is-active --quiet qemu-guest-agent 2>/dev/null; then
+        sudo systemctl enable qemu-guest-agent 2>/dev/null
+        log_success "QEMU Guest Agent activé"
+    fi
+    
+    # Configuration réseau optimisée pour QEMU
+    log_info "Optimisation réseau QEMU..."
+    sudo ethtool -K eth0 gso off gro off 2>/dev/null || true
+    
+    log_success "Drivers QEMU installés avec succès"
+    return 0
+}
+
+install_vmware_drivers() {
+    log_info "Installation drivers VMware..."
+    
+    # Mettre à jour les listes de paquets
+    apt_update_safe || return 1
+    
+    # Paquets requis pour VMware
+    local packages=(
+        "open-vm-tools"              # Tools VMware principal
+        "open-vm-tools-desktop"      # Support graphique (Wayland/X11)
+        "open-vm-tools-devel"        # Headers pour compilation
+        "build-essential"             # Pour compiler si nécessaire
+        "linux-headers-generic"      # Headers noyau
+    )
+    
+    # Installer les paquets
+    for pkg in "${packages[@]}"; do
+        if ! dpkg -l | grep -q "^ii  $pkg"; then
+            apt_install_safe "$pkg" "Installation $pkg (VMware)" || log_warning "$pkg non disponible"
+        fi
+    done
+    
+    # Démarrer et activer les services VMware Tools
+    if systemctl is-active --quiet vmtoolsd 2>/dev/null; then
+        sudo systemctl enable vmtoolsd 2>/dev/null
+        sudo systemctl start vmtoolsd 2>/dev/null
+        log_success "VMware Tools Service activé"
+    fi
+    
+    # Activer le support SVGA 3D si disponible
+    if lspci 2>/dev/null | grep -q "SVGA III"; then
+        log_info "Carte vidéo SVGA III détectée - Configuration optimisée"
+        sudo mkdir -p /etc/modprobe.d/
+        echo "options vmwgfx enable_fbdev=1" | sudo tee /etc/modprobe.d/vmware-gfx.conf >/dev/null 2>&1
+        log_success "Drivers graphiques VMware optimisés"
+    fi
+    
+    # Configuration réseau optimisée pour VMware
+    log_info "Optimisation réseau VMware..."
+    sudo ethtool -K eth0 gso off gro off 2>/dev/null || true
+    
+    log_success "Drivers VMware installés avec succès"
+    return 0
+}
+
+install_virtualbox_drivers() {
+    log_info "Installation drivers VirtualBox..."
+    
+    # Mettre à jour les listes de paquets
+    apt_update_safe || return 1
+    
+    # Paquets requis pour VirtualBox
+    local packages=(
+        "virtualbox-guest-utils"     # Utils invité
+        "virtualbox-guest-x11"       # Support graphique X11
+        "virtualbox-guest-dkms"      # Module noyau dynamique
+        "build-essential"             # Pour DKMS
+        "linux-headers-generic"      # Headers noyau
+    )
+    
+    # Installer les paquets
+    for pkg in "${packages[@]}"; do
+        if ! dpkg -l | grep -q "^ii  $pkg"; then
+            apt_install_safe "$pkg" "Installation $pkg (VirtualBox)" || log_warning "$pkg non disponible"
+        fi
+    done
+    
+    # Reconstruire les modules DKMS
+    log_info "Reconstruction modules VirtualBox..."
+    sudo dkms autoinstall 2>&1 | grep -v "^$" | while read line; do
+        log_info "  $line"
+    done || true
+    
+    # Activer le service
+    if systemctl list-unit-files | grep -q "vboxadd-service"; then
+        sudo systemctl enable vboxadd-service 2>/dev/null
+        sudo systemctl start vboxadd-service 2>/dev/null
+        log_success "VirtualBox Guest Service activé"
+    fi
+    
+    log_success "Drivers VirtualBox installés avec succès"
+    return 0
+}
+
+install_hyperv_drivers() {
+    log_info "Installation drivers Hyper-V..."
+    
+    # Mettre à jour les listes de paquets
+    apt_update_safe || return 1
+    
+    # Les drivers Hyper-V sont intégrés au noyau Linux
+    # On installe juste les outils supplémentaires
+    local packages=(
+        "linux-image-generic"        # Noyau avec support Hyper-V
+        "linux-tools-generic"        # Outils de diagnostic
+        "build-essential"
+    )
+    
+    # Installer les paquets
+    for pkg in "${packages[@]}"; do
+        if ! dpkg -l | grep -q "^ii  $pkg"; then
+            apt_install_safe "$pkg" "Installation $pkg (Hyper-V)" || log_warning "$pkg non disponible"
+        fi
+    done
+    
+    # Activer les modules Hyper-V
+    log_info "Configuration modules Hyper-V..."
+    sudo modprobe hv_vmbus
+    sudo modprobe hv_storvsc
+    sudo modprobe hv_netvsc
+    
+    # Rendre persistants
+    echo "hv_vmbus" | sudo tee -a /etc/modules >/dev/null 2>&1
+    echo "hv_storvsc" | sudo tee -a /etc/modules >/dev/null 2>&1
+    echo "hv_netvsc" | sudo tee -a /etc/modules >/dev/null 2>&1
+    
+    log_success "Drivers Hyper-V configurés"
+    return 0
+}
+
+# ==============================================================================
+# Export pour sous-scripts
+# ==============================================================================
+
+export -f log_info log_error log_warning log_success
+export -f run_command_retry save_checkpoint skip_if_completed
+export -f backup_file restore_file
+export -f check_disk_space check_internet_connection check_sudo_access
+export -f apt_update_safe apt_install_safe
+export -f detect_hypervisor install_hypervisor_drivers
+export -f install_qemu_drivers install_vmware_drivers
+export -f install_virtualbox_drivers install_hyperv_drivers
+

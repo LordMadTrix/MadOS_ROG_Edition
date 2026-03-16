@@ -199,7 +199,8 @@
             <h2><span>01</span> Démarrer sur la clé USB</h2>
             <p>Insérez la clé USB contenant l'ISO d'Ubuntu Server 24.04 (Noble Numbat) que vous avez flashée (avec Rufus
                 ou Balena). Si vous n'avez pas encore Ubuntu Server, téléchargez-le et mettez-le sur une
-                <strong>autre</strong> clé USB.</p>
+                <strong>autre</strong> clé USB.
+            </p>
             <ul>
                 <li>Allumez le PC et tapotez <strong>Echap</strong> ou <strong>F8</strong> pour ouvrir le Boot Menu.
                 </li>
@@ -224,7 +225,8 @@
                         FIN.</strong> Le système doit rester totalement vide.</li>
             </ul>
             <p>Laissez l'installation se terminer. Quand on vous le demande, retirez la clé Ubuntu, et faites
-                <strong>Reboot Now</strong>.</p>
+                <strong>Reboot Now</strong>.
+            </p>
         </div>
 
         <div class="step-card">
@@ -240,8 +242,14 @@
             <p>Tapez exactement cette commande pour lancer la magie, en remplaçant <span class="highlight">$USER</span>
                 par votre nom d'utilisateur :</p>
             <code>bash /media/$USER/MADOS/start.sh</code>
-            <p><em>Astuce : Si ça ne marche pas, vous pouvez taper <code>lsblk</code> pour voir vos disques, ou essayer
-                    <code>bash /media/mados/MADOS/start.sh</code></em></p>
+            <p><em>Astuce : Si ça ne marche pas ou si vous êtes sur une Machine Virtuelle (QEMU/VMware) sans montage
+                    automatique, forcez le montage manuellement :</em></p>
+            <code>
+sudo mkdir -p /mnt/usb<br>
+sudo mount /dev/sda1 /mnt/usb<br>
+cd /mnt/usb/mados<br>
+sudo ./install_local.sh
+            </code>
         </div>
 
         <div class="step-card">
