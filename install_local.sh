@@ -23,6 +23,7 @@ main() {
     export DEBIAN_FRONTEND=noninteractive
     # IMPORTANT: Mode 'l' (list) pour éviter de couper le SSH en redémarrant le réseau
     export NEEDRESTART_MODE=l
+    export CURRENT_MODULE="INITIALISATION"
     set -uo pipefail
 
     # ---- BOUCLIER ULTIME : Blocage des redémarrages de services (Fix SSH/ModemManager) ----
@@ -79,16 +80,22 @@ main() {
     check_disk_space 10 || exit 1
     
     # ---- PROTECTION GOD-TIER : Auto-Clonage vers /opt (Safe Zone) ----
-    # Évite les plantages si le point de montage (/mnt/hgfs) saute pendant l'install
-    # On utilise /opt au lieu de /tmp car /tmp est souvent un RAMDisk trop petit.
-    export CURRENT_MODULE="INITIALISATION"
     if [[ "$SCRIPT_DIR" == *"/mnt/"* || "$SCRIPT_DIR" == *"/media/"* ]]; then
         local TMP_RUN="/opt/mados_run"
         if [ "$SCRIPT_DIR" != "$TMP_RUN" ]; then
-            echo -e "${YELLOW}[!] Source sur dossier partagé détectée. Déploiement vers Zone Stable...${NC}"
+            echo -e "${YELLOW}[!] Source sur dossier partagé détectée. Optimisation du déploiement...${NC}"
             sudo mkdir -p "$TMP_RUN"
-            sudo cp -rf "$SCRIPT_DIR/"* "$TMP_RUN/"
-            echo -e "${GREEN}[OK] Proxy local établi dans /opt. Relance du moteur...${NC}"
+            
+            # Copie sélective pour éviter les fichiers lourds (ISO, VM)
+            echo -e "${GRAY}    ├─ Clonage du cœur MadOS (lib, modules, scripts)...${NC}"
+            for item in "lib" "modules" "scripts" "assets" "docs"; do
+                [ -d "$SCRIPT_DIR/$item" ] && sudo cp -rf "$SCRIPT_DIR/$item" "$TMP_RUN/"
+            done
+            sudo cp -f "$SCRIPT_DIR"/*.sh "$TMP_RUN/" 2>/dev/null || true
+            sudo cp -f "$SCRIPT_DIR"/*.md "$TMP_RUN/" 2>/dev/null || true
+            sudo cp -f "$SCRIPT_DIR"/.nojekyll "$TMP_RUN/" 2>/dev/null || true
+            
+            echo -e "${GREEN}[OK] Proxy local établi dans /opt. Relance ultra-rapide...${NC}"
             cd "$TMP_RUN"
             sudo bash ./install_local.sh "$@"
             exit $?
