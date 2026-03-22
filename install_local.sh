@@ -28,6 +28,7 @@ main() {
     # Charger les fonctions communes
     # ==============================================================================
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    export PROJECT_ROOT="$SCRIPT_DIR"
     if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
         source "$SCRIPT_DIR/lib/common.sh"
     else
