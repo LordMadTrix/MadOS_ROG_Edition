@@ -602,23 +602,44 @@ mode_destruction() {
 
 cloture_installation() {
     clear
-    echo -e "${CYAN}Génération du lien de diagnostic (Upload sécurisé vers Termbin)...${NC}"
-    local ACTUAL_LOG="$MADOS_LOG_DIR/mados_install.log"
-    if [ -f "$ACTUAL_LOG" ]; then
-        LOG_URL=$(cat "$ACTUAL_LOG" | nc termbin.com 9999 || echo "Échec de l'upload")
-    else
-        LOG_URL="Aucun log généré."
+    echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║${NC} 🏁 ${WHITE}${BOLD}Séquence de Clôture MadOS 3.2 Ultimate Edition${NC}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
+
+    # Vérification et installation asynchrone de netcat pour l'upload
+    if ! command -v nc &>/dev/null; then
+        echo -e "${GRAY}    Installation de netcat-openbsd pour le diagnostic...${NC}"
+        sudo apt-get install -y netcat-openbsd -qq >/dev/null 2>&1
     fi
 
-    whiptail --title "MadOS 3.0 - DÉPLOIEMENT TERMINÉ 🎉" --msgbox "Déploiement Terminé avec Succès !\n\nLien de Diagnostic (Copiez-le pour le dev) :\n$LOG_URL\n\nAu prochain redémarrage, vous profiterez de MadOS 3.0 :\n - Kernel XanMod EDGE\n - Interface Wayland / KDE Plasma 6\n - Modules Avancés Actifs" 16 70
-    if whiptail --title "MadOS 3.0 - REDÉMARRAGE" --yesno "Voulez-vous redémarrer le système maintenant pour savourer MadOS 3.0 ?" 10 55; then
+    echo -e "${CYAN}📡 Génération du rapport de mission (Termbin)...${NC}"
+    local ACTUAL_LOG="$MADOS_LOG_DIR/mados_install.log"
+    local LOG_URL="https://termbin.com/indisponible"
+    
+    if [ -f "$ACTUAL_LOG" ]; then
+        # On limite le log aux 10000 dernières lignes pour éviter de saturer termbin
+        LOG_URL=$(tail -n 10000 "$ACTUAL_LOG" | nc termbin.com 9999 2>/dev/null || echo "Échec de l'upload")
+    fi
+
+    # UI Finale Premium
+    whiptail --title "MadOS 3.2 — DÉPLOIEMENT TERMINÉ 🚀" --msgbox \
+    "MAD-OS EST MAINTENANT ACTIF SUR VOTRE SYSTÈME !\n\n\
+    [STATUT] : OPÉRATIONNEL\n\
+    [LOG DIAG] : $LOG_URL\n\n\
+    Prochaines étapes :\n\
+    1. Redémarrez pour charger le Kernel XanMod.\n\
+    2. Le bureau KDE Plasma 6 (MadEdition) sera actif.\n\
+    3. Vos modules Turbo-Tuner & Stealth-Mode sont scellés.\n\n\
+    Bon jeu, $(whoami) !" 18 70
+
+    if whiptail --title "SÉQUENCE DE REDÉMARRAGE" --yesno "Voulez-vous engager le redémarrage immédiat ?" 10 50; then
         clear
-        echo -e "${RED}Initiation de la séquence de reboot...${NC}"
+        echo -e "${RED}🚀 REBOOT ENGAGÉ. Rendez-vous dans la matrice...${NC}"
         sleep 2
         sudo reboot
     else
         clear
-        echo -e "${GRAY}À bientôt dans la Matrice. Lien de log : $LOG_URL${NC}"
+        echo -e "${GREEN}Séquence terminée. Votre station MadOS est prête.${NC}"
         exit 0
     fi
 }
