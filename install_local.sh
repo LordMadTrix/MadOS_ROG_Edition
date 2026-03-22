@@ -24,7 +24,13 @@ main() {
     # IMPORTANT: Mode 'l' (list) pour éviter de couper le SSH en redémarrant le réseau
     export NEEDRESTART_MODE=l
     set -uo pipefail
-    
+
+    # ---- BOUCLIER ULTIME : Blocage des redémarrages de services (Fix SSH/ModemManager) ----
+    echo -e '#!/bin/sh\nexit 101' | sudo tee /usr/sbin/policy-rc.d > /dev/null
+    sudo chmod +x /usr/sbin/policy-rc.d
+    # Retirer le blocage à la fin du script (même en cas de crash)
+    trap 'sudo rm -f /usr/sbin/policy-rc.d' EXIT
+
     # ==============================================================================
     # Charger les fonctions communes
     # ==============================================================================
