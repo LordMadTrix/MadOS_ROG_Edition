@@ -23,10 +23,21 @@ main() {
     export DEBIAN_FRONTEND=noninteractive
     # IMPORTANT: Mode 'l' (list) pour éviter de couper le SSH en redémarrant le réseau
     export NEEDRESTART_MODE=l
-    export CURRENT_MODULE="INITIALISATION"
+    export CURRENT_MODULE="SAUVETAGE"
     set -uo pipefail
 
-    # ---- BOUCLIER ULTIME : Blocage des redémarrages de services (Fix SSH/ModemManager) ----
+    # ---- OPÉRATION FORCE BRUTE : Libération des verrous APT/DPKG/SNAP ----
+    # Évite le blocage infini si l'install précédente a crashé
+    echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║${NC} 🧱 ${WHITE}${BOLD}Opération Libération des Verrous Système...${NC}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
+
+    sudo pkill -9 apt 2>/dev/null || true
+    sudo pkill -9 apt-get 2>/dev/null || true
+    sudo pkill -9 dpkg 2>/dev/null || true
+    sudo pkill -9 snapd 2>/dev/null || true
+    sudo rm -f /var/lib/apt/lists/lock /var/cache/apt/archives/lock /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock 2>/dev/null || true
+    sudo dpkg --configure -a 2>/dev/null || true
     echo -e '#!/bin/sh\nexit 101' | sudo tee /usr/sbin/policy-rc.d > /dev/null
     sudo chmod +x /usr/sbin/policy-rc.d
     # Retirer le blocage à la fin du script (même en cas de crash)
