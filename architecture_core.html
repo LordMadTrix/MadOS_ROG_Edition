@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MadOS 3.2 — Spécifications Techniques Profondes</title>
+    <title>MadOS 3.2 — Bibliothèque Technique Totale</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
@@ -37,121 +37,207 @@
         .logo { font-family: 'Orbitron', sans-serif; color: white; text-decoration: none; font-weight: 900; }
         .logo span { color: var(--rog-red); }
 
-        .container { max-width: 1000px; margin: 5rem auto; padding: 0 2rem; }
+        .container { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; }
 
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; margin-bottom: 2rem; color: var(--rog-red); text-transform: uppercase; border-bottom: 1px solid var(--rog-red); padding-bottom: 1rem; }
-        h2 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; margin: 4rem 0 1.5rem; color: white; border-left: 4px solid var(--rog-red); padding-left: 1.5rem; }
-        h3 { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: var(--cyan); margin-top: 2rem; margin-bottom: 1rem; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 2rem; color: var(--rog-red); text-transform: uppercase; text-align: center; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; }
 
-        p { margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dim); }
-
-        .tech-box {
+        .module-item {
             background: var(--panel-bg);
             border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 2rem;
             border-radius: 12px;
-            margin-bottom: 2rem;
             position: relative;
+            transition: 0.3s;
         }
-        .tech-box::after { content: "DATA_CORE"; position: absolute; top: 0.5rem; right: 1rem; font-size: 0.6rem; color: #333; font-family: 'Share Tech Mono'; }
-
-        code { font-family: 'Share Tech Mono', monospace; color: var(--green); background: #000; padding: 0.2rem 0.5rem; border-radius: 4px; }
-        pre { background: #000; padding: 1.5rem; border-radius: 8px; border-left: 3px solid var(--rog-red); overflow-x: auto; margin: 1.5rem 0; font-family: 'Share Tech Mono'; color: var(--green); }
-
-        ul { margin-bottom: 2rem; padding-left: 1.5rem; color: var(--text-dim); }
-        li { margin-bottom: 0.8rem; }
-
-        .status-badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 50px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; margin-right: 0.5rem; font-family: 'Orbitron'; }
-        .stable { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--green); color: var(--green); }
-        .extreme { background: rgba(255, 0, 60, 0.1); border: 1px solid var(--rog-red); color: var(--rog-red); }
-
-        footer { text-align: center; padding: 5rem; border-top: 1px solid rgba(255,255,255,0.05); color: #333; }
+        .module-item:hover { border-color: var(--rog-red); transform: scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .m-num { position: absolute; top: 1rem; right: 1rem; font-family: 'Share Tech Mono'; color: rgba(255,255,255,0.05); font-size: 3rem; font-weight: 900; line-height: 1; pointer-events: none; }
+        
+        .m-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--cyan); margin-bottom: 0.8rem; text-transform: uppercase; }
+        .m-desc { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 1.2rem; min-height: 3em; }
+        
+        .m-tech { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .m-tag { font-family: 'Share Tech Mono'; font-size: 0.7rem; background: #000; padding: 0.2rem 0.6rem; border-radius: 4px; color: var(--green); border: 1px solid rgba(0, 255, 136, 0.2); }
+        .m-tag.red { color: var(--rog-red); border-color: rgba(255, 0, 60, 0.2); }
 
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="index.html" class="logo">MADOS <span>BACKEND</span></a>
+    <a href="index.html" class="logo">MADOS <span>CATALOG</span></a>
     <a href="index.html" style="color:white; text-decoration:none; font-family:'Orbitron'; font-size:0.8rem;">➔ HUB</a>
 </nav>
 
 <div class="container">
-    <h1>Spécifications : MadOS 3.2 Ultimate</h1>
-    <p>Ce document détaille les entrailles du framework MadOS. Chaque ligne de code est pensée pour maximiser le rendement matériel des configurations <strong>ASUS ROG (i9 / RTX)</strong> sous un environnement Linux minimaliste.</p>
+    <h1>📦 MadOS 3.2 — Manifeste Technique des Modules</h1>
+    <p style="text-align: center; color: var(--text-dim); margin-bottom: 4rem;">Une analyse profonde de chaque script d'optimisation intégré.</p>
 
-    <div class="tech-box">
-        <h3>🚀 Le Propulseur : Moteur Nala</h3>
-        <p>MadOS remplace le gestionnaire de paquets par défaut (APT) par <strong>Nala</strong>. Cela permet un téléchargement parallèle sur les 16 meilleurs miroirs détectés dynamiquement.</p>
-        <pre># Dans MASTER_INSTALL.sh
-ensure_nala() {
-    sudo apt update && sudo apt install -y nala
-    alias apt='sudo nala'
-}</pre>
-        <ul>
-            <li><strong>Réduction de latence :</strong> Choix automatique des serveurs les plus proches.</li>
-            <li><strong>Parallélisation :</strong> Jusqu'à 16 flux simultanés (gain de temps de ~400%).</li>
-        </ul>
+    <div class="grid">
+        <!-- 00-05 -->
+        <div class="module-item">
+            <div class="m-num">00</div>
+            <div class="m-title">Nettoyage Ubuntu</div>
+            <div class="m-desc">Purge le système des résidus Canonical. Désactivation de Snapd et suppression de la télémétrie.</div>
+            <div class="m-tech"><span class="m-tag">Snapd-Kill</span><span class="m-tag">RAM-Free</span><span class="m-tag red">System</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">01</div>
+            <div class="m-title">Kernel XanMod</div>
+            <div class="m-desc">Injection du noyau temps-réel XanMod Edge. Priorité aux jeux et réduction massive de l'input lag.</div>
+            <div class="m-tech"><span class="m-tag">Real-Time</span><span class="m-tag">Kernel-Patch</span><span class="m-tag red">Extreme</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">02</div>
+            <div class="m-title">Pilotes GPU Pro</div>
+            <div class="m-desc">Détection IA du matériel. Installe les pilotes NVIDIA 550+ ou AMD MESA dernière génération.</div>
+            <div class="m-tech"><span class="m-tag">NVIDIA</span><span class="m-tag">AMD</span><span class="m-tag red">Hardware</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">03</div>
+            <div class="m-title">ASUS ROG Tools</div>
+            <div class="m-desc">Les outils vitaux pour votre machine : asusctl, supergfxctl (Mux Switch) et rog-control-center.</div>
+            <div class="m-tech"><span class="m-tag">MUX-Switch</span><span class="m-tag">Fans-Control</span><span class="m-tag red">Essential</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">04</div>
+            <div class="m-title">Arsenal Logiciel</div>
+            <div class="m-desc">Installation massive d'outils critiques (VLC, VSCode, Discord, Git) via Nala en parallèle.</div>
+            <div class="m-tech"><span class="m-tag">Bloat-Free</span><span class="m-tag">Parallel-DL</span><span class="m-tag red">Apps</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">05</div>
+            <div class="m-title">KDE Plasma 6</div>
+            <div class="m-desc">Environnement de bureau nouvelle génération optimisé pour Wayland et le HRR (High Refresh Rate).</div>
+            <div class="m-tech"><span class="m-tag">Wayland</span><span class="m-tag">HDR-Ready</span><span class="m-tag red">Desktop</span></div>
+        </div>
+
+        <!-- 06-12 -->
+        <div class="module-item">
+            <div class="m-num">06</div>
+            <div class="m-title">Thème Pulsar</div>
+            <div class="m-desc">Design MadOS Total : ROG, Cyber ou Carbon. Icônes néon et interface Glassmorphism.</div>
+            <div class="m-tech"><span class="m-tag">Glassmorphism</span><span class="m-tag">Custom-Icons</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">07</div>
+            <div class="m-title">Snapshots BTRFS</div>
+            <div class="m-desc">Sauvegarde temporelle du système. Restaurez votre OS en 1 minute en cas de panne critique.</div>
+            <div class="m-tech"><span class="m-tag">BTRFS</span><span class="m-tag">Instant-Recovery</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">08</div>
+            <div class="m-title">Proton-GE / Gamescope</div>
+            <div class="m-desc">La couche de compatibilité ultime de Valve. Micro-compositeur pour débloquer les FPS.</div>
+            <div class="m-tech"><span class="m-tag">Valve</span><span class="m-tag">FPS-Boost</span><span class="m-tag red">Gaming</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">10</div>
+            <div class="m-title">Digital Audio Startup</div>
+            <div class="m-desc">Effet sonore ROG spatialisé à l'ouverture de session pour une immersion totale.</div>
+            <div class="m-tech"><span class="m-tag">Pipewire</span><span class="m-tag">FX-Audio</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">11</div>
+            <div class="m-title">Battery Health Pro</div>
+            <div class="m-desc">Limite le seuil de charge matérielle à 60% ou 80% pour préserver la batterie du laptop.</div>
+            <div class="m-tech"><span class="m-tag">Battery-Care</span><span class="m-tag red">Protection</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">12</div>
+            <div class="m-title">MangoHud Layer</div>
+            <div class="m-desc">Overlay performances Gaming (FPS, FrameTime, Temps GPU) avec design ROG exclusif.</div>
+            <div class="m-tech"><span class="m-tag">Overlay</span><span class="m-tag">Benchmarks</span></div>
+        </div>
+
+        <!-- 15-22 -->
+        <div class="module-item">
+            <div class="m-num">15</div>
+            <div class="m-title">Réseau Anti-Lag</div>
+            <div class="m-desc">Optimisation TCP BBR. Réduction du jitter et du ping lors des sessions compétitives.</div>
+            <div class="m-tech"><span class="m-tag">TCP-BBR</span><span class="m-tag">E-Sport-Ping</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">16</div>
+            <div class="m-title">ZRAM Engine</div>
+            <div class="m-desc">Doublez votre RAM virtuellement via compression algorithmique ZSTD temps-réel.</div>
+            <div class="m-tech"><span class="m-tag">ZSTD</span><span class="m-tag">RAM-Compression</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">17</div>
+            <div class="m-title">Host-Shield (Anti-Ad)</div>
+            <div class="m-desc">Blocage DNS au niveau master de toutes les publicités et traqueurs connus.</div>
+            <div class="m-tech"><span class="m-tag">Ad-Blocker</span><span class="m-tag">Privacy</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">20</div>
+            <div class="m-title">USB Overclock (1KHz)</div>
+            <div class="m-desc">Force le Polling Rate des ports USB à 1000Hz pour une réactivité souris nanométrique.</div>
+            <div class="m-tech"><span class="m-tag">Low-Latency</span><span class="m-tag red">eSport</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">22</div>
+            <div class="m-title">Undervolt i9/AMD</div>
+            <div class="m-desc">Réduit les tensions CPU pour baisser la température sans perdre de performance brute.</div>
+            <div class="m-tech"><span class="m-tag">Cooling-Patch</span><span class="m-tag">Voltage-Mod</span></div>
+        </div>
+
+        <!-- GOD TIER 29-36 -->
+        <div class="module-item">
+            <div class="m-num">29</div>
+            <div class="m-title">MadChat IA Locale</div>
+            <div class="m-desc">Injection de Mistral/Llama tournant 100% sur la RTX via Ollama. 0 Cloud.</div>
+            <div class="m-tech"><span class="m-tag">AI-RTX</span><span class="m-tag">Local-LLM</span><span class="m-tag red">God-Tier</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">30</div>
+            <div class="m-title">EmuDeck Retro-Station</div>
+            <div class="m-desc">Installation complète de RetroArch et des BIOS pour PS3, Switch, WII-U etc.</div>
+            <div class="m-tech"><span class="m-tag">Retro-Gaming</span><span class="m-tag">Pro-Config</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">31</div>
+            <div class="m-title">Turbo-Tuner Engine</div>
+            <div class="m-desc">Hugepages + PCI Latency + I/O Scheduler. La trinité de la performance i9/RTX.</div>
+            <div class="m-tech"><span class="m-tag">Hugepages</span><span class="m-tag">PCI-Optimization</span><span class="m-tag red">God-Tier</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">32</div>
+            <div class="m-title">Stealth Mode 3.2</div>
+            <div class="m-desc">Encryption DNS-over-TLS (Quad9) et Hardening Firewall absolu.</div>
+            <div class="m-tech"><span class="m-tag">DNS-over-TLS</span><span class="m-tag red">Stealth</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">33</div>
+            <div class="m-title">MadCenter Dashboard</div>
+            <div class="m-desc">Tableau de bord graphique PyQt6 pour piloter les thèmes et les modes de puissance.</div>
+            <div class="m-tech"><span class="m-tag">Python-GUI</span><span class="m-tag">Control-Center</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">34</div>
+            <div class="m-title">MadLink Sync</div>
+            <div class="m-desc">Ecosystème de partage de fichiers et notifications entre votre Smartphone et MadOS.</div>
+            <div class="m-tech"><span class="m-tag">Cross-Platform</span><span class="m-tag">Auto-Sync</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">35</div>
+            <div class="m-title">Plymouth Pulsar</div>
+            <div class="m-desc">Animation cinématique du boot ROG pendant le chargement des pilotes GPU.</div>
+            <div class="m-tech"><span class="m-tag">Cinematic-Boot</span><span class="m-tag">ROG-Pulsar</span></div>
+        </div>
+        <div class="module-item">
+            <div class="m-num">36</div>
+            <div class="m-title">MadStream RTX Pack</div>
+            <div class="m-desc">Optimisation OBS NVENC P7 pour streamer en 4K Ultra-Low-Latency.</div>
+            <div class="m-tech"><span class="m-tag">NVENC-P7</span><span class="m-tag">Streaming-Pro</span></div>
+        </div>
     </div>
-
-    <h2>💎 Moteurs "God Tier" (Spécifications)</h2>
-
-    <div class="tech-box">
-        <span class="status-badge extreme">Extreme</span>
-        <h3>🏁 Module 31 : Turbo-Tuner</h3>
-        <p>Le cœur de l'optimisation hardware. Ce module reconfigure dynamiquement le kernel pour les architectures i9 hautes fréquences.</p>
-        <ul>
-            <li><strong>Hugepages :</strong> Allocation massive de 4096 pages pour les jeux VR et AAA, réduisant les défauts de cache mémoire.</li>
-            <li><strong>PCI Latency :</strong> Ajustement des timers de latence PCI pour que la RTX puisse "parler" au CPU sans file d'attente logicielle (Passage de 64 à 32 cycles).</li>
-            <li><strong>IO Scheduler :</strong> Force l'ordonnanceur <strong>BFQ</strong> sur les disques NVMe pour prioriser l'accès aux données de jeux par rapport aux processus système.</li>
-        </ul>
-    </div>
-
-    <div class="tech-box">
-        <span class="status-badge stable">Stable</span>
-        <h3>🛡️ Module 32 : Stealth-Mode</h3>
-        <p>Hardening complet du système pour une confidentialité totale.</p>
-        <ul>
-            <li><strong>DNS-over-TLS :</strong> Cryptage de toutes les requêtes DNS via <strong>Quad9</strong> (Encapsulation TLS 1.3).</li>
-            <li><strong>Anti-Telemetry :</strong> Purge nucléaire des paquets <code>apport</code>, <code>popularity-contest</code> et blocage des rapports d'erreurs Canonical.</li>
-            <li><strong>Firewall Caméléon :</strong> Configuration UFW fermée par défaut, avec ouverture adaptative pour Steam et les connexions LAN synchronisées.</li>
-        </ul>
-    </div>
-
-    <div class="tech-box">
-        <span class="status-badge stable">Stable</span>
-        <h3>🧠 Module 29 : MadChat IA</h3>
-        <p>Intégration locale d'IA générative directement sur le GPU.</p>
-        <pre># Configuration Ollama via RTX
-systemctl enable --now ollama
-ollama run mistral</pre>
-        <p>L'IA utilise les <strong>Tensor Cores</strong> de la RTX pour une génération de texte à ~50 tokens/sec, sans aucune connexion cloud.</p>
-    </div>
-
-    <h2>🧱 Architecture de l'Installeur</h2>
-
-    <div class="tech-box">
-        <h3>🛠️ L'Orchestrateur Modulaire</h3>
-        <p>L'installeur utilise un système de "Traps" et de "Locks" pour garantir qu'aucune installation ne se chevauche.</p>
-        <ul>
-            <li><strong>wait_for_apt :</strong> Boucle de surveillance des verrous DPKG pour éviter les erreurs "Another process is using this file".</li>
-            <li><strong>Modularité :</strong> Les 36 modules sont isolés. Un échec sur le module 'Son' n'empêche pas l'installation du 'Noyau'.</li>
-            <li><strong>Rollback :</strong> En cas d'erreur critique, MadOS génère un rapport complet dans <code>/var/log/mados/mados_errors.log</code>.</li>
-        </ul>
-    </div>
-
-    <h2>🎮 Pile Gaming & Graphique</h2>
-    <p>MadOS force l'utilisation des derniers standards de performance graphique.</p>
-    <ul>
-        <li><strong>Wayland par défaut :</strong> Utilisation de KDE Plasma 6 sur Wayland pour une fluidité sans déchirement (Zero Tearing).</li>
-        <li><strong>VRR (Variable Refresh Rate) :</strong> Pré-activé pour les écrans G-Sync/FreeSync des laptops ROG.</li>
-        <li><strong>MangoHud ROG :</strong> Profil personnalisé affichant le Framerate, la Température GPU et la Charge CPU en overlay néon rouge.</li>
-    </ul>
-
 </div>
 
 <footer>
-    &copy; 2026 MADOS TECHNICAL ARCHITECTURE | GOD TIER | 3.2 ULTIMATE
+    &copy; 2026 MADOS FULL MODULE CATALOG | 36 SCRIPTS OF POWER
 </footer>
 
 </body>
