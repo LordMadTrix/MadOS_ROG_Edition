@@ -18,7 +18,9 @@ echo -e "${RED}╚════════════════════�
 echo -e "    ${WHITE}├─ [SYSTEM] Injection de OBS Studio (Version Récente)...${NC}"
 sudo add-apt-repository ppa:obsproject/obs-studio -y 2>/dev/null || true
 sudo apt update -q
-sudo apt install -y obs-studio ffmpeg v4l2loopback-dkms
+# Installation des headers requis pour la compilation du module v4l2loopback (Virtual Cam)
+sudo apt install -y linux-headers-$(uname -r) 2>/dev/null || true
+sudo apt install -y obs-studio ffmpeg v4l2loopback-dkms || true
 
 # 2. Injection du profil de performance RTX
 echo -e "    ${WHITE}├─ [CONFIG] Calibration des profils d'encodage NVENC (Max Quality)...${NC}"
@@ -62,7 +64,9 @@ EOF
 
 # 3. Création du raccourci Bureau MadStream
 echo -e "    ${WHITE}├─ [UI] Création de l'icône 'MadStream' sur le Bureau...${NC}"
-cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/Desktop/MadStream_OBS.desktop" >/dev/null
+    # S'assurer que le dossier des raccourcis existe
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications"
+    cat << EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.local/share/applications/MadStream_OBS.desktop" > /dev/null
 [Desktop Entry]
 Name=MadStream (OBS RTX)
 Comment=Lancer OBS avec les presets MadOS RTX

@@ -47,6 +47,7 @@ ORCA_URL=$(curl -s https://api.github.com/repos/SoftFever/OrcaSlicer/releases/la
 if [ -n "$ORCA_URL" ]; then
     sudo -u "$REAL_USER" wget -q --show-progress "$ORCA_URL" -O "$MAKER_DIR/OrcaSlicer.AppImage"
     sudo chmod +x "$MAKER_DIR/OrcaSlicer.AppImage"
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications"
     cat << EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.local/share/applications/orcaslicer.desktop" > /dev/null
 [Desktop Entry]
 Name=OrcaSlicer (Rapide / Klipper)
@@ -57,6 +58,9 @@ Terminal=false
 Type=Application
 Categories=Graphics;3DGraphics;Engineering;
 EOF
+    # Copie sur le Bureau
+    cp "$USER_HOME/.local/share/applications/orcaslicer.desktop" "$USER_HOME/Desktop/" 2>/dev/null || true
+    chmod +x "$USER_HOME/Desktop/orcaslicer.desktop" 2>/dev/null || true
     echo -e "    ${GRAY}    ├─ OrcaSlicer configuré avec succès !${NC}"
 fi
 
@@ -65,6 +69,7 @@ PRUSA_URL=$(curl -s https://api.github.com/repos/prusa3d/PrusaSlicer/releases/la
 if [ -n "$PRUSA_URL" ]; then
     sudo -u "$REAL_USER" wget -q --show-progress "$PRUSA_URL" -O "$MAKER_DIR/PrusaSlicer.AppImage"
     sudo chmod +x "$MAKER_DIR/PrusaSlicer.AppImage"
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications"
     cat << EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.local/share/applications/prusaslicer.desktop" > /dev/null
 [Desktop Entry]
 Name=PrusaSlicer (Universel)
@@ -75,6 +80,9 @@ Terminal=false
 Type=Application
 Categories=Graphics;3DGraphics;Engineering;
 EOF
+    # Copie sur le Bureau
+    cp "$USER_HOME/.local/share/applications/prusaslicer.desktop" "$USER_HOME/Desktop/" 2>/dev/null || true
+    chmod +x "$USER_HOME/Desktop/prusaslicer.desktop" 2>/dev/null || true
     echo -e "    ${GRAY}    ├─ PrusaSlicer configuré avec succès !${NC}"
 fi
 
@@ -86,6 +94,9 @@ echo -e "    ${GRAY}    └─ Suite d'Impression 3D Globale parée au lancement
 # 5. Gravure Laser (TwoTrees TTS 55 Pro) -> LaserWeb 4
 echo -e "    ${WHITE}├─ [GRAVURE LASER] Préparation pour TwoTrees TTS-55 Pro (LaserWeb)...${NC}"
 echo -e "    ${GRAY}    Création du raccourci vers LightBurn (Logiciel Pro recommandé)...${NC}"
+
+# S'assurer que le dossier des raccourcis existe
+sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications" 2>/dev/null || true
 
 cat << EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.local/share/applications/lightburn-download.desktop" > /dev/null
 [Desktop Entry]
