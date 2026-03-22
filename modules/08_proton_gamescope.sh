@@ -41,7 +41,7 @@ if sudo -u "$REAL_USER" command -v protonup &>/dev/null; then
     sudo -u "$REAL_USER" protonup -d "$STEAM_COMPAT_DIR" -y >/dev/null 2>&1 || true
     echo -e "    ${GRAY}✅ [SUCCÈS] Proton-GE a été déployé pour votre compte Steam.${NC}"
 else
-    echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Impossible de télécharger Proton-GE automatiquement. Utilisez ProtonUp-Qt.${NC}"
+    echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Impossible de télécharger Proton-GE automatiquement. Utilisez ProtonUp-Qt.${NC}"
 fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 8 Terminée.${NC}"

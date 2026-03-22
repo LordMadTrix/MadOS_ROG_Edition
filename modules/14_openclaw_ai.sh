@@ -159,7 +159,7 @@ while true; do
           google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
         fi
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     2)
@@ -167,7 +167,7 @@ while true; do
         clear
         cd "$HOME/OpenClaw" && node scripts/run-node.mjs tui
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     3)

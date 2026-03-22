@@ -48,12 +48,17 @@ install_pkg vlc obs-studio stacer mangohud goverlay ttf-mscorefonts-installer pi
 echo -e "    ${WHITE}├─ [PROTON] Déploiement Console ProtonUp-Qt...${NC}"
 sudo -u "$REAL_USER" pipx install protonup-qt 2>/dev/null || true
 
-echo -e "    ${WHITE}├─ [EPIC/GOG] Déploiement Heroic Games Launcher & SGDBoop...${NC}"
-install_pkg flatpak
-sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
-sudo flatpak install -y flathub com.heroicgameslauncher.hgl >/dev/null 2>&1 || true
-sudo flatpak install -y flathub com.steamgriddb.SGDBoop >/dev/null 2>&1 || true
+echo -e "    ${WHITE}├─ [EPIC/GOG] Configuration Flatpak & Flathub...${NC}"
+install_pkg flatpak 2>/dev/null || true
+if command -v flatpak &>/dev/null; then
+    sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
+    echo -e "    ${GRAY}├─ Injection de Heroic Games Launcher...${NC}"
+    sudo flatpak install -y flathub com.heroicgameslauncher.hgl --noninteractive >/dev/null 2>&1 || true
+    echo -e "    ${GRAY}├─ Injection de SGDBoop (Steam Artwork)...${NC}"
+    sudo flatpak install -y flathub com.steamgriddb.SGDBoop --noninteractive >/dev/null 2>&1 || true
+fi
 
 # OpenClaw IA a été extrait vers son propre module (14_openclaw_ai.sh) pour l'automatisation.
 
+echo -e "\n    ${GREEN}✅ [SUCCÈS] Phase 4 (Arsenal Logiciel) injectée.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 4 Terminée.${NC}"
