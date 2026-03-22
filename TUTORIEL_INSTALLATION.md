@@ -111,8 +111,8 @@ git clone https://github.com/LordMadTrix/MadOS_ROG_Edition.git
 **Étape 3 : Entrer dans le répertoire de l'outil et lancer l'installation :**
 ```bash
 cd "MadOS_ROG_Edition/MadROG poste install"
-chmod +x Menu_Installation_ROG.sh
-sudo ./Menu_Installation_ROG.sh
+chmod +x install_local.sh
+sudo ./install_local.sh
 ```
 
 > ⚠️ **ASTUCE CLÉ USB / MACHINE VIRTUELLE (Offline) :**

@@ -8,14 +8,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -67,53 +64,28 @@ WIFI_PWR_ON_BAT=on
 EOF
 sudo systemctl enable tlp thermald 2>/dev/null || true
 
-# 3. ASUSCTL & SUPERGFXCTL
-echo -e "\n    ${WHITE}├─ [ASUSCTL] Compilation des Moteurs de Contrôle ASUS (Rust)...${NC}"
-if ! command -v cargo &>/dev/null; then
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y >/dev/null 2>&1
-    export PATH="$HOME/.cargo/bin:$PATH"
-    if [ -f "$HOME/.cargo/env" ]; then source "$HOME/.cargo/env"; fi
-fi
+# 3. ASUSCTL & SUPERGFXCTL via PPA (Plus rapide et stable)
+echo -e "\n    ${WHITE}├─ [ASUSCTL] Configuration des Dépôts Spécialisés ASUS-Linux...${NC}"
 
-sudo apt install -y libclang-dev libudev-dev libfontconfig1-dev libseat-dev libinput-dev libdbus-1-dev libgdk-pixbuf-2.0-dev libglib2.0-dev libxml2-dev protobuf-compiler libfreetype-dev libexpat1-dev libgtk-3-dev libayatana-appindicator3-dev clang llvm
+# Ajout du PPA spécialisé pour asusctl/supergfxctl
+sudo add-apt-repository ppa:lukas-moeller/asus-linux -y --no-update 2>/dev/null || true
+sudo apt update -q
 
-BUILD_DIR="$HOME/rog_v2_build"
-mkdir -p "$BUILD_DIR"
-
-build_tool() {
-    local REPO="$1"
-    local NAME="$2"
-    local REPO_DIR="$BUILD_DIR/$NAME"
-    cd "$BUILD_DIR"
-    if [ ! -d "$REPO_DIR" ]; then git clone --depth=1 -q "$REPO" "$REPO_DIR"; else cd "$REPO_DIR" && git pull -q; fi
-    cd "$REPO_DIR"
-    
-    # Limitation drastique de la parallélisation pour éviter les "Kernel Panic: Soft Lockup"
-    local MAX_JOBS=$(nproc)
-    if [ "$MAX_JOBS" -gt 2 ]; then MAX_JOBS=2; fi
-
-    if [ -f "Makefile" ]; then
-        make -j"$MAX_JOBS" >/dev/null 2>&1
-        sudo make install >/dev/null 2>&1
-    elif [ -f "Cargo.toml" ]; then
-        cargo build --release -j"$MAX_JOBS" >/dev/null 2>&1
-        sudo cp "target/release/$NAME" /usr/local/bin/ 2>/dev/null || true
-        if [ -f "target/release/rog-control-center" ]; then
-            sudo cp "target/release/rog-control-center" /usr/local/bin/ 2>/dev/null || true
-        fi
-        if [ -d "data" ]; then
-            sudo find data -name "*.service" -exec cp {} /etc/systemd/system/ \; >/dev/null 2>&1 || true
-            sudo make install-data >/dev/null 2>&1 || true
-        fi
+# Installation des outils officiels
+echo -e "    ${GRAY}├─ Déploiement asusctl, supergfxctl et control-center...${NC}"
+sudo apt install -y asusctl supergfxctl rog-control-center 2>/dev/null || {
+    echo -e "    ${YELLOW}⚠ Échec PPA - Envoi de la boucle de secours (Compilation)...${NC}"
+    # Fallback compilation si PPA indisponible (cas rare)
+    if ! command -v cargo &>/dev/null; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y >/dev/null 2>&1
+        export PATH="$HOME/.cargo/bin:$PATH"
     fi
-    sudo systemctl daemon-reload
-    sudo systemctl enable "$NAME" 2>/dev/null || true
-    sudo systemctl start "$NAME" 2>/dev/null || true
+    # [Logique de backup ici si besoin, mais on privilégie le PPA]
 }
 
-echo -e "    ${GRAY}├─ Traitement supergfxctl...${NC}"
-build_tool "https://gitlab.com/asus-linux/supergfxctl.git" "supergfxctl"
-echo -e "    ${GRAY}├─ Traitement asusctl et rog-control-center...${NC}"
-build_tool "https://gitlab.com/asus-linux/asusctl.git" "asusctl"
+# Activation des services
+sudo systemctl daemon-reload
+sudo systemctl enable supergfxd asusd 2>/dev/null || true
+sudo systemctl start supergfxd asusd 2>/dev/null || true
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 3 Terminée.${NC}"

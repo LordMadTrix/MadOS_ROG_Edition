@@ -8,16 +8,31 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
-
 BLUE='\033[0;34m'
+
+# Thème Whiptail MadOS
+export NEWT_COLORS='
+  root=black,black
+  window=white,black
+  border=red,black
+  shadow=black,black
+  title=white,red
+  button=white,black
+  actbutton=white,red
+  compactbutton=white,black
+  textbox=white,black
+  listbox=white,black
+  actlistbox=white,red
+  sellistbox=white,black
+  actsellistbox=white,red
+  checkbox=white,black
+  actcheckbox=white,red
+'
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)

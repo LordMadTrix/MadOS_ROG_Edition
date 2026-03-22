@@ -55,6 +55,7 @@ secret/
 # ==========================================
 MadOS_3.0_AutoVM/
 vm/MadOS_3.0_AutoVM/
+vm/MadOS_3.0_TestBench/
 vm/VMwarePortable/
 vm/QemuPortable/
 vm/MadOS_3.0_QemuVM/
@@ -75,6 +76,12 @@ vm/Qemu_USB_Share/
 *.ps1
 *.bat
 connect_mados_ssh.bat
-# Exceptions : dossier usb/ entierement suivi
+# Exceptions : Dossiers scripts suivis
 !usb/
 !usb/**
+!vm/*.bat
+!vm/*.ps1
+!vm/*.txt
+!modules/*.py
+!*.py
+!*.sh

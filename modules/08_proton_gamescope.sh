@@ -8,14 +8,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -44,7 +41,7 @@ if sudo -u "$REAL_USER" command -v protonup &>/dev/null; then
     sudo -u "$REAL_USER" protonup -d "$STEAM_COMPAT_DIR" -y >/dev/null 2>&1 || true
     echo -e "    ${GRAY}✅ [SUCCÈS] Proton-GE a été déployé pour votre compte Steam.${NC}"
 else
-    echo -e "    ${RED}⚠️  [ATTENTION] Impossible de télécharger Proton-GE automatiquement. Utilisez ProtonUp-Qt.${NC}"
+    echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Impossible de télécharger Proton-GE automatiquement. Utilisez ProtonUp-Qt.${NC}"
 fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 8 Terminée.${NC}"

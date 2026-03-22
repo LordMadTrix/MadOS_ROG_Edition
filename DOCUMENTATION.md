@@ -13,8 +13,8 @@ MadOS ROG Edition est un système de post-installation automatisé pour transfor
 
 ```
 MadROG poste install/
-├── Menu_Installation_ROG.sh     ← Script principal (lanceur TUI)
-├── install.sh                   ← Bootstrap d'installation rapide
+├── install_local.sh         ← Script principal (lanceur local TUI)
+├── install.sh               ← Bootstrap d'installation rapide (wget)
 ├── modules/
 │   ├── 00_nettoyage_ubuntu.sh   ← Phase 0  : Nettoyage & Dépôts
 │   ├── 01_noyau_xanmod.sh       ← Phase 1  : Kernel XanMod EDGE
@@ -51,9 +51,9 @@ MadROG poste install/
 
 ---
 
-## 🚀 Script Principal : `Menu_Installation_ROG.sh`
+## 🚀 Script Principal : `install_local.sh`
 
-**Rôle :** Point d'entrée du système. Affiche le menu TUI et orchestre l'exécution des modules.
+**Rôle :** Point d'entrée du système local. Affiche le menu TUI et orchestre l'exécution des modules.
 
 ### Commandes et leur rôle
 

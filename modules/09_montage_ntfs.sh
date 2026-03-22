@@ -8,14 +8,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_UID=$(id -u "$REAL_USER")
@@ -59,12 +56,12 @@ if sudo blkid | grep -q "$TARGET_DRIVE"; then
     
     # Check si déjà dans fstab
     if grep -q "$UUID" /etc/fstab; then
-        echo -e "    ${RED}⚠️  [ATTENTION] Le disque est déjà configuré dans /etc/fstab.${NC}"
+        echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le disque est déjà configuré dans /etc/fstab.${NC}"
     else
         echo -e "    ${GRAY}├─ Ajout de l'entrée fstab optimisée Steam...${NC}"
         sudo apt install -y ntfs-3g > /dev/null 2>&1 || true
         echo "UUID=$UUID $MOUNT_POINT ntfs-3g uid=$USER_UID,gid=$USER_GID,rw,user,exec,umask=000,utf8 0 0" | sudo tee -a /etc/fstab > /dev/null
-        sudo mount -a || echo -e "    ${RED}⚠️  [ATTENTION] Erreur lors du montage automatique.${NC}"
+        sudo mount -a || echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Erreur lors du montage automatique.${NC}"
         echo -e "    ${GREEN}✅ [SUCCÈS] Disque monté avec succès dans $MOUNT_POINT !${NC}"
     fi
 else

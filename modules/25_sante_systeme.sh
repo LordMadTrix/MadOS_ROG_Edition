@@ -8,16 +8,34 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
+BLUE='\033[0;34m'
+
+# Thème Whiptail MadOS
+export NEWT_COLORS='
+  root=black,black
+  window=white,black
+  border=red,black
+  shadow=black,black
+  title=white,red
+  button=white,black
+  actbutton=white,red
+  compactbutton=white,black
+  textbox=white,black
+  listbox=white,black
+  actlistbox=white,red
+  sellistbox=white,black
+  actsellistbox=white,red
+  checkbox=white,black
+  actcheckbox=white,red
+'
 
 REAL_USER=${SUDO_USER:-$USER}
+USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 25 Diagnostic Santé du Système MadOS${NC}"
@@ -53,20 +71,18 @@ else
 fi
 
 echo -e "\n    ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "    ${CYAN}[2/6] KDE Plasma 6${NC}"
+echo -e "    ${CYAN}[2/6] Interface Graphique${NC}"
 echo -e "    ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 if command -v plasmashell &>/dev/null; then
     PLASMA_VER=$(plasmashell --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
     echo "Plasma : $PLASMA_VER" >> "$REPORT_FILE"
-    if echo "$PLASMA_VER" | grep -q "^6\." ; then
-        check_ok "KDE Plasma 6 installé (v$PLASMA_VER)"
-    elif echo "$PLASMA_VER" | grep -q "^5\." ; then
-        check_ok "KDE Plasma 5 installé (v$PLASMA_VER)"
-    else
-        check_warn "KDE Plasma installé mais version inattendue (v$PLASMA_VER)"
-    fi
+    check_ok "KDE Plasma détecté (v$PLASMA_VER)"
+elif command -v gnome-shell &>/dev/null; then
+    GNOME_VER=$(gnome-shell --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
+    echo "GNOME : $GNOME_VER" >> "$REPORT_FILE"
+    check_ok "GNOME MadOS Edition détecté (v$GNOME_VER)"
 else
-    check_fail "KDE Plasma non détecté"
+    check_fail "Aucun environnement graphique (KDE/GNOME) détecté"
 fi
 
 echo -e "\n    ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

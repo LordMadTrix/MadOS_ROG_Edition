@@ -8,14 +8,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -58,7 +55,7 @@ if [ -f "$NEW_VERSION_FILE" ] && [ -f "$CURRENT_VERSION_FILE" ]; then
 fi
 
 echo -e "    ${GRAY}├─ Application des permissions...${NC}"
-sudo chmod +x "$INSTALL_DIR/Menu_Installation_ROG.sh" "$INSTALL_DIR/modules/"*.sh
+sudo chmod +x "$INSTALL_DIR/install_local.sh" "$INSTALL_DIR/modules/"*.sh
 
 # Demander quels modules relancer
 CHOICE=$(whiptail --title "MadOS 3.0 - 🔄 Update Launcher" --menu \
@@ -71,11 +68,11 @@ CHOICE=$(whiptail --title "MadOS 3.0 - 🔄 Update Launcher" --menu \
 case "$CHOICE" in
     1)
         echo -e "    ${WHITE}▶ Lancement de la mise à jour totale...${NC}"
-        cd "$INSTALL_DIR" && sudo bash Menu_Installation_ROG.sh
+        cd "$INSTALL_DIR" && sudo bash install_local.sh
         ;;
     2)
         echo -e "    ${WHITE}▶ Lancement du menu sélectif...${NC}"
-        cd "$INSTALL_DIR" && sudo bash Menu_Installation_ROG.sh
+        cd "$INSTALL_DIR" && sudo bash install_local.sh
         ;;
     3)
         echo -e "    ${GRAY}├─ Mise à jour des paquets système...${NC}"

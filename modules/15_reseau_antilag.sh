@@ -8,15 +8,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
-
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 15 Déploiement du profil Réseau Anti-Lag (TCP BBR)${NC}"
@@ -26,20 +22,29 @@ SYSCTL_CONF="/etc/sysctl.d/99-mados-network.conf"
 
 cat <<'EOF' | sudo tee "$SYSCTL_CONF" >/dev/null
 # =====================================
-# MadOS ROG - Profil Réseau Gaming Ultra
+# MadOS ROG - Profil Réseau eSport BBR+
 # =====================================
 
-# 1. Activation de l'algorithme TCP BBR (Google) pour réduire la latence
+# 1. Activation de l'algorithme TCP BBR + fq_codel (Google)
 net.core.default_qdisc=fq_codel
 net.ipv4.tcp_congestion_control=bbr
 
-# 2. Augmentation des buffers réseaux (High Speed)
-net.core.rmem_max=16777216
-net.core.wmem_max=16777216
-net.ipv4.tcp_rmem=4096 87380 16777216
-net.ipv4.tcp_wmem=4096 65536 16777216
+# 2. Augmentation massive des buffers (RTX / i9 High Speed)
+net.core.rmem_max=67108864
+net.core.wmem_max=67108864
+net.ipv4.tcp_rmem=4096 87380 67108864
+net.ipv4.tcp_wmem=4096 65536 67108864
+net.core.netdev_max_backlog=10000
 
-# 3. Protection basique contre le SYN Flood (Sécurité)
+# 3. Optimisation Latence (FastOpen & Low-SACK)
+net.ipv4.tcp_fastopen=3
+net.ipv4.tcp_window_scaling=1
+net.ipv4.tcp_timestamps=0
+net.ipv4.tcp_sack=1
+net.ipv4.tcp_dsack=1
+net.ipv4.tcp_fack=1
+
+# 4. Sécurité SYN Flood (Active)
 net.ipv4.tcp_syncookies=1
 net.ipv4.tcp_rfc1337=1
 EOF

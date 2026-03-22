@@ -9,14 +9,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -28,7 +25,7 @@ echo -e "${RED}╚════════════════════�
 if command -v lspci >/dev/null; then
     GPU_INFO=$(lspci | grep -i 'vga\|3d\|2d')
 else
-    echo -e "    ${RED}⚠️  [ATTENTION] 'lspci' introuvable, installation de bases recommandées...${NC}"
+    echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] 'lspci' introuvable, installation de bases recommandées...${NC}"
     sudo apt install pciutils -y >/dev/null 2>&1
     GPU_INFO=$(lspci | grep -i 'vga\|3d\|2d')
 fi
@@ -83,7 +80,7 @@ elif echo "$GPU_INFO" | grep -iq "intel"; then
     sudo apt install -y mesa-vulkan-drivers mesa-vulkan-drivers:i386 intel-media-va-driver-non-free vulkan-tools
     echo -e "    ${GRAY}✅ [SUCCÈS] Pilotes Intel HD/ARC configurés.${NC}"
 else
-    echo -e "\n    ${RED}⚠️  [ATTENTION] Puce non reconnue. Application des moteurs graphiques génériques.${NC}"
+    echo -e "\n    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Puce non reconnue. Application des moteurs graphiques génériques.${NC}"
 fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 2 Terminée.${NC}"

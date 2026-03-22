@@ -8,17 +8,13 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
-
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
@@ -163,7 +159,7 @@ while true; do
           google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
         fi
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️ Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     2)
@@ -171,12 +167,12 @@ while true; do
         clear
         cd "$HOME/OpenClaw" && node scripts/run-node.mjs tui
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️ Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     3)
       systemctl --user start openclaw.service
-      whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "✅ Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 18789." 9 75
+      whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "✅ [SUCCÈS] Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 18789." 9 75
       ;;
     4)
       systemctl --user stop openclaw.service

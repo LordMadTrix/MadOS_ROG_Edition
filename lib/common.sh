@@ -9,15 +9,15 @@
 # Variables Globales
 # ==============================================================================
 
-# Couleurs
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-CYAN='\033[0;36m'
-WHITE='\033[1;37m'
-GRAY='\033[0;37m'
-YELLOW='\033[0;33m'
-BOLD='\033[1m'
-NC='\033[0m'
+# Couleurs (Globales)
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export CYAN='\033[0;36m'
+export WHITE='\033[1;37m'
+export GRAY='\033[0;37m'
+export YELLOW='\033[0;33m'
+export BOLD='\033[1m'
+export NC='\033[0m'
 
 # Chemins critiques
 export MADOS_LOG_DIR="/var/log/mados"
@@ -147,16 +147,32 @@ run_command_retry() {
 }
 
 # ==============================================================================
-# Sauvegarde & Restauration (Checkpoints)
+# Sauvegarde & Restauration (Checkpoints Persistants)
 # ==============================================================================
+STATE_FILE="/var/lib/mados/install_state"
 
 save_checkpoint() {
     local module="$1"
     local status="${2:-OK}"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
-    echo "[${timestamp}] ${status}:${module}" >> "$MADOS_CHECKPOINT_FILE"
+    sudo mkdir -p "$(dirname "$STATE_FILE")"
+    echo "$module:$status:$timestamp" | sudo tee -a "$STATE_FILE" > /dev/null
     log_info "Checkpoint sauvegardé: ${module} (${status})"
+}
+
+skip_if_completed() {
+    local module=$1
+    if [ -f "$STATE_FILE" ] && grep -q "^$module:OK" "$STATE_FILE"; then
+        log_info "Module $module déjà complété (skip)."
+        return 0
+    fi
+    return 1
+}
+
+reset_install_state() {
+    sudo rm -f "$STATE_FILE" 2>/dev/null
+    log_info "État d'installation réinitialisé."
 }
 
 get_completed_modules() {
@@ -386,16 +402,24 @@ install_qemu_drivers() {
         fi
     done
     
-    # Démarrer et activer le service QEMU Guest Agent
-    if systemctl is-active --quiet qemu-guest-agent 2>/dev/null; then
-        sudo systemctl enable qemu-guest-agent 2>/dev/null
-        log_success "QEMU Guest Agent activé"
-    fi
-    
     # Configuration réseau optimisée pour QEMU
     log_info "Optimisation réseau QEMU..."
-    sudo ethtool -K eth0 gso off gro off 2>/dev/null || true
+    if command -v ethtool >/dev/null 2>&1; then
+        for iface in eth0 ens0 ens33 ens160 enp0s1; do
+            if [ -e "/sys/class/net/$iface" ]; then
+                sudo ethtool -K "$iface" gso off gro off tso off 2>/dev/null || true
+            fi
+        done
+    fi
+
+    # Désactiver le watchdog (Vitesse de boot & VM friendly)
+    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nowatchdog"/' /etc/default/grub 2>/dev/null || true
     
+    # I/O Scheduler pour SSD Virtuels
+    if [ -f "/sys/block/sda/queue/scheduler" ]; then
+        echo "noop" | sudo tee /sys/block/sda/queue/scheduler >/dev/null 2>&1 || true
+    fi
+
     log_success "Drivers QEMU installés avec succès"
     return 0
 }
@@ -410,7 +434,7 @@ install_vmware_drivers() {
     local packages=(
         "open-vm-tools"              # Tools VMware principal
         "open-vm-tools-desktop"      # Support graphique (Wayland/X11)
-        "open-vm-tools-devel"        # Headers pour compilation
+        "open-vm-tools-dev"          # Headers pour compilation
         "build-essential"             # Pour compiler si nécessaire
         "linux-headers-generic"      # Headers noyau
     )
@@ -439,8 +463,14 @@ install_vmware_drivers() {
     
     # Configuration réseau optimisée pour VMware
     log_info "Optimisation réseau VMware..."
-    sudo ethtool -K eth0 gso off gro off 2>/dev/null || true
-    
+    if command -v ethtool >/dev/null 2>&1; then
+        for iface in eth0 ens33 ens160; do
+            if [ -e "/sys/class/net/$iface" ]; then
+                sudo ethtool -K "$iface" gso off gro off tso off 2>/dev/null || true
+            fi
+        done
+    fi
+
     log_success "Drivers VMware installés avec succès"
     return 0
 }

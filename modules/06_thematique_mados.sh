@@ -9,14 +9,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -27,31 +24,58 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 ASSETS_DIR="$PROJECT_ROOT/assets"
 
-echo -e "\n${RED}╔══════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC}   ${WHITE}${BOLD}MadOS ROG V2 — APPLICATION DE LA CHARTE GRAPHIQUE${NC}  ${RED}║${NC}"
-echo -e "${RED}╚══════════════════════════════════════════════════════╝${NC}\n"
+# ==============================================================================
+# Choix du Thème (ROG / CYBER / CARBON)
+# ==============================================================================
+case "$MADOS_THEME" in
+    "CYBER")
+        THEME_COLOR='\033[1;35m' # Pink/Purp for Cyber
+        ZSH_LOGO_COLOR='\033[1;36m' # Cyan
+        WALLPAPER_NAME="MadCyber.png"
+        THEME_DESC="Cyberpunk Neon Edition"
+        ;;
+    "CARBON")
+        THEME_COLOR='\033[0;37m' # Gray
+        ZSH_LOGO_COLOR='\033[1;37m' # White
+        WALLPAPER_NAME="MadCarbon.png"
+        THEME_DESC="Carbon Stealth Edition"
+        ;;
+    *) # Default ROG
+        THEME_COLOR='\033[0;31m' # Red
+        ZSH_LOGO_COLOR='\033[1;31m' # Bold Red
+        WALLPAPER_NAME="MadRog.png"
+        THEME_DESC="Republic of Gamers Edition"
+        ;;
+esac
+
+echo -e "\n${THEME_COLOR}╔══════════════════════════════════════════════════════╗${NC}"
+echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 3.2 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
+echo -e "${THEME_COLOR}╚══════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. OS Identity
-echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}1/5 Configuration de l'identité système${NC}"
-echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
-cat > /etc/os-release <<'OSRELEASE'
+cat > /etc/os-release <<OSRELEASE
 NAME="MadOS ROG Edition"
-VERSION="2.6 (Noble)"
+VERSION="3.2 (Ultimate)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="MadOS ROG Edition 2.6"
-VERSION_ID="24.04"
-VERSION_CODENAME=noble
-UBUNTU_CODENAME=noble
-HOME_URL="https://github.com/mados-rog"
+PRETTY_NAME="MadOS ROG Edition 3.2 ($THEME_DESC)"
+VERSION_ID="25.10"
 OSRELEASE
 
 echo "mados-rog" > /etc/hostname
 hostname mados-rog 2>/dev/null || true
 
-cat > /etc/update-motd.d/00-mados-header <<'MOTD'
+cat > /etc/update-motd.d/00-mados-header <<MOTD
 #!/bin/bash
+echo -e "${ZSH_LOGO_COLOR}${BOLD}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗\033[0m"
+echo -e "${ZSH_LOGO_COLOR}${BOLD}  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝\033[0m"
+echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██╔████╔██║███████║██║  ██║██║   ██║███████╗\033[0m"
+echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║\033[0m"
+echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║\033[0m"
+echo -e "${ZSH_LOGO_COLOR}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝\033[0m"
+echo -e "  \033[0;36m\033[1mMadOS 3.2 ($THEME_DESC)\033[0m  |  Kernel: \$(uname -r)"
+MOTD
+chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
 RESET='\033[0m'
 echo -e "${RED}${BOLD}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗${RESET}"
 echo -e "${RED}${BOLD}  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝${RESET}"
@@ -90,27 +114,26 @@ ZSHRC
 chown "$REAL_USER:$REAL_USER" "$USER_HOME/.zshrc"
 
 # 3. Wallpapers & SDDM
-echo -e "\n${RED}>>> ${WHITE}[3/5] ${BOLD}Intégration des Fonds d'écran Officiels...${NC}"
+echo -e "\n${THEME_COLOR}>>> ${WHITE}[3/5] ${BOLD}Intégration du Fond d'écran $WALLPAPER_NAME...${NC}"
 WALLPAPER_DIR="/usr/share/wallpapers/MadOS"
 sudo mkdir -p "$WALLPAPER_DIR"
 
-if [ -d "$ASSETS_DIR/wallpapers" ]; then
-    echo -e "    ${GRAY}├─ Déploiement du pack complet de fonds d'écran...${NC}"
-    sudo cp -r "$ASSETS_DIR/wallpapers/"* "$WALLPAPER_DIR/" 2>/dev/null || true
+if [ -f "$ASSETS_DIR/wallpapers/$WALLPAPER_NAME" ]; then
+    sudo cp "$ASSETS_DIR/wallpapers/$WALLPAPER_NAME" "$WALLPAPER_DIR/default_wallpaper.png"
     
-    # Sync sur SDDM avec le premier wallpaper (MadRog1.jpg)
+    # Sync sur SDDM
     sudo mkdir -p /usr/share/sddm/themes/breeze/
-    cat <<'THEME_EOF' | sudo tee /usr/share/sddm/themes/breeze/theme.conf.user > /dev/null
+    cat <<THEME_EOF | sudo tee /usr/share/sddm/themes/breeze/theme.conf.user > /dev/null
 [General]
-background=/usr/share/wallpapers/MadOS/MadRog1.jpg
+background=$WALLPAPER_DIR/default_wallpaper.png
 THEME_EOF
 
-    # Configurer l'application automatique du wallpaper pour la session KDE via autostart
+    # Configurer l'application automatique du wallpaper pour la session KDE/GNOME
     sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/autostart"
-    cat <<'EOF' | sudo -u "$REAL_USER" tee "$USER_HOME/.config/autostart/set-wallpaper.desktop" >/dev/null
+    cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.config/autostart/set-wallpaper.desktop" >/dev/null
 [Desktop Entry]
 Type=Application
-Exec=sh -c "sleep 4 && plasma-apply-wallpaperimage /usr/share/wallpapers/MadOS/MadRog1.jpg && rm -f ~/.config/autostart/set-wallpaper.desktop"
+Exec=sh -c "sleep 4 && plasma-apply-wallpaperimage $WALLPAPER_DIR/default_wallpaper.png && gsettings set org.gnome.desktop.background picture-uri 'file://$WALLPAPER_DIR/default_wallpaper.png' && rm -f ~/.config/autostart/set-wallpaper.desktop"
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true

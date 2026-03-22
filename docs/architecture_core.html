@@ -191,7 +191,7 @@
             guerre Gaming, de manière 100% automatisée ou sélective (Menu interactif).</p>
 
         <div class="notice">
-            <strong>🚀 L'Orchestrateur Principal :</strong> <code>Menu_Installation_ROG.sh</code> n'installe quasiment
+            <strong>🚀 L'Orchestrateur Principal :</strong> <code>install_local.sh</code> n'installe quasiment
             rien de lui-même. C'est un chef d'orchestre ultra-rapide qui lit, appelle et coordonne les 26 sous-modules
             isolés selon les choix de l'utilisateur.
         </div>
@@ -346,6 +346,10 @@
                 <p>Injection de bout en bout du driver ALVR (Air Link VR) et du serveur ADB-tools pour jouer en VR
                     sans-fil sous Linux.</p>
             </div>
+            <div class="module-card">
+                <h4>28_mados_cli.sh</h4>
+                <p>Installation du wrapper CLI 'mados' pour piloter tout l'OS via des commandes simplifiées (shift, check, aura).</p>
+            </div>
             <div class="module-card" style="border-left: 3px solid var(--rog-red);">
                 <h4>format_scripts.py</h4>
                 <p>Nettoyeur local de sauts de lignes Microsoft (CRLF -> LF) pour garantir une exécution parfaite, même
@@ -362,7 +366,7 @@
 
         <h3>Exemple de mécanique de lancement isolé :</h3>
         <div class="code-block">
-            # Dans Menu_Installation_ROG.sh
+            # Dans install_local.sh
             bash "$INSTALL_DIR/modules/04_arsenal_logiciel.sh" "$REAL_USER"
         </div>
 
@@ -377,7 +381,7 @@
 
         <h2>🛡️ 5. L'Intelligence "OpenClaw AI"</h2>
         <p>Le système n'est plus un simple script. Il englobe une instance locale d'intelligence artificielle légère,
-            activable par <code>03_intelligence_openclaw.sh</code>, agissant comme un co-pilote terminal surveillant la
+            activable par <code>14_openclaw_ai.sh</code>, agissant comme un co-pilote terminal surveillant la
             santé de vos paquets en temps réel.</p>
     </div>
 

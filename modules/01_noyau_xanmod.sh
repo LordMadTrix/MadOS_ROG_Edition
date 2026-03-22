@@ -9,14 +9,11 @@
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
 # ==============================================================================
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-WHITE='\033[1;37m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -42,7 +39,7 @@ echo -e "    ${GRAY}├─ Injection du paquet : $XANMOD_PKG...${NC}"
 if sudo apt install -y "$XANMOD_PKG"; then
     echo -e "    ${GRAY}✅ [SUCCÈS] Noyau $XANMOD_PKG installé.${NC}"
 else
-    echo -e "    ${RED}⚠️  [ATTENTION] Moteur introuvable, tentative version générique...${NC}"
+    echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Moteur introuvable, tentative version générique...${NC}"
     sudo apt install -y linux-xanmod-edge
 fi
 
