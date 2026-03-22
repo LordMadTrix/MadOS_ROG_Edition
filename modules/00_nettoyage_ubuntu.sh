@@ -39,13 +39,24 @@ echo -e "${RED}╚════════════════════�
 echo -e "    ${WHITE}├─ [PREREQUIS] Installation des outils de dépôts...${NC}"
 sudo apt install -y software-properties-common dirmngr gpg curl wget 2>/dev/null || true
 
-# 1. Nettoyage des Bloatwares Serveur (Cloud-Init, Multipathd)
-echo -e "    ${WHITE}├─ [NETTOYAGE] Suppression des services serveur inutiles...${NC}"
-sudo apt purge -y cloud-init multipath-tools snapd 2>/dev/null || true
-sudo apt autoremove -y --purge 2>/dev/null || true
+# 1. Neutralisation TOTALE et DÉFINITIVE de Snap (Bouclier MadOS)
+echo -e "    ${WHITE}├─ [SÉCURITÉ] Érection d'un mur anti-Snap (APT Blockade)...${NC}"
+# Bloquer toute réinstallation automatique de snapd par APT
+sudo tee /etc/apt/preferences.d/nosnap.pref > /dev/null <<EOF
+Package: snapd
+Pin: release a=*
+Pin-Priority: -10
+EOF
 
-# Suppression propre des dossiers cloud-init
-sudo rm -rf /etc/cloud/ /var/lib/cloud/ 2>/dev/null || true
+# Tuer les processus snapd s'ils tournent encore
+sudo systemctl stop snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
+sudo systemctl disable snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
+
+# Purge radicale des composants et des montages snap
+echo -e "    ${WHITE}├─ [NETTOYAGE] Purge atomique des composants Snap & Cloud-Init...${NC}"
+sudo apt purge -y cloud-init multipath-tools snapd 2>/dev/null || true
+sudo rm -rf /var/cache/snapd/ /var/lib/snapd/ /snap/ 2>/dev/null || true
+sudo apt autoremove -y --purge 2>/dev/null || true
 
 # Assurer que NetworkManager prend le relais du réseau
 echo -e "    ${GRAY}├─ Basculement réseau vers NetworkManager...${NC}"

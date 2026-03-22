@@ -32,6 +32,15 @@ main() {
     # Retirer le blocage à la fin du script (même en cas de crash)
     trap 'sudo rm -f /usr/sbin/policy-rc.d' EXIT
 
+    # ---- BOMBE ANTI-SNAP : On bloque tout de suite l'ennemi ----
+    sudo systemctl stop snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
+    sudo systemctl disable snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
+    sudo tee /etc/apt/preferences.d/nosnap.pref > /dev/null <<EOF
+Package: snapd
+Pin: release a=*
+Pin-Priority: -10
+EOF
+
     # ==============================================================================
     # Charger les fonctions communes
     # ==============================================================================
