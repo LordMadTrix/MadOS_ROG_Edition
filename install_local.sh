@@ -43,6 +43,14 @@ main() {
         exit 1
     fi
     
+    # Initialiser les optimisations
+    wait_for_apt
+    ensure_nala
+
+    # 🚧 RÉPARATION CRITIQUE : Recolier les morceau si crash précédent 🚧
+    echo -e "${YELLOW}[!] Vérification de l'intégrité de la base de données paquets...${NC}"
+    sudo dpkg --configure -a >/dev/null 2>&1 || true
+    sudo apt-get install -f -y >/dev/null 2>&1 || true
     # Initialiser les pièges d'erreur et logs
     setup_error_traps
     init_mados_logging

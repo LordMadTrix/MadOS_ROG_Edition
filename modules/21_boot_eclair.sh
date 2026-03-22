@@ -19,6 +19,9 @@ echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 21 Extrémisation du Boot (Dé
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Initramfs LZ4
+echo -e "    ${GRAY}├─ Injection de l'outil de compression LZ4 (Ultra-Speed)...${NC}"
+sudo apt-get install -y lz4 -qq >/dev/null 2>&1 || true
+
 echo -e "    ${GRAY}├─ Modification de l'algorithme de décompression Kernel vers LZ4 (Le plus rapide)...${NC}"
 INITRAMFS_CONF="/etc/initramfs-tools/initramfs.conf"
 if [ -f "$INITRAMFS_CONF" ]; then
@@ -45,8 +48,13 @@ fi
 
 # 3. Application massive
 echo -e "    ${GRAY}├─ Reconstruction brutale de l'initramfs et du grub (${CYAN}Ceci prendra 30s...${GRAY})${NC}"
-sudo update-initramfs -u -k all >/dev/null 2>&1 || true
-sudo update-grub >/dev/null 2>&1 || true
+sudo update-initramfs -u -k all >/tmp/initramfs_update.log 2>&1
+if [ $? -ne 0 ]; then
+    echo -e "    ${RED}⚠ Échec du LZ4. Tentative de repli vers GZIP (Standard)...${NC}"
+    sudo sed -i 's/^COMPRESS=lz4/COMPRESS=gzip/' "$INITRAMFS_CONF"
+    sudo update-initramfs -u -k all >/dev/null 2>&1
+fi
+sudo update-grub >/dev/null 2>&1
 
 echo -e "    ${CYAN}✅ [SUCCÈS] Boot sublimé. Au redémarrage, la seule chose que vous verrez sera le Splash Plymouth ROG instantané.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 21 Terminée.${NC}"
