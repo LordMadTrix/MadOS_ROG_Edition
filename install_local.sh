@@ -21,7 +21,8 @@ NC='\033[0m'
 
 main() {
     export DEBIAN_FRONTEND=noninteractive
-    export NEEDRESTART_MODE=a
+    # IMPORTANT: Mode 'l' (list) pour éviter de couper le SSH en redémarrant le réseau
+    export NEEDRESTART_MODE=l
     set -uo pipefail
     
     # ==============================================================================

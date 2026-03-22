@@ -19,6 +19,7 @@ sudo apt install -y kdeconnect openssh-server
 
 # 2. Ouverture des ports Firewall (Indispensable pour la découverte mobile)
 echo -e "    ${WHITE}├─ [NETWORK] Débridage des ports de communication MadLink...${NC}"
+sudo ufw allow 22/tcp 2>/dev/null || true
 sudo ufw allow 1714:1764/udp 2>/dev/null || true
 sudo ufw allow 1714:1764/tcp 2>/dev/null || true
 sudo ufw reload 2>/dev/null || true

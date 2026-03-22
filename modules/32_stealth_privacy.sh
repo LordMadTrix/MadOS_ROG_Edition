@@ -36,7 +36,8 @@ echo -e "    ${WHITE}├─ [PAR-FEU] Activation du Firewall UFW (Profil Gaming)
 sudo apt install -y ufw
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-# Ports Steam/Gaming
+# Ports Steam/Gaming & SSH (Crucial pour ne pas couper la session en cours)
+sudo ufw allow 22/tcp 2>/dev/null || true
 sudo ufw allow 27000:27100/udp 2>/dev/null || true
 sudo ufw --force enable 2>/dev/null || true
 
