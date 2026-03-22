@@ -70,15 +70,17 @@ main() {
     check_sudo_access || exit 1
     check_disk_space 10 || exit 1
     
-    # ---- PROTECTION GOD-TIER : Auto-Clonage vers /tmp ----
+    # ---- PROTECTION GOD-TIER : Auto-Clonage vers /opt (Safe Zone) ----
     # Évite les plantages si le point de montage (/mnt/hgfs) saute pendant l'install
+    # On utilise /opt au lieu de /tmp car /tmp est souvent un RAMDisk trop petit.
+    export CURRENT_MODULE="INITIALISATION"
     if [[ "$SCRIPT_DIR" == *"/mnt/"* || "$SCRIPT_DIR" == *"/media/"* ]]; then
-        local TMP_RUN="/tmp/mados_run"
+        local TMP_RUN="/opt/mados_run"
         if [ "$SCRIPT_DIR" != "$TMP_RUN" ]; then
-            echo -e "${YELLOW}[!] Source sur dossier partagé détectée. Sécurisation en cours...${NC}"
+            echo -e "${YELLOW}[!] Source sur dossier partagé détectée. Déploiement vers Zone Stable...${NC}"
             sudo mkdir -p "$TMP_RUN"
-            sudo cp -r "$SCRIPT_DIR/"* "$TMP_RUN/"
-            echo -e "${GREEN}[OK] Script cloné dans la RAM (/tmp). Relance automatique...${NC}"
+            sudo cp -rf "$SCRIPT_DIR/"* "$TMP_RUN/"
+            echo -e "${GREEN}[OK] Proxy local établi dans /opt. Relance du moteur...${NC}"
             cd "$TMP_RUN"
             sudo bash ./install_local.sh "$@"
             exit $?

@@ -99,11 +99,14 @@ handle_error() {
     local exit_code=$1
     local line_number=$2
     
+    # Fallback si CURRENT_MODULE n'est pas défini (set -u safety)
+    local active_mod="${CURRENT_MODULE:-unknown}"
+    
     log_error "Erreur à la ligne ${line_number} (code: ${exit_code})"
-    log_error "Module actuel: ${CURRENT_MODULE:-unknown}"
+    log_error "Module actuel: ${active_mod}"
     
     # Sauvegarder l'état d'erreur
-    echo "FAILED:${CURRENT_MODULE}:line_${line_number}" >> "$MADOS_CHECKPOINT_FILE"
+    echo "FAILED:${active_mod}:line_${line_number}" >> "$MADOS_CHECKPOINT_FILE"
     
     # NE PAS EXIT - continuer le script
     return 0

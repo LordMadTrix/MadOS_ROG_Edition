@@ -16,6 +16,8 @@ sudo vmhgfs-fuse .host:/mados /mnt/hgfs -o allow_other -o uid=$(id -u) -o gid=$(
 # Vérifier si les fichiers sont là
 ls /mnt/hgfs
 
+cd  /mnt/hgfs
+
 --- [ 2. MONTAGE AUTOMATIQUE (AU REDÉMARRAGE) ] ---
 
 # Pour que le dossier soit présent à chaque boot, tapez :
