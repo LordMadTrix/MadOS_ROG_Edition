@@ -18,25 +18,25 @@ echo -e "\n${RED}╔════════════════════
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 21 Extrémisation du Boot (Démarrage Éclair)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
-# 1. Initramfs LZ4
-echo -e "    ${GRAY}├─ Injection de l'outil de compression LZ4 (Ultra-Speed)...${NC}"
-sudo apt-get install -y lz4 -qq >/dev/null 2>&1 || true
+# 1. Initramfs ZSTD (Modern & Safe)
+echo -e "    ${GRAY}├─ Injection de l'outil de compression ZSTD (Standard Moderne)...${NC}"
+sudo apt-get install -y zstd -qq >/dev/null 2>&1 || true
 
-echo -e "    ${GRAY}├─ Modification de l'algorithme de décompression Kernel vers LZ4 (Le plus rapide)...${NC}"
+echo -e "    ${GRAY}├─ Optimisation du moteur Initramfs vers ZSTD (Équilibre Vitesse/Fiabilité)...${NC}"
 INITRAMFS_CONF="/etc/initramfs-tools/initramfs.conf"
 if [ -f "$INITRAMFS_CONF" ]; then
-    sudo sed -i 's/^COMPRESS=.*/COMPRESS=lz4/' "$INITRAMFS_CONF"
+    sudo sed -i 's/^COMPRESS=.*/COMPRESS=zstd/' "$INITRAMFS_CONF"
 fi
 
 # 2. Silent GRUB
 echo -e "    ${GRAY}├─ Masquage total des textes BIOS POST sous GRUB pour une esthétique console pure...${NC}"
 GRUB_CONF="/etc/default/grub"
 if [ -f "$GRUB_CONF" ]; then
-    # Masquer le timeout en style Hidden
-    sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=hidden/' "$GRUB_CONF"
-    sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=0/' "$GRUB_CONF"
+    # Masquer le timeout en style Hidden mais garder 2 secondes de survie
+    sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' "$GRUB_CONF"
+    sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=2/' "$GRUB_CONF"
     sudo sed -i '/GRUB_RECORDFAIL_TIMEOUT/d' "$GRUB_CONF"
-    echo 'GRUB_RECORDFAIL_TIMEOUT=0' | sudo tee -a "$GRUB_CONF" >/dev/null
+    echo 'GRUB_RECORDFAIL_TIMEOUT=2' | sudo tee -a "$GRUB_CONF" >/dev/null
 
     # Paramètres de boot ultra discrets
     if grep -q "^GRUB_CMDLINE_LINUX_DEFAULT=" "$GRUB_CONF"; then
@@ -46,12 +46,12 @@ if [ -f "$GRUB_CONF" ]; then
     fi
 fi
 
-# 3. Application massive
+# 3. Application massive avec protection LVM
 echo -e "    ${GRAY}├─ Reconstruction brutale de l'initramfs et du grub (${CYAN}Ceci prendra 30s...${GRAY})${NC}"
 sudo update-initramfs -u -k all >/tmp/initramfs_update.log 2>&1
 if [ $? -ne 0 ]; then
-    echo -e "    ${RED}⚠ Échec du LZ4. Tentative de repli vers GZIP (Standard)...${NC}"
-    sudo sed -i 's/^COMPRESS=lz4/COMPRESS=gzip/' "$INITRAMFS_CONF"
+    echo -e "    ${RED}⚠ Échec du ZSTD. Tentative de repli vers GZIP (Standard)...${NC}"
+    sudo sed -i 's/^COMPRESS=zstd/COMPRESS=gzip/' "$INITRAMFS_CONF"
     sudo update-initramfs -u -k all >/dev/null 2>&1
 fi
 sudo update-grub >/dev/null 2>&1

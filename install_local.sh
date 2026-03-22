@@ -69,10 +69,15 @@ EOF
     ensure_nala
 
     # 🚧 RÉPARATION CRITIQUE : Recolier les morceau si crash précédent 🚧
-    echo -e "${YELLOW}[!] Nettoyage des résidus d'installation cassés...${NC}"
+    echo -e "${YELLOW}[!] Nettoyage des résidus et restauration des systèmes de fichiers...${NC}"
     # Désactivation temporaire des erreurs pour purger les éléments bloquants
     sudo dpkg --configure -a 2>/dev/null || true
     sudo apt-get install -f -y 2>/dev/null || true
+    
+    # Restauration impérative du support LVM/Disque (Fix pour l'erreur initramfs /dev/mapper)
+    echo -e "${GRAY}    ├─ Restauration du support LVM (Disques Virtuels)...${NC}"
+    sudo apt-get install -y lvm2 coreutils thin-provisioning-tools 2>/dev/null || true
+
     # Forcer la désinstallation de v4l2loopback-dkms s'il est resté dans un état de crash (Bug Critique identifié)
     if dpkg -l | grep -q "v4l2loopback-dkms"; then
         echo -e "${GRAY}    ├─ Neutralisation du pilote caméra corrompu...${NC}"
