@@ -69,9 +69,15 @@ EOF
     ensure_nala
 
     # 🚧 RÉPARATION CRITIQUE : Recolier les morceau si crash précédent 🚧
-    echo -e "${YELLOW}[!] Vérification de l'intégrité de la base de données paquets...${NC}"
-    sudo dpkg --configure -a >/dev/null 2>&1 || true
-    sudo apt-get install -f -y >/dev/null 2>&1 || true
+    echo -e "${YELLOW}[!] Nettoyage des résidus d'installation cassés...${NC}"
+    # Désactivation temporaire des erreurs pour purger les éléments bloquants
+    sudo dpkg --configure -a 2>/dev/null || true
+    sudo apt-get install -f -y 2>/dev/null || true
+    # Forcer la désinstallation de v4l2loopback-dkms s'il est resté dans un état de crash (Bug Critique identifié)
+    if dpkg -l | grep -q "v4l2loopback-dkms"; then
+        echo -e "${GRAY}    ├─ Neutralisation du pilote caméra corrompu...${NC}"
+        sudo apt-get purge -y v4l2loopback-dkms 2>/dev/null || true
+    fi
     # Initialiser les pièges d'erreur et logs
     setup_error_traps
     init_mados_logging
