@@ -481,6 +481,12 @@ installation_totale() {
     # Optimisation APT (Passage en NALA pour la vitesse)
     ensure_nala
 
+    # ---- BOUNCLIER DE CONTINUITÉ DÉPLOYÉ ----
+    # On désactive la "paranoïa" de Bash pour que l'installation ne s'arrête PAS 
+    # même si un petit logiciel ne peut pas s'installer.
+    set +u
+    set +o pipefail
+
     # Modules obligatoires
     run_module "00_nettoyage_ubuntu.sh" "Purification du système & Dépôts"
     run_module "01_noyau_xanmod.sh"     "Injection du Noyau XanMod EDGE"
@@ -594,6 +600,11 @@ installation_custom() {
     clear
     echo -e "${RED}Début du protocole custom...${NC}\n"
     sleep 2
+
+    # ---- BOUNCLIER DE CONTINUITÉ DÉPLOYÉ ----
+    # On désactive la "paranoïa" de Bash pour que l'installation ne s'arrête PAS 
+    set +u
+    set +o pipefail
 
     [[ "$CHOIX_ALL" == *"00_clean"* ]] && run_module "00_nettoyage_ubuntu.sh" "Purification du système"
     [[ "$CHOIX_ALL" == *"01_kern"* ]] && run_module "01_noyau_xanmod.sh" "Injection du Noyau"
