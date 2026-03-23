@@ -126,10 +126,15 @@ EOF
             sudo cp -f "$SCRIPT_DIR"/*.md "$TMP_RUN/" 2>/dev/null || true
             sudo cp -f "$SCRIPT_DIR"/.nojekyll "$TMP_RUN/" 2>/dev/null || true
             
-            echo -e "${GREEN}[OK] Proxy local établi dans /opt. Relance ultra-rapide...${NC}"
-            cd "$TMP_RUN"
-            sudo bash ./install_local.sh "$@"
-            exit $?
+            echo -e "${GREEN}[OK] Proxy local établi dans /opt. Vérification de l'intégrité...${NC}"
+            # Vérification vitale
+            if [ ! -f "$TMP_RUN/lib/common.sh" ] || [ ! -d "$TMP_RUN/assets" ]; then
+                 echo -e "${RED}[!] Échec critique du clonage vers /opt. Repli sur source originale...${NC}"
+            else
+                 cd "$TMP_RUN"
+                 sudo bash ./install_local.sh "$@"
+                 exit $?
+            fi
         fi
     fi
 

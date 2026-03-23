@@ -90,20 +90,24 @@ log_success() {
 # ==============================================================================
 
 setup_error_traps() {
+    # On capture les erreurs mais on ne sort plus violemment (set +e)
     trap 'handle_error $? $LINENO' ERR
     trap 'handle_interrupt' INT TERM
-    set -o pipefail
+    # Désactivation du pipefail global pour laisser le flux couler vers la fin
+    set +o pipefail
 }
 
 handle_error() {
     local exit_code=$1
     local line_number=$2
+    local command="${BASH_COMMAND}"
     
     # Fallback si CURRENT_MODULE n'est pas défini (set -u safety)
     local active_mod="${CURRENT_MODULE:-unknown}"
     
-    log_error "Erreur à la ligne ${line_number} (code: ${exit_code})"
-    log_error "Module actuel: ${active_mod}"
+    # Noter l'erreur discrètement sans couper le script
+    log_warning "Signal d'erreur détecté (Code: $exit_code) à la ligne $line_number : $command"
+    echo "[!] Erreur non-critique enregistrée à $(date '+%H:%M:%S') - Ligne $line_number" >> "$MADOS_ERRORS_FILE"
     
     # Sauvegarder l'état d'erreur
     echo "FAILED:${active_mod}:line_${line_number}" >> "$MADOS_CHECKPOINT_FILE"
