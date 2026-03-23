@@ -26,15 +26,27 @@ sudo update-locale LANG=fr_FR.UTF-8 LC_MESSAGES=fr_FR.UTF-8 2>/dev/null || true
 
 # 2. OPTIMISATIONS E-SPORT & RTX (0% LATENCE)
 echo -e "    ${WHITE}├─ [TWEAK] Désactivation des animations GNOME (Input Lag minimal)...${NC}"
-# Utilisation de dbus-launch pour s'assurer que gsettings fonctionne sans session X active
 sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.desktop.interface enable-animations false
-
 echo -e "    ${WHITE}├─ [TWEAK] Activation Variable Refresh Rate (VRR) pour RTX...${NC}"
 sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate', 'scale-monitor-framebuffer']"
-
 echo -e "    ${WHITE}├─ [TWEAK] Forcer le profil Energie sur PERFORMANCE...${NC}"
-sudo apt install -y power-profiles-daemon
+sudo apt install -y power-profiles-daemon 2>/dev/null || true
 sudo powerprofilesctl set performance 2>/dev/null || true
+
+# 3. CONFIGURATION ESTHÉTIQUE "WINDOWS-STYLE" ROG
+echo -e "    ${WHITE}├─ [TWEAK] Sculpture du Bureau GNOME (Windows-Style)...${NC}"
+# Basculer la barre (Dock) vers le BAS et en faire un panneau horizontal
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock extend-height true
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 32
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode 'FIXED'
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.8
+
+# Appliquer le Thème Sombre & l'Accent Rouge (Ubuntu Modern)
+echo -e "    ${WHITE}├─ [TWEAK] Injection de l'ADN Rouge MadOS...${NC}"
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
+sudo -u "$REAL_USER" dbus-launch gsettings set org.gnome.desktop.interface accent-color 'red' 2>/dev/null || true
 
 # Désactivation des services lourds (Background Indexing)
 echo -e "    ${WHITE}├─ [TWEAK] Mise en sommeil des services Tracker3 (CPU Save)...${NC}"
