@@ -183,15 +183,33 @@ else
     echo -e "    ${GRAY}├─ Échec du téléchargement du thème GRUB. (Ignoré)${NC}"
 fi
 
-# 5. Accent Rouge & Papirus Icons
-echo -e "\n${RED}>>> ${WHITE}[5/5] ${BOLD}Configuration UI et Accentuation KDE Plasma (Rouge)...${NC}"
-sudo apt install -y papirus-icon-theme plymouth plymouth-theme-spinner || true
+# 5. Accent Rouge & Papirus Icons (Transformation Windows-Style)
+echo -e "\n${RED}>>> ${WHITE}[5/5] ${BOLD}Sculpture du Bureau (ROG Windows-Style)...${NC}"
+sudo apt install -y papirus-icon-theme plymouth plymouth-theme-spinner dconf-cli 2>/dev/null || true
 
+# Application des dossiers rouges Papirus
 wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/install.sh | sh 2>/dev/null || true
 if command -v papirus-folders &>/dev/null; then
     sudo papirus-folders -C red --theme Papirus-Dark 2>/dev/null || true
 fi
 
+# ---- SCULPTURE KDE (Mode 'Elite Gaming' / Windows-style) ----
+if command -v plasma-apply-lookandfeel &>/dev/null; then
+    echo -e "    ${GRAY}├─ Injection du Layout Plasma 6 (Barre en bas, Start menu)...${NC}"
+    sudo -u "$REAL_USER" plasma-apply-lookandfeel -a org.kde.breezedark.desktop 2>/dev/null || true
+    sudo -u "$REAL_USER" plasma-apply-colorscheme BreezeDark 2>/dev/null || true
+fi
+
+# ---- SCULPTURE GNOME (Mode 'Safe-Mode' / ROG-Style) ----
+if command -v gsettings &>/dev/null; then
+    echo -e "    ${GRAY}├─ Basculement du Dock GNOME vers le BAS (Windows style)...${NC}"
+    sudo -u "$REAL_USER" gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM' 2>/dev/null || true
+    sudo -u "$REAL_USER" gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+    sudo -u "$REAL_USER" gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark' 2>/dev/null || true
+    sudo -u "$REAL_USER" gsettings set org.gnome.desktop.interface accent-color 'red' 2>/dev/null || true
+fi
+
+# Injection des constantes de couleurs KDE
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config"
 cat <<'KDEGLOBALS' | sudo -u "$REAL_USER" tee "$USER_HOME/.config/kdeglobals" >/dev/null
 [General]
