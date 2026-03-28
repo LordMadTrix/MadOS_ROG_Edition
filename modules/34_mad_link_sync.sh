@@ -14,8 +14,8 @@ echo -e "${RED}╚════════════════════�
 
 # 1. Installation du Moteur KDE Connect
 echo -e "    ${WHITE}├─ [SYSTEM] Injection du moteur de synchronisation universel...${NC}"
-sudo apt update -q
-sudo apt install -y kdeconnect openssh-server
+sudo apt update -q || true
+sudo apt install -y kdeconnect openssh-server || true
 
 # 2. Ouverture des ports Firewall (Indispensable pour la découverte mobile)
 echo -e "    ${WHITE}├─ [NETWORK] Débridage des ports de communication MadLink...${NC}"

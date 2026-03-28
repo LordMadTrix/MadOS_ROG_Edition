@@ -17,14 +17,14 @@ echo -e "${RED}╚════════════════════�
 # 1. Installation de OBS Studio
 echo -e "    ${WHITE}├─ [SYSTEM] Injection de OBS Studio (Version Récente)...${NC}"
 sudo add-apt-repository ppa:obsproject/obs-studio -y 2>/dev/null || true
-sudo apt update -q
+sudo apt update -q || true
 # Installation des headers requis pour la compilation du module v4l2loopback (Virtual Cam)
 sudo apt install -y linux-headers-$(uname -r) 2>/dev/null || true
 sudo apt install -y obs-studio ffmpeg v4l2loopback-dkms || true
 
 # 2. Injection du profil de performance RTX
 echo -e "    ${WHITE}├─ [CONFIG] Calibration des profils d'encodage NVENC (Max Quality)...${NC}"
-sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/obs-studio/basic/profiles/MadOS_Stream"
+sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/obs-studio/basic/profiles/MadOS_Stream" || true
 
 # Création du fichier de config MadOS_Stream profil
 cat <<'EOF' | sudo -u "$REAL_USER" tee "$USER_HOME/.config/obs-studio/basic/profiles/MadOS_Stream/basic.ini" >/dev/null

@@ -13,12 +13,12 @@ echo -e "${RED}╚════════════════════�
 
 # 1. Installation des outils Plymouth
 echo -e "    ${WHITE}├─ [SYSTEM] Injection du moteur de démarrage graphique...${NC}"
-sudo apt update -q
-sudo apt install -y plymouth plymouth-themes
+sudo apt update -q || true
+sudo apt install -y plymouth plymouth-themes || true
 
 # 2. Création du Thème MadOS-Pulsar
 echo -e "    ${WHITE}├─ [THEME] Création de l'animation MadOS-ROG-Pulse...${NC}"
-sudo mkdir -p /usr/share/plymouth/themes/mados-pulsar
+sudo mkdir -p /usr/share/plymouth/themes/mados-pulsar || true
 
 # Utilisation d'un script Plymouth simple pour l'animation de fondu
 cat <<'EOF' | sudo tee /usr/share/plymouth/themes/mados-pulsar/mados-pulsar.script >/dev/null
@@ -56,7 +56,7 @@ EOF
 
 # Copie du logo ROG (on utilise l'image déjà présente dans les assets si possible)
 if [ -f "/usr/share/wallpapers/MadOS/default_wallpaper.png" ]; then
-    sudo cp "/usr/share/wallpapers/MadOS/default_wallpaper.png" "/usr/share/plymouth/themes/mados-pulsar/logo.png"
+    sudo cp "/usr/share/wallpapers/MadOS/default_wallpaper.png" "/usr/share/plymouth/themes/mados-pulsar/logo.png" || true
 fi
 
 # 3. Activation du Thème

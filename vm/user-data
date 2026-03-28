@@ -3,30 +3,52 @@ autoinstall:
   version: 1
   identity:
     hostname: mados-vm
-    password: "$6$vI.xozR5$8.X9zV.zR5J.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6" # password: mados
+    password: "$6$vI.xozR5$8.X9zV.zR5J.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6.34.6"
     realname: MadOS User
     username: mados
-  keyboard:
-    layout: fr
+  keyboard: {layout: fr}
   language: fr_FR.UTF-8
   locale: fr_FR.UTF-8
   network:
     network:
       version: 2
       ethernets:
-        id0:
-          match:
-            name: "en*"
-          dhcp4: true
-          nameservers:
-            addresses: [8.8.8.8, 8.8.4.4]
+        id0: {match: {name: "en*"}, dhcp4: true}
   ssh:
     allow-pw: true
     install-server: true
   storage:
-    layout:
-      name: direct
+    layout: {name: direct}
+  
   late-commands:
-    - "curtin in-target -- target bash -c 'wget -qO install.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh && bash install.sh'"
-  user-data:
-    package_upgrade: true
+    # Création du script de premier démarrage
+    - curtin in-target -- bash -c "cat <<'EOF' > /usr/local/bin/mados-oobe
+#!/bin/bash
+clear
+echo '🚀 MadOS Initialisation (MODE LOCAL)...'
+sudo mkdir -p /mnt/hgfs/mados
+sudo mount -t fuse.vmhgfs-fuse .host:/mados /mnt/hgfs/mados -o allow_other 2>/dev/null
+if [ -f /mnt/hgfs/mados/install_local.sh ]; then
+    cd /mnt/hgfs/mados && sudo bash ./install_local.sh
+else
+    echo '❌ Mode local echoue. Repli GitHub...'
+    sudo apt update && sudo apt install -y git
+    git clone --depth=1 https://github.com/LordMadTrix/MadOS_ROG_Edition.git /tmp/mados
+    cd /tmp/mados && sudo bash ./install_local.sh
+fi
+EOF"
+    - curtin in-target -- chmod +x /usr/local/bin/mados-oobe
+    
+    # Injection dans le .bashrc de l'utilisateur
+    - curtin in-target -- bash -c "echo '[[ -f /usr/local/bin/mados-oobe ]] && /usr/local/bin/mados-oobe' >> /home/mados/.bashrc"
+    
+    # Raccourci Bureau (pour plus tard)
+    - curtin in-target -- mkdir -p /etc/xdg/autostart
+    - curtin in-target -- bash -c "cat <<'EOF' > /etc/xdg/autostart/mados.desktop
+[Desktop Entry]
+Type=Application
+Name=MadOS Setup
+Exec=gnome-terminal -- bash -c '/usr/local/bin/mados-oobe'
+Icon=utilities-terminal
+Terminal=false
+EOF"

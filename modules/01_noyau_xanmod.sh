@@ -2,8 +2,9 @@
 # ==============================================================================
 # MadOS ROG Edition 3.0 - 01_noyau_xanmod.sh
 # ==============================================================================
-# Phase: 1 - Installation Kernel XanMod EDGE
+# Phase: 1 - Installation Kernel XanMod EDGE (7.0+)
 # Cible spécifiquement la variance x64v3 pour ROG (AVX2).
+# Inclut désormais le support natif NTSYNC pour Wine 11.
 # ==============================================================================
 
 # ==============================================================================
@@ -18,7 +19,7 @@ BOLD='\033[1m'
 export DEBIAN_FRONTEND=noninteractive
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 1 Déploiement du Noyau XanMod EDGE${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 1 Déploiement du Noyau XanMod EDGE (Optimisé 7.0)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 detect_cpu_level() {
@@ -39,8 +40,8 @@ echo -e "    ${GRAY}├─ Injection du paquet : $XANMOD_PKG...${NC}"
 if sudo apt install -y "$XANMOD_PKG"; then
     echo -e "    ${GRAY}✅ [SUCCÈS] Noyau $XANMOD_PKG installé.${NC}"
 else
-    echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Moteur introuvable, tentative version générique...${NC}"
-    sudo apt install -y linux-xanmod-edge
+    echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Moteur introuvable, tentative version générique...${NC}"
+    sudo apt install -y linux-xanmod-edge || true
 fi
 
 echo -e "    ${WHITE}├─ [HEADERS] Construction des en-têtes (Prérequis DKMS GPU)...${NC}"
@@ -52,5 +53,16 @@ fi
 
 echo -e "    ${WHITE}├─ [BOOT] Séquenceur GRUB mis à jour.${NC}"
 sudo update-grub 2>/dev/null || true
+
+# 4. Activation NTSYNC (Révolution Gaming 2026)
+echo -e "    ${WHITE}├─ [NTSYNC] Activation de la synchronisation noyau...${NC}"
+sudo modprobe ntsync 2>/dev/null || true
+echo "ntsync" | sudo tee /etc/modules-load.d/ntsync.conf > /dev/null
+
+if [ -c /dev/ntsync ]; then
+    echo -e "    ${GRAY}✅ [SUCCÈS] /dev/ntsync est opérationnel.${NC}"
+else
+    echo -e "    ${YELLOW}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [INFO] NTSYNC sera actif après le prochain redémarrage.${NC}"
+fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 1 Terminée (Ne pas redémarrer avant le script GPU).${NC}"

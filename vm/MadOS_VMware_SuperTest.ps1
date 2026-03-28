@@ -17,11 +17,20 @@ $FormatCore = Join-Path $ProjectRoot 'modules/format_core.py'
 if (Test-Path $FormatScript) { python $FormatScript }
 if (Test-Path $FormatCore) { python $FormatCore }
 
-# 0. Check ISO
+# 0. Check ISO & Configuration
 if (-not (Test-Path $IsoPath)) {
-    Write-Error "Fichier ISO introuvable : $IsoPath. Merci de placer l'ISO Ubuntu 25.10 dans le dossier."
+    Write-Error "Fichier ISO introuvable : $IsoPath."
     Read-Host "Appuyez sur Entree pour quitter"
     exit
+}
+
+# 0b. Préparation Autoinstall (Base64)
+$UserDataPath = Join-Path $PSScriptRoot "user-data"
+$UserDataBase64 = ""
+if (Test-Path $UserDataPath) {
+    Write-Host "Preparation de l'Autoinstall (GuestInfo)..."
+    $UserDataContent = Get-Content $UserDataPath -Raw
+    $UserDataBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($UserDataContent))
 }
 
 # 2. Preparation VM
@@ -40,6 +49,7 @@ if ($DeployNew) {
     if (-not (Test-Path $VDiskManager)) { $VDiskManager = 'C:\Program Files (x86)\VMware\VMware Player\vmware-vdiskmanager.exe' }
     if (Test-Path $VDiskManager) { & $VDiskManager -c -s 120GB -a lsilogic -t 0 "$VmdkPath" }
 
+    $InstanceID = Get-Random
     $VmxContent = @(
         '.encoding = "windows-1252"',
         'config.version = "8"',
@@ -84,7 +94,11 @@ if ($DeployNew) {
         'isolation.tools.hgfs.disable = "FALSE"',
         "sharedFolder0.hostPath = `"$ProjectRoot`"",
         'sharedFolder0.guestName = "mados"',
-        'sharedFolder.maxNum = "1"'
+        'sharedFolder.maxNum = "1"',
+        # INJECTION AUTOINSTALL (GUESTINFO)
+        "guestinfo.metadata = `"instance-id: MadOS-ROG-$InstanceID`"",
+        "guestinfo.userdata = `"$UserDataBase64`"",
+        'guestinfo.userdata.encoding = "base64"'
     )
     $VmxContent | Out-File -FilePath $VmxPath -Encoding ascii
 }

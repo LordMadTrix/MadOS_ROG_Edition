@@ -36,7 +36,7 @@ echo "gdm3 shared/default-x-display-manager select sddm" | sudo debconf-set-sele
 
 # Installation KDE
 echo -e "    ${WHITE}├─ [BUREAU] Compilation KDE Plasma Desktop 6...${NC}"
-sudo DEBIAN_FRONTEND=noninteractive apt install -y kubuntu-desktop kde-plasma-desktop plasma-workspace plasma-nm plasma-pa plasma-systemmonitor kde-standard dolphin konsole kate ark gwenview kde-spectacle kcalc partitionmanager
+sudo DEBIAN_FRONTEND=noninteractive apt install -y kubuntu-desktop kde-plasma-desktop plasma-workspace plasma-session-x11 plasma-nm plasma-pa plasma-systemmonitor kde-standard dolphin konsole kate ark gwenview kde-spectacle kcalc partitionmanager dbus-x11 xserver-xorg
 
 echo -e "    ${WHITE}├─ [TRADUCTION] Conversion Locale vers Français...${NC}"
 sudo DEBIAN_FRONTEND=noninteractive apt install -y language-pack-fr language-pack-gnome-fr language-pack-kde-fr hunspell-fr
@@ -48,9 +48,28 @@ sudo DEBIAN_FRONTEND=noninteractive apt install -y sddm sddm-theme-breeze
 sudo systemctl disable gdm3 lightdm xdm 2>/dev/null || true
 sudo systemctl enable sddm 2>/dev/null || true
 
+# Détection VM pour forcer X11 (Stabilité VMware)
+IS_VM=$(systemd-detect-virt)
 SDDM_CONF="/etc/sddm.conf.d/mados-sddm.conf"
 sudo mkdir -p /etc/sddm.conf.d/
-cat <<'SDDM_EOF' | sudo tee "$SDDM_CONF" >/dev/null
+
+if [[ "$IS_VM" == "vmware" || "$IS_VM" == "qemu" || "$IS_VM" == "oracle" ]]; then
+    echo -e "    ${YELLOW}⚠️  VM Détectée : Forçage du DisplayServer X11 pour la stabilité...${NC}"
+    cat <<'SDDM_EOF' | sudo tee "$SDDM_CONF" >/dev/null
+[General]
+DisplayServer=x11
+InputMethod=
+
+[Theme]
+Current=breeze
+
+[Autologin]
+Relogin=false
+Session=plasma
+User=mados
+SDDM_EOF
+else
+    cat <<'SDDM_EOF' | sudo tee "$SDDM_CONF" >/dev/null
 [Theme]
 Current=breeze
 [Autologin]
@@ -63,14 +82,14 @@ ServerPath=/usr/bin/X
 ServerArguments=-nolisten tcp
 EnableHiDPI=true
 SDDM_EOF
+fi
 
-# Wayland env pour root & user
+# Wayland env (Optionnel : On laisse le système choisir pour éviter les écrans noirs NVIDIA)
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config"
-cat <<'ENV_EOF' | sudo -u "$REAL_USER" tee -a "$USER_HOME/.profile" >/dev/null
-export QT_QPA_PLATFORM=wayland
-export GDK_BACKEND=wayland
-export MOZ_ENABLE_WAYLAND=1
-ENV_EOF
+# On commente les exports forcés pour la stabilité
+# export QT_QPA_PLATFORM=wayland
+# export GDK_BACKEND=wayland
+# export MOZ_ENABLE_WAYLAND=1
 
 # Nettoyage GNOME / FIrefox Snap
 echo -e "\n    ${RED}>>> ${WHITE}[NETTOYAGE] ${BOLD}Désintégration de GNOME, Firefox (Snap) et du Démon Snapd...${NC}"
@@ -79,5 +98,19 @@ sudo snap remove --purge firefox 2>/dev/null || true
 sudo apt-get purge -y firefox snapd 2>/dev/null || true
 sudo apt-get autoremove -y --purge > /dev/null 2>&1 || true
 sudo apt-get clean > /dev/null 2>&1 || true
+
+# ---- NOUVEAU : Macros-ROG (Raccourcis Clavier MadOS) ----
+echo -e "    ${WHITE}├─ [HOTKEYS] Injection des raccourcis clavier MadOS (Macro-ROG)...${NC}"
+sudo -u "$REAL_USER" kwriteconfig5 --file "$USER_HOME/.config/kglobalshortcutsrc" --group "khotkeys" --key "{mados_game}" "Meta+Shift+G,none,MadOS Game Mode" 2>/dev/null || true
+sudo -u "$REAL_USER" kwriteconfig5 --file "$USER_HOME/.config/kglobalshortcutsrc" --group "khotkeys" --key "{mados_eco}" "Meta+Shift+E,none,MadOS Eco Mode" 2>/dev/null || true
+sudo -u "$REAL_USER" kwriteconfig5 --file "$USER_HOME/.config/kglobalshortcutsrc" --group "khotkeys" --key "{mados_stealth}" "Meta+Shift+S,none,MadOS Stealth Mode" 2>/dev/null || true
+# ---- NOUVEAU : Rage-Quit Force (Kill Game) ----
+sudo -u "$REAL_USER" kwriteconfig5 --file "$USER_HOME/.config/kglobalshortcutsrc" --group "kglobalaccel" --key "Kill Window" "Ctrl+Alt+Backspace,none,Force Kill Current Window" 2>/dev/null || true
+
+# Création du dossier khotkeys si manquant
+sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/khotkeys"
+
+# Lancer la prise en compte (Optionnel: nécessite une session active, mais le config file est prêt pour le boot)
+sudo -u "$REAL_USER" qdbus org.kde.kglobalaccel /kglobalaccel reconfigure >/dev/null 2>&1 || true
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 5 Terminée.${NC}"

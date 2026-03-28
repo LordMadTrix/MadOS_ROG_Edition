@@ -69,7 +69,7 @@ echo -e "\n    ${WHITE}├─ [ASUSCTL] Configuration des Dépôts Spécialisés
 
 # Ajout du PPA spécialisé pour asusctl/supergfxctl
 sudo add-apt-repository ppa:lukas-moeller/asus-linux -y --no-update 2>/dev/null || true
-sudo apt update -q
+sudo apt update -q || true
 
 # Installation des outils officiels
 echo -e "    ${GRAY}├─ Déploiement asusctl, supergfxctl et control-center...${NC}"
@@ -82,9 +82,49 @@ sudo apt install -y asusctl supergfxctl rog-control-center 2>/dev/null || {
     fi
     # [Logique de backup ici si besoin, mais on privilégie le PPA]
 }
+    sudo systemctl daemon-reload || true
+    
+    # ---- NOUVEAU : Script RGB Dynamique (Réaction Température) ----
+    echo -e "    ${GRAY}├─ Injection du Moniteur RGB Réactif (ASUS ROG)...${NC}"
+    sudo apt install -y lm-sensors 2>/dev/null || true
+    cat <<'RGB_EOF' | sudo tee /usr/local/bin/mados-rgb-temp >/dev/null
+#!/bin/bash
+while true; do
+  TEMP=$(sensors | grep "Package id 0" | awk '{print $4}' | tr -d '+°C' | cut -d. -f1)
+  if [ "$TEMP" -lt 55 ]; then COLOR="00FF00"; # Green (Cool)
+  elif [ "$TEMP" -lt 80 ]; then COLOR="FFFF00"; # Yellow (Warm)
+  else COLOR="FF0000"; # Red (Hot)
+  fi
+  asusctl led-mode static -c $COLOR >/dev/null 2>&1
+  
+  # ---- NOUVEAU : Thermal Safety Guard (Alerte 90C) ----
+  if [ "$TEMP" -gt 90 ]; then
+    # Alerte Vocale
+    spd-say -v fr-fr -r 0 "Alerte Thermique ! Ventilation forcée engagée." 2>/dev/null
+    # Force les ventilateurs au maximum (Profil Performance/Turbo)
+    asusctl profile -P Performance 2>/dev/null
+  fi
+  sleep 5
+done
+RGB_EOF
+    sudo chmod +x /usr/local/bin/mados-rgb-temp || true
+    
+    # Création du service pour le démarrage automatique
+    cat <<'SVC_EOF' | sudo tee /etc/systemd/system/mados-rgb.service >/dev/null
+[Unit]
+Description=MadOS RGB Temp Monitor
+After=multi-user.target
 
-# Activation des services
-sudo systemctl daemon-reload
+[Service]
+ExecStart=/usr/local/bin/mados-rgb-temp
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+SVC_EOF
+    sudo systemctl enable mados-rgb.service >/dev/null 2>&1 || true
+    sudo systemctl start mados-rgb.service >/dev/null 2>&1 || true
+
 sudo systemctl enable supergfxd asusd 2>/dev/null || true
 sudo systemctl start supergfxd asusd 2>/dev/null || true
 

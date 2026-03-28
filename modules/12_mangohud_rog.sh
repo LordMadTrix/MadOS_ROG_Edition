@@ -24,7 +24,7 @@ echo -e "${RED}╚════════════════════�
 sudo apt install -y goverlay || true
 
 # Création de la configuration MangoHud
-MANGO_DIR="/home/$REAL_USER/.config/MangoHud"
+MANGO_DIR="$USER_HOME/.config/MangoHud"
 sudo -u "$REAL_USER" mkdir -p "$MANGO_DIR"
 
 cat <<'EOF' | sudo -u "$REAL_USER" tee "$MANGO_DIR/MangoHud.conf" >/dev/null

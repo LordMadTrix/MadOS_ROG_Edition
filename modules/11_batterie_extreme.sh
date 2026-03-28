@@ -20,26 +20,29 @@ echo -e "\n${RED}╔════════════════════
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 11 Installation du gestionnaire Batterie Extrême${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
-# auto-cpufreq est particulièrement efficace pour les PC portables
-# Note: apt update centralisé déjà effectué dans install_local.sh - pas besoin ici
-# Il est préférable de l'installer via snap sur ubuntu 24.04 pour éviter les conflits pythons capricieux,
-# mais vu que nous avons purgé snap, nous allons l'installer manuellement via git/python-installer.
-# Cependant, une version APT communautaire ou le script officiel est mieux.
-# On utilise le script d'installation officiel de git.
+# 1. Résolution des conflits système
+# Sur Ubuntu 24/25, power-profiles-daemon empêche auto-cpufreq de fonctionner correctement.
+echo -e "    ${GRAY}├─ Suppression des conflits (power-profiles-daemon)...${NC}"
+sudo systemctl disable --now power-profiles-daemon 2>/dev/null || true
+sudo apt purge -y power-profiles-daemon 2>/dev/null || true
 
+# 2. Installation de auto-cpufreq (Moteur d'optimisation processeur)
 if ! command -v auto-cpufreq >/dev/null 2>&1; then
+    echo -e "    ${WHITE}├─ [DOWNLOAD] Recuperation du moteur auto-cpufreq...${NC}"
     TEMP_DIR=$(mktemp -d)
-    git clone --depth=1 https://github.com/AdnanHodzic/auto-cpufreq.git "$TEMP_DIR" >/dev/null 2>&1
-    cd "$TEMP_DIR"
-    sudo ./auto-cpufreq-installer --install >/dev/null 2>&1 || true
-    rm -rf "$TEMP_DIR"
+    if git clone --depth=1 https://github.com/AdnanHodzic/auto-cpufreq.git "$TEMP_DIR" >/dev/null 2>&1; then
+        cd "$TEMP_DIR" && sudo ./auto-cpufreq-installer --install >/dev/null 2>&1
+        rm -rf "$TEMP_DIR"
+    fi
 fi
 
 if command -v auto-cpufreq >/dev/null 2>&1; then
-    sudo systemctl enable auto-cpufreq >/dev/null 2>&1 || true
-    echo -e "    ✅ [SUCCÈS] auto-cpufreq est installé et activé en service."
+    # On force la configuration initiale
+    sudo auto-cpufreq --install >/dev/null 2>&1 || true
+    sudo systemctl enable --now auto-cpufreq >/dev/null 2>&1
+    echo -e "    ${GREEN}✅ [SUCCÈS] auto-cpufreq est operationnel et le conflit power-profiles est regle.${NC}"
 else
-    echo -e "    ❌ [ERREUR] Erreur lors de l'installation de auto-cpufreq."
+    echo -e "    ${RED}❌ [ERREUR] Impossible d'installer le moteur de batterie.${NC}"
 fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 11 Terminée.${NC}"

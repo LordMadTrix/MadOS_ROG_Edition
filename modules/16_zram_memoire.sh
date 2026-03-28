@@ -20,7 +20,7 @@ echo -e "\n${RED}╔════════════════════
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 16 Configuration ZRAM (Compression Mémoire Ultra-Rapide)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
-sudo apt-get update -q >/dev/null 2>&1
+sudo apt-get update -q >/dev/null 2>&1 || true
 sudo apt-get install -y zram-tools >/dev/null 2>&1 || true
 
 # Configuration agressive : on alloue 50% de la RAM max pour compresser les données en mémoire via zstd

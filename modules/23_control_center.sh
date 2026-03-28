@@ -24,12 +24,12 @@ sudo apt install -y python3-pyqt6 python3-psutil 2>/dev/null || true
 
 APP_DIR="/opt/mados-control-center"
 echo -e "    ${GRAY}├─ Création de l'arborescence $APP_DIR...${NC}"
-sudo mkdir -p "$APP_DIR"
+sudo mkdir -p "$APP_DIR" || true
 
 echo -e "    ${GRAY}├─ Copie de l'application graphique...${NC}"
 if [ -f "$(dirname "$0")/../assets/mados_cc.py" ]; then
-    sudo cp -f "$(dirname "$0")/../assets/mados_cc.py" "$APP_DIR/mados_cc.py"
-    sudo chmod +x "$APP_DIR/mados_cc.py"
+    sudo cp -f "$(dirname "$0")/../assets/mados_cc.py" "$APP_DIR/mados_cc.py" || true
+    sudo chmod +x "$APP_DIR/mados_cc.py" || true
 fi
 
 if [ -f "$(dirname "$0")/../assets/logo.png" ]; then
@@ -53,8 +53,8 @@ Type=Application
 Categories=System;Settings;
 StartupNotify=true
 EOF
-    sudo chmod +x "$USER_HOME/Desktop/MadOS_Control_Center.desktop"
-    sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/Desktop/MadOS_Control_Center.desktop"
+    sudo chmod +x "$USER_HOME/Desktop/MadOS_Control_Center.desktop" || true
+    sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/Desktop/MadOS_Control_Center.desktop" || true
     # Copie bureau français
     sudo cp "$USER_HOME/Desktop/MadOS_Control_Center.desktop" "$USER_HOME/Bureau/" 2>/dev/null || true
 

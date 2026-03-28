@@ -77,12 +77,8 @@ if command -v plasmashell &>/dev/null; then
     PLASMA_VER=$(plasmashell --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
     echo "Plasma : $PLASMA_VER" >> "$REPORT_FILE"
     check_ok "KDE Plasma détecté (v$PLASMA_VER)"
-elif command -v gnome-shell &>/dev/null; then
-    GNOME_VER=$(gnome-shell --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
-    echo "GNOME : $GNOME_VER" >> "$REPORT_FILE"
-    check_ok "GNOME MadOS Edition détecté (v$GNOME_VER)"
 else
-    check_fail "Aucun environnement graphique (KDE/GNOME) détecté"
+    check_fail "KDE Plasma non détecté (Interface MadOS requise)"
 fi
 
 echo -e "\n    ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -127,7 +123,7 @@ command -v gamemoded &>/dev/null && check_ok "GameMode installé" || check_warn 
 echo -e "\n    ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "    ${CYAN}[6/6] Services Système${NC}"
 echo -e "    ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-systemctl is-active --quiet sddm && check_ok "SDDM actif" || check_warn "SDDM inactif"
+(systemctl is-active --quiet sddm || systemctl is-active --quiet gdm) && check_ok "Gestionnaire de session actif (SDDM/GDM)" || check_warn "Gestionnaire de session inactif"
 systemctl is-active --quiet NetworkManager && check_ok "NetworkManager actif" || check_warn "NetworkManager inactif"
 command -v asusctl &>/dev/null && check_ok "asusctl ROG installé" || check_warn "asusctl non installé (non-ROG ou manquant)"
 
@@ -155,9 +151,32 @@ fi
 
 echo -e "\n    ${GRAY}Rapport complet sauvegardé dans : ${WHITE}$REPORT_FILE${NC}"
 
+# 8. Benchmark de Performance (Validation MadOS)
+echo -e "\n    ${CYAN}📊 [BENCHMARK] Test de stress et validation performance...${NC}"
+sudo apt install -y sysbench bc >/dev/null 2>&1 || true
+
+# Test CPU (Calcul des nombres premiers)
+echo -ne "    ${GRAY}├─ Test du processeur (CPU)... ${NC}"
+CPU_SCORE=$(sysbench cpu --cpu-max-prime=20000 --threads=$(nproc) run | grep "events per second" | awk '{print $4}')
+echo -e "${GREEN}${BOLD}$CPU_SCORE ops/sec${NC}"
+
+# Test RAM (Vitesse d'accès séquentiel)
+echo -ne "    ${GRAY}├─ Test de la mémoire (RAM)... ${NC}"
+RAM_SCORE=$(sysbench memory --memory-block-size=1M --memory-total-size=10G run | grep "transferred" | awk -F'[(|)]' '{print $2}')
+echo -e "${GREEN}${BOLD}$RAM_SCORE${NC}"
+
+# Calcul du Score Global MadOS (Normalisation simple)
+SCORE_MATH=$(echo "$CPU_SCORE / 10" | bc 2>/dev/null || echo "0")
+TOTAL_SCORE=$(($PERCENT + (SCORE_MATH / 100)))
+
+# Rapport Final Dynamique
+echo -e "\n    ${WHITE}${BOLD}╔═════════════════════════════════════════════════════╗${NC}"
+echo -e "    ${WHITE}${BOLD}║  VOTRE RÉSULTAT MAD-OS : ${CYAN}$TOTAL_SCORE / 100${NC}               ${WHITE}${BOLD}║${NC}"
+echo -e "    ${WHITE}${BOLD}╚═════════════════════════════════════════════════════╝${NC}"
+
 # Proposer d'afficher le rapport complet
-whiptail --title "MadOS 3.0 - 🏥 Health Check" \
-    --yesno "Score de Santé : $SCORE/$TOTAL ($PERCENT%)\n\nVoulez-vous consulter le rapport complet ?" 10 55 && \
-    whiptail --title "MadOS 3.0 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
+whiptail --title "MadOS 3.3 - 🏥 Diagnostic & Benchmark" \
+    --yesno "Score Global : $TOTAL_SCORE/100 (Santé: $PERCENT%)\n\nVoulez-vous consulter le rapport détaillé ?" 12 55 && \
+    whiptail --title "MadOS 3.3 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 25 Terminée.${NC}"

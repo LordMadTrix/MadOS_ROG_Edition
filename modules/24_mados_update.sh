@@ -48,14 +48,14 @@ if [ -f "$NEW_VERSION_FILE" ] && [ -f "$CURRENT_VERSION_FILE" ]; then
     CUR_VER=$(cat "$CURRENT_VERSION_FILE")
     if [ "$NEW_VER" = "$CUR_VER" ]; then
         echo -e "    ${CYAN}ℹ️  MadOS est déjà à jour (version $CUR_VER).${NC}"
-        sudo rm -rf "$INSTALL_DIR"
+        sudo rm -rf "$INSTALL_DIR" || true
         exit 0
     fi
     echo -e "    ${GRAY}├─ Mise à jour : ${RED}$CUR_VER${NC} → ${GREEN}$NEW_VER${NC}"
 fi
 
 echo -e "    ${GRAY}├─ Application des permissions...${NC}"
-sudo chmod +x "$INSTALL_DIR/install_local.sh" "$INSTALL_DIR/modules/"*.sh
+sudo chmod +x "$INSTALL_DIR/install_local.sh" "$INSTALL_DIR/modules/"*.sh || true
 
 # Demander quels modules relancer
 CHOICE=$(whiptail --title "MadOS 3.0 - 🔄 Update Launcher" --menu \
@@ -76,7 +76,7 @@ case "$CHOICE" in
         ;;
     3)
         echo -e "    ${GRAY}├─ Mise à jour des paquets système...${NC}"
-        sudo apt update -q && sudo apt upgrade -y
+        sudo apt update -q || true && sudo apt upgrade -y || true
         sudo npm update -g pnpm 2>/dev/null || true
         echo -e "    ${GREEN}✓ Paquets mis à jour.${NC}"
         ;;

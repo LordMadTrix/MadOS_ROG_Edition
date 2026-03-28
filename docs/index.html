@@ -243,18 +243,19 @@
 <nav>
     <a href="index.html" class="logo">MADOS <span>ULTIMATE</span></a>
     <div class="nav-links">
-        <a href="#install">Déploiement</a>
+        <a href="#install">Installation</a>
+        <a href="#iso">ISO Auto-Pilot</a>
         <a href="#features">Moteurs</a>
-        <a href="architecture_core.html">Architecture</a>
         <a href="https://github.com/LordMadTrix/MadOS_ROG_Edition" target="_blank">Source</a>
     </div>
 </nav>
 
 <section class="hero">
-    <div class="version-badge">GOD TIER VERSION 3.2 — ULTIMATE</div>
+    <div class="version-badge">GOD TIER VERSION 3.5 — QUESTING EDITION</div>
     <h1>MADOS<br><span>ROG EDITION</span></h1>
     <p class="subtitle">
         Le framework Linux le plus agressif du monde. Forgé pour l'i9 et la RTX. 
+        Basé sur <b>Ubuntu 25.10</b>, propulsé par <b>XanMod 6.19+</b> et <b>Plasma 6</b>.
         Performances pures, IA locale et esthétique Cyber-ROG sans aucun compromis.
     </p>
 
@@ -265,9 +266,21 @@
         </div>
         <div class="terminal-body">
             <span class="prompt">$</span>
-            <code class="command" id="cmd">wget -qO install.sh mados.sh && sudo bash install.sh</code>
+            <code class="command" id="cmd">wget -qO- mados.sh | sudo bash</code>
             <button class="copy-btn" onclick="copyText()">Infecter</button>
         </div>
+    </div>
+</section>
+
+<section id="iso" style="padding: 5rem 5%; text-align: center; border-top: 1px solid var(--border-red); background: rgba(255, 0, 60, 0.05);">
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 1.5rem;">💿 ISO AUTO-PILOT</h2>
+    <p style="color: var(--text-dim); max-width: 800px; margin: 0 auto 3rem; font-size: 1.2rem;">
+        Pas envie de taper des commandes ? Téléchargez l'ISO MadOS officielle. 
+        Brûlez-la sur une clé USB, bootez, et regardez le système s'installer <b>tout seul</b>.
+    </p>
+    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <a href="#" class="copy-btn" style="text-decoration: none; padding: 1.5rem 3rem;">TÉLÉCHARGER MADOS 3.5 (ISO)</a>
+        <a href="https://github.com/LordMadTrix/MadOS_ROG_Edition" class="copy-btn" style="background: transparent; border: 1px solid var(--rog-red); text-decoration: none; padding: 1.5rem 3rem;">GÉNÉRER MON ISO PERSO</a>
     </div>
 </section>
 

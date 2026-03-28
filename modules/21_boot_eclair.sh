@@ -24,8 +24,23 @@ sudo apt-get install -y zstd -qq >/dev/null 2>&1 || true
 
 echo -e "    ${GRAY}├─ Optimisation du moteur Initramfs vers ZSTD (Équilibre Vitesse/Fiabilité)...${NC}"
 INITRAMFS_CONF="/etc/initramfs-tools/initramfs.conf"
+# 3. Mode Secours MadOS dans GRUB
+echo -e "    ${WHITE}├─ [RESCUE] Création de l'entrée de Secours ROG dans GRUB...${NC}"
+cat <<'RESCUE_EOF' | sudo tee /etc/grub.d/40_custom > /dev/null
+menuentry 'MadOS ROG Edition - Mode Secours (Reset Drivers/UI)' --class red --class mados {
+	set root='(hd0,1)'
+	linux	/boot/vmlinuz-xanmod-edge root=/dev/sda1 ro single mados_rescue=1
+	initrd	/boot/initrd.img-xanmod-edge
+}
+RESCUE_EOF
+sudo chmod +x /etc/grub.d/40_custom || true
+
+# 4. Activation du Timeout et Masquage partiel
+echo -e "    ${WHITE}├─ [CONFIG] Optimisation du Timeout et Thème boot...${NC}"
+sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=3/' /etc/default/grub || true
+sudo update-grub 2>/dev/null || true
 if [ -f "$INITRAMFS_CONF" ]; then
-    sudo sed -i 's/^COMPRESS=.*/COMPRESS=zstd/' "$INITRAMFS_CONF"
+    sudo sed -i 's/^COMPRESS=.*/COMPRESS=zstd/' "$INITRAMFS_CONF" || true
 fi
 
 # 2. Silent GRUB
@@ -33,10 +48,10 @@ echo -e "    ${GRAY}├─ Masquage total des textes BIOS POST sous GRUB pour un
 GRUB_CONF="/etc/default/grub"
 if [ -f "$GRUB_CONF" ]; then
     # Masquer le timeout en style Hidden mais garder 2 secondes de survie
-    sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' "$GRUB_CONF"
-    sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=2/' "$GRUB_CONF"
-    sudo sed -i '/GRUB_RECORDFAIL_TIMEOUT/d' "$GRUB_CONF"
-    echo 'GRUB_RECORDFAIL_TIMEOUT=2' | sudo tee -a "$GRUB_CONF" >/dev/null
+    sudo sed -i 's/^GRUB_TIMEOUT_STYLE=.*/GRUB_TIMEOUT_STYLE=menu/' "$GRUB_CONF" || true
+    sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=2/' "$GRUB_CONF" || true
+    sudo sed -i '/GRUB_RECORDFAIL_TIMEOUT/d' "$GRUB_CONF" || true
+    echo 'GRUB_RECORDFAIL_TIMEOUT=2' | sudo tee -a "$GRUB_CONF" >/dev/null || true
 
     # Paramètres de boot ultra discrets
     if grep -q "^GRUB_CMDLINE_LINUX_DEFAULT=" "$GRUB_CONF"; then
@@ -54,7 +69,7 @@ if [ $? -ne 0 ]; then
     sudo sed -i 's/^COMPRESS=zstd/COMPRESS=gzip/' "$INITRAMFS_CONF"
     sudo update-initramfs -u -k all >/dev/null 2>&1
 fi
-sudo update-grub >/dev/null 2>&1
+sudo update-grub >/dev/null 2>&1 || true
 
 echo -e "    ${CYAN}✅ [SUCCÈS] Boot sublimé. Au redémarrage, la seule chose que vous verrez sera le Splash Plymouth ROG instantané.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 21 Terminée.${NC}"

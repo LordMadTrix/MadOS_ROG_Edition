@@ -133,10 +133,9 @@ THEME_EOF
     cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.config/autostart/set-wallpaper.desktop" >/dev/null
 [Desktop Entry]
 Type=Application
-Exec=sh -c "sleep 4 && plasma-apply-wallpaperimage $WALLPAPER_DIR/default_wallpaper.png && gsettings set org.gnome.desktop.background picture-uri 'file://$WALLPAPER_DIR/default_wallpaper.png' && rm -f ~/.config/autostart/set-wallpaper.desktop"
+Exec=sh -c "sleep 6 && (plasma-apply-wallpaperimage $WALLPAPER_DIR/default_wallpaper.png &) && rm -f ~/.config/autostart/set-wallpaper.desktop"
 Hidden=false
 NoDisplay=false
-X-GNOME-Autostart-enabled=true
 Name=Set MadOS Wallpaper
 EOF
     sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/autostart/set-wallpaper.desktop"
@@ -200,14 +199,7 @@ if command -v plasma-apply-lookandfeel &>/dev/null; then
     sudo -u "$REAL_USER" plasma-apply-colorscheme BreezeDark 2>/dev/null || true
 fi
 
-# ---- SCULPTURE GNOME (Mode 'Safe-Mode' / ROG-Style) ----
-if command -v gsettings &>/dev/null; then
-    echo -e "    ${GRAY}├─ Basculement du Dock GNOME vers le BAS (Windows style)...${NC}"
-    sudo -u "$REAL_USER" gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM' 2>/dev/null || true
-    sudo -u "$REAL_USER" gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
-    sudo -u "$REAL_USER" gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark' 2>/dev/null || true
-    sudo -u "$REAL_USER" gsettings set org.gnome.desktop.interface accent-color 'red' 2>/dev/null || true
-fi
+# ---- FIN SCULPTURE BUREAU ----
 
 # Injection des constantes de couleurs KDE
 sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config"

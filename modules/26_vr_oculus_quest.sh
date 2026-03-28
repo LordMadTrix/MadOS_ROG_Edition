@@ -44,16 +44,16 @@ echo -e "${YELLOW}[!] Ce module configure le support natif pour les casques Meta
 
 # 1. Installation des pré-requis (ADB, fuse, jq)
 echo -e "\n${BLUE}[+] Installation des outils Android (ADB) et dépendances...${NC}"
-sudo apt-get update
-sudo apt-get install -y android-tools-adb curl jq libfuse2 wget xz-utils libnss3
+sudo apt-get update || true
+sudo apt-get install -y android-tools-adb curl jq libfuse2 wget xz-utils libnss3 || true
 
 # 2. Règles udev pour Meta Quest (Vendor ID 2833)
 echo -e "\n${BLUE}[+] Configuration des règles USB (Udev) pour Oculus/Meta Quest...${NC}"
 UDEV_RULE_FILE="/etc/udev/rules.d/51-android.rules"
 if ! grep -q "2833" "$UDEV_RULE_FILE" 2>/dev/null; then
     echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="2833", MODE="0666", GROUP="plugdev"' | sudo tee -a "$UDEV_RULE_FILE" >/dev/null
-    sudo udevadm control --reload-rules
-    sudo udevadm trigger
+    sudo udevadm control --reload-rules || true
+    sudo udevadm trigger || true
     echo -e "    ${GRAY}├─ Règles udev Oculus ajoutées avec succès.${NC}"
 else
     echo -e "    ${GRAY}├─ Règles udev Oculus déjà présentes.${NC}"
@@ -78,8 +78,8 @@ if [ -n "$SQ_LATEST_TAG" ]; then
         sudo rm -rf /opt/MadOS_VR/SideQuest
         sudo mkdir -p /opt/MadOS_VR/SideQuest
         if sudo tar -xf "$SQ_PATH" -C /opt/MadOS_VR/SideQuest --strip-components=1 2>/dev/null; then
-            sudo rm -f "$SQ_PATH"
-            sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/SideQuest
+            sudo rm -f "$SQ_PATH" || true
+            sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/SideQuest || true
             
             # Création du raccourci
             echo -e "    ${GRAY}├─ Création du raccourci Bureau pour SideQuest...${NC}"

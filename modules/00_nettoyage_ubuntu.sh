@@ -37,7 +37,7 @@ echo -e "${RED}╚════════════════════�
 # 0. Installation des outils de base requis pour la suite
 # Note: apt update centralisé déjà effectué dans install_local.sh avant le lancement des modules
 echo -e "    ${WHITE}├─ [PREREQUIS] Installation des outils de dépôts...${NC}"
-sudo apt install -y software-properties-common dirmngr gpg curl wget 2>/dev/null || true
+sudo apt install -y software-properties-common dirmngr gpg curl wget lsb-release 2>/dev/null || true
 
 # 1. Neutralisation TOTALE et DÉFINITIVE de Snap (Bouclier MadOS)
 echo -e "    ${WHITE}├─ [SÉCURITÉ] Érection d'un mur anti-Snap (APT Blockade)...${NC}"
@@ -95,6 +95,7 @@ sudo mkdir -p /etc/apt/keyrings
 (curl -sS https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/spotify-new.gpg) &
 (curl -sS https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/spotify-old.gpg) &
 (wget -qO - https://dl.xanmod.org/archive.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/xanmod-archive-keyring.gpg) &
+(wget -qO - https://dl.winehq.org/wine-builds/winehq.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/winehq-archive-keyring.gpg) &
 
 # Attendre que tous les téléchargements soient finis
 wait
@@ -102,6 +103,7 @@ wait
 echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
 echo "deb [signed-by=/etc/apt/keyrings/spotify-new.gpg,/etc/apt/keyrings/spotify-old.gpg arch=amd64] https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list > /dev/null
 echo 'deb [signed-by=/etc/apt/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/winehq.list > /dev/null
 
 # Lutris & Divers
 if ! ls /etc/apt/sources.list.d/lutris-team-ubuntu-lutris-*.list &>/dev/null; then

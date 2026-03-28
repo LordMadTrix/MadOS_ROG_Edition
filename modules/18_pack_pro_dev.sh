@@ -24,7 +24,7 @@ echo -e "${RED}╚════════════════════�
 
 # Docker
 echo -e "    ${GRAY}├─ Installation de Docker...${NC}"
-sudo apt-get update -q
+sudo apt-get update -q || true
 sudo apt-get install -y docker.io docker-compose-v2 git-lfs || true
 
 # Add user to docker group
@@ -44,12 +44,12 @@ sudo usermod -aG kvm "$REAL_USER" || true
 echo -e "    ${GRAY}├─ Installation de VSCodium (Éditeur Code Open Source)...${NC}"
 wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
     | gpg --dearmor --yes \
-    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg >/dev/null 2>&1
+    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg >/dev/null 2>&1 || true
 
 echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
     | sudo tee /etc/apt/sources.list.d/vscodium.list >/dev/null
 
-sudo apt-get update -q
+sudo apt-get update -q || true
 sudo apt-get install -y codium || true
 
 # Google Antigravity AI n'est pas disponible publiquement comme paquet Linux.

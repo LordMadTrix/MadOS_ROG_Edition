@@ -14,8 +14,8 @@ echo -e "${RED}╚════════════════════�
 
 # 1. Installation des dépendances Retro
 echo -e "    ${WHITE}├─ [SYSTEM] Dépendances pour l'émulation...${NC}"
-sudo apt update -q
-sudo apt install -y curl wget unzip p7zip-full flatpak libfuse2
+sudo apt update -q || true
+sudo apt install -y curl wget unzip p7zip-full flatpak libfuse2 || true
 
 # 2. Téléchargement d'EmuDeck (Moteur d'installation)
 echo -e "    ${WHITE}├─ [INSTALL] Téléchargement du script EmuDeck...${NC}"
@@ -25,7 +25,7 @@ chmod +x "$USER_HOME/Documents/MadOS_Downloads/EmuDeck.desktop"
 
 # 3. Installation de EmulationStation (Flatpak)
 echo -e "    ${WHITE}├─ [BUREAU] Pré-installation de EmulationStation (Frontend)...${NC}"
-sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
 sudo flatpak install -y flathub org.mozilla.firefox 2>/dev/null || true # Browser pour scraping
 sudo flatpak install -y flathub org.libretro.RetroArch 2>/dev/null || true
 

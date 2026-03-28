@@ -238,7 +238,7 @@ class MadOSControlCenter(QMainWindow):
         
         bl.addWidget(self._pbtn("▶  Démarrer le Moteur IA", "mados ai start", "#2e7d32"))
         bl.addWidget(self._pbtn("💬  Ouvrir l'Interface de Chat Web", self._open_ai_url, "#0055cc"))
-        bl.addWidget(self._abtn("📋  Voir les Logs Diagnostic", "mados ai status", "#444"))
+        bl.addWidget(self._abtn("📋  Voir les Logs Diagnostic", "mados ai status"))
         
         lay.addWidget(box)
         lay.addStretch()

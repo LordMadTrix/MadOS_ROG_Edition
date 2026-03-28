@@ -23,7 +23,7 @@ echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 10 Installation du Son de Dém
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 sudo apt install -y sox libsox-fmt-all sound-theme-freedesktop >/dev/null 2>&1 || true
 
-AUTOSTART_DIR="/home/$REAL_USER/.config/autostart"
+AUTOSTART_DIR="$USER_HOME/.config/autostart"
 sudo -u "$REAL_USER" mkdir -p "$AUTOSTART_DIR"
 
 cat <<'EOF' | sudo -u "$REAL_USER" tee "$AUTOSTART_DIR/mados-login-sound.desktop" >/dev/null
@@ -37,5 +37,30 @@ Type=Application
 X-KDE-AutostartScript=true
 EOF
 
+    # ---- NOUVEAU : Salut Vocal IA ----
+    echo -e "    ${GRAY}├─ Injection de l'Accueil Vocal IA MadOS...${NC}"
+    sudo apt install -y speech-dispatcher 2>/dev/null || true
+    
+    # Script de bienvenue vocal
+    cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/Documents/mados_welcome.sh" >/dev/null
+#!/bin/bash
+sleep 5
+spd-say -v fr-fr -r -20 "MadOS 3.3 Engagé. Puissance au maximum. Bienvenue Maître \$(whoami)."
+EOF
+    sudo chmod +x "$USER_HOME/Documents/mados_welcome.sh" || true
+    
+    # Ajout au démarrage
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/autostart"
+    cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.config/autostart/mados-voice.desktop" >/dev/null
+[Desktop Entry]
+Type=Application
+Exec=bash $USER_HOME/Documents/mados_welcome.sh
+Hidden=false
+NoDisplay=false
+Name=MadOS Voice Greeting
+EOF
+    sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/autostart/mados-voice.desktop" || true
+
+    echo -e "    ${CYAN}✅ [SUCCÈS] Son de démarrage et Salut Vocal MadOS configurés.${NC}"
 echo -e "    ${GRAY}✅ [SUCCÈS] Effet audio d'ouverture de session ajouté.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 10 Terminée.${NC}"

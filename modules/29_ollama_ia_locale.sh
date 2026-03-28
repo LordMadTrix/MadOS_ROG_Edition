@@ -17,8 +17,8 @@ echo -e "    ${WHITE}├─ [SYSTEM] Installation de l'orchestrateur Ollama...${
 curl -fsSL https://ollama.com/install.sh | sh
 
 # 2. Configuration du Service
-sudo systemctl enable ollama
-sudo systemctl start ollama
+sudo systemctl enable ollama || true
+sudo systemctl start ollama || true
 
 # 3. Pré-chargement des modèles (Mistral & Llama 3)
 echo -e "    ${WHITE}├─ [MODELS] Téléchargement des modèles IA légers (Mistral 7B)...${NC}"

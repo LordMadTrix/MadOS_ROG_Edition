@@ -26,7 +26,7 @@ echo -e "${RED}╚════════════════════�
 echo -e "    ${GRAY}├─ Installation des dépendances systèmes (Node.js, Git)...${NC}"
 if ! command -v node >/dev/null 2>&1; then
     curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null 2>&1
-    sudo apt-get install -y nodejs
+    sudo apt-get install -y nodejs || true
 fi
 
 sudo apt-get install -y git build-essential || true
@@ -41,7 +41,7 @@ OC_DIR="$USER_HOME/OpenClaw"
 
 echo -e "    ${GRAY}├─ Clonage du dépôt OpenClaw...${NC}"
 if [ ! -d "$OC_DIR" ]; then
-    sudo -u "$REAL_USER" git clone --depth=1 https://github.com/openclaw/openclaw.git "$OC_DIR" >/dev/null 2>&1
+    sudo -u "$REAL_USER" git clone --depth=1 https://github.com/openclaw/openclaw.git "$OC_DIR" >/dev/null 2>&1 || true
 else
     echo -e "    ${GRAY}│  Le dossier existe déjà. Mise à jour via git pull...${NC}"
     sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && git pull" >/dev/null 2>&1 || true
@@ -159,7 +159,7 @@ while true; do
           google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
         fi
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     2)
@@ -167,7 +167,7 @@ while true; do
         clear
         cd "$HOME/OpenClaw" && node scripts/run-node.mjs tui
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     3)

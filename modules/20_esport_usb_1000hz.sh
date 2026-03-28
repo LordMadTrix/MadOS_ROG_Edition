@@ -30,8 +30,8 @@ ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
 ACTION=="add", SUBSYSTEM=="usb", TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
 EOF
 
-sudo udevadm control --reload-rules
-sudo udevadm trigger
+sudo udevadm control --reload-rules || true
+sudo udevadm trigger || true
 
 echo -e "    ${GRAY}├─ Injection d'un polling rate Kernel forcé...${NC}"
 # Optionnel : Sous certains OS/Kernel, le polling default est 125hz (souris standard).

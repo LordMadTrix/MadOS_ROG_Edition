@@ -27,17 +27,17 @@ echo -e "${RED}╚════════════════════�
 
 # 1. Droits USB (Crucial pour Klipper/LaserGRBL)
 echo -e "    ${WHITE}├─ [SYSTÈME] Configuration des accès ports USB / Séries (dialout, tty)...${NC}"
-sudo usermod -aG dialout "$REAL_USER"
-sudo usermod -aG tty "$REAL_USER"
+sudo usermod -aG dialout "$REAL_USER" || true
+sudo usermod -aG tty "$REAL_USER" || true
 sudo usermod -aG uucp "$REAL_USER" 2>/dev/null || true
 
 # 2. Utilitaires de base
 echo -e "    ${WHITE}├─ [PRÉREQUIS] Installation des bibliothèques de communication matérielle...${NC}"
-sudo apt install -y curl wget unzip p7zip-full python3 python3-pip python3-venv libfuse2 > /dev/null 2>&1
+sudo apt install -y curl wget unzip p7zip-full python3 python3-pip python3-venv libfuse2 > /dev/null 2>&1 || true
 
 # 3. Création du répertoire AppImages pour les outils Maker
 MAKER_DIR="$USER_HOME/Applications/Maker"
-sudo -u "$REAL_USER" mkdir -p "$MAKER_DIR"
+sudo -u "$REAL_USER" mkdir -p "$MAKER_DIR" || true
 
 # 4. Impression 3D (Gestion Globale : OrcaSlicer, Cura, PrusaSlicer)
 echo -e "    ${WHITE}├─ [IMPRESSION 3D] Installation des Slicers Majeurs (K1, Marlin, RepRap)...${NC}"
@@ -45,9 +45,9 @@ echo -e "    ${WHITE}├─ [IMPRESSION 3D] Installation des Slicers Majeurs (K1
 # OrcaSlicer (Klipper / K1)
 ORCA_URL=$(curl -s https://api.github.com/repos/SoftFever/OrcaSlicer/releases/latest | grep "browser_download_url.*Ubuntu.*\.AppImage\"" | cut -d '"' -f 4 | head -n 1)
 if [ -n "$ORCA_URL" ]; then
-    sudo -u "$REAL_USER" wget -q --show-progress "$ORCA_URL" -O "$MAKER_DIR/OrcaSlicer.AppImage"
-    sudo chmod +x "$MAKER_DIR/OrcaSlicer.AppImage"
-    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications"
+    sudo -u "$REAL_USER" wget -q --show-progress "$ORCA_URL" -O "$MAKER_DIR/OrcaSlicer.AppImage" || true
+    sudo chmod +x "$MAKER_DIR/OrcaSlicer.AppImage" || true
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications" || true
     cat << EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.local/share/applications/orcaslicer.desktop" > /dev/null
 [Desktop Entry]
 Name=OrcaSlicer (Rapide / Klipper)
@@ -67,9 +67,9 @@ fi
 # PrusaSlicer (Global / Très stable)
 PRUSA_URL=$(curl -s https://api.github.com/repos/prusa3d/PrusaSlicer/releases/latest | grep "browser_download_url.*linux-x64-GTK3.*\.AppImage\"" | cut -d '"' -f 4 | head -n 1)
 if [ -n "$PRUSA_URL" ]; then
-    sudo -u "$REAL_USER" wget -q --show-progress "$PRUSA_URL" -O "$MAKER_DIR/PrusaSlicer.AppImage"
-    sudo chmod +x "$MAKER_DIR/PrusaSlicer.AppImage"
-    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications"
+    sudo -u "$REAL_USER" wget -q --show-progress "$PRUSA_URL" -O "$MAKER_DIR/PrusaSlicer.AppImage" || true
+    sudo chmod +x "$MAKER_DIR/PrusaSlicer.AppImage" || true
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications" || true
     cat << EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.local/share/applications/prusaslicer.desktop" > /dev/null
 [Desktop Entry]
 Name=PrusaSlicer (Universel)
