@@ -36,43 +36,37 @@ echo "$GPU_INFO" | while read -r line; do
 done
 
 if echo "$GPU_INFO" | grep -iq "nvidia"; then
-    echo -e "\n    ${WHITE}├─ [NVIDIA] Puce dédiée détectée. Engage du protocole Propriétaire DKMS...${NC}"
-    
-    # Ajout du PPA officiel NVIDIA pour les pilotes très récents
-    if ! ls /etc/apt/sources.list.d/graphics-drivers-ubuntu-ppa-*.list &>/dev/null; then
-        sudo add-apt-repository ppa:graphics-drivers/ppa -y --no-update >/dev/null 2>&1 || true
-        sudo apt update -q || true
-    fi
+    # 1. Nettoyage préventif
+    echo -e "    ${YELLOW}├─ [CLEAN] Purge des installations NVIDIA existantes...${NC}"
+    sudo apt-get purge -y nvidia* 2>/dev/null || true
+    sudo apt-get autoremove -y >/dev/null 2>&1 || true
 
-    # Trouver le pilote recommandé via ubuntu-drivers
-    echo -e "    ${GRAY}├─ Recherche du dernier profil stable...${NC}"
+    # 2. Détection du meilleur pilote
+    echo -e "    ${GRAY}├─ Recherche du pilote recommandé...${NC}"
     if command -v ubuntu-drivers >/dev/null; then
-        # Capture strictly the driver name from lines containing 'recommended' and 'nvidia-driver'
         RECOMMENDED_DRIVER=$(ubuntu-drivers devices | grep 'recommended' | grep -o 'nvidia-driver-[0-9]*' | head -n 1)
-        if [ -z "$RECOMMENDED_DRIVER" ]; then
-            # Fallback for recent ROG models (RTX 40 series)
-            RECOMMENDED_DRIVER="nvidia-driver-560"
-        fi
+        [ -z "$RECOMMENDED_DRIVER" ] && RECOMMENDED_DRIVER="nvidia-driver-550"
     else
-        RECOMMENDED_DRIVER="nvidia-driver-550"
+        RECOMMENDED_DRIVER="nvidia-driver-535"
     fi
 
-    # Extraire la version (ex: 560) pour les outils
+    # Extraire la version
     DRIVER_VER=$(echo "$RECOMMENDED_DRIVER" | grep -o '[0-9]*$')
 
-    echo -e "    ${WHITE}├─ [INSTALL] Cible acquise : $RECOMMENDED_DRIVER (Version $DRIVER_VER)${NC}"
+    echo -e "    ${WHITE}├─ [INSTALL] Cible locale : $RECOMMENDED_DRIVER (Stable)${NC}"
     
-    # Installation avec support encodage (OBS/NVENC) et DKMS
-    if sudo apt install -y "$RECOMMENDED_DRIVER" dkms "nvidia-utils-$DRIVER_VER" libnvidia-encode-$DRIVER_VER 2>/dev/null || sudo apt install -y "$RECOMMENDED_DRIVER" dkms; then
-        echo -e "    ${GRAY}✅ [SUCCÈS] Pilotes NVIDIA $DRIVER_VER installes et compiles (DKMS).${NC}"
+    # Installation Standard
+    if sudo apt-get install -y "$RECOMMENDED_DRIVER" "nvidia-utils-$DRIVER_VER" libnvidia-encode-$DRIVER_VER 2>/dev/null; then
+        echo -e "    ${GRAY}✅ [SUCCÈS] Pilotes NVIDIA $DRIVER_VER installés.${NC}"
         
-        # Forcer le Modeset pour Wayland (KDE Plasma 6 exige Modeset)
-        echo -e "    ${GRAY}├─ Activation de NVIDIA DRM Modeset pour interface Wayland...${NC}"
+        # Activation DRM Modeset
+        echo -e "    ${GRAY}├─ Activation de NVIDIA DRM Modeset...${NC}"
         echo "options nvidia-drm modeset=1" | sudo tee /etc/modprobe.d/nvidia-modeset.conf >/dev/null
         sudo update-initramfs -u >/dev/null 2>&1 || true
     else
-        echo -e "    ${RED}❌ [ERREUR] ALERTE: Echec sur l'installation du pilote $RECOMMENDED_DRIVER${NC}"
+        echo -e "    ${RED}❌ [ERREUR] Échec installation $RECOMMENDED_DRIVER.${NC}"
     fi
+fi
 
 elif echo "$GPU_INFO" | grep -iq "amd\|radeon"; then
     echo -e "\n    ${WHITE}├─ [AMD] Architecture Radeon détectée. Engage des bibliothèques Mesa/Vulkan...${NC}"

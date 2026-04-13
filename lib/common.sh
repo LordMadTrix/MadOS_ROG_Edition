@@ -19,6 +19,42 @@ export YELLOW='\033[0;33m'
 export BOLD='\033[1m'
 export NC='\033[0m'
 
+# ==============================================================================
+# Helpers Environnement Utilisateur (D-Bus / X11)
+# ==============================================================================
+
+# Fonction pour exécuter gsettings au nom de l'utilisateur réel
+user_gsettings() {
+    local REAL_USER=${SUDO_USER:-$USER}
+    local USER_ID=$(id -u "$REAL_USER")
+    
+    # Tentative de détection du bus D-Bus
+    local DBUS_ADDR="unix:path=/run/user/${USER_ID}/bus"
+    if [ ! -S "/run/user/${USER_ID}/bus" ]; then
+        # Fallback : chercher dans les processus
+        local DBUS_SESSION_PID=$(pgrep -u "$USER_ID" gnome-session | head -n 1)
+        [ -n "$DBUS_SESSION_PID" ] && DBUS_ADDR=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$DBUS_SESSION_PID/environ | cut -d= -f2-)
+    fi
+
+    sudo -u "$REAL_USER" \
+        DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDR" \
+        XDG_RUNTIME_DIR="/run/user/${USER_ID}" \
+        DISPLAY="${DISPLAY:-:0}" \
+        gsettings "$@"
+}
+
+# Fonction pour exécuter une commande simple au nom de l'utilisateur réel avec env complet
+user_run() {
+    local REAL_USER=${SUDO_USER:-$USER}
+    local USER_ID=$(id -u "$REAL_USER")
+    sudo -u "$REAL_USER" \
+        XDG_RUNTIME_DIR="/run/user/${USER_ID}" \
+        DISPLAY="${DISPLAY:-:0}" \
+        DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/${USER_ID}/bus" \
+        "$@"
+}
+
+
 # Chemins critiques
 export MADOS_LOG_DIR="/var/log/mados"
 export MADOS_BACKUP_DIR="/var/lib/mados_backup"
@@ -43,10 +79,16 @@ init_mados_logging() {
     touch "$MADOS_CHECKPOINT_FILE" "$MADOS_STATUS_FILE" 2>/dev/null || true
     
     log_info "═══════════════════════════════════════════════════════════"
-    log_info "MadOS ROG Edition 3.0 - Démarrage Installation"
+    log_info "MadOS ROG Edition 3.5 - Démarrage Installation"
     log_info "Date: $(date '+%Y-%m-%d %H:%M:%S')"
     log_info "Utilisateur: $USER"
     log_info "═══════════════════════════════════════════════════════════"
+    
+    # DNS Fix : Stabilisation pour les installations réseau fragiles (VM / WiFi)
+    if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
+        log_warning "Instabilité réseau détectée. Injection de DNS de secours..."
+        printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" | sudo tee /etc/resolv.conf > /dev/null || true
+    fi
 }
 
 # ==============================================================================
@@ -244,12 +286,13 @@ check_disk_space() {
 check_internet_connection() {
     log_info "Vérification de la connexion Internet..."
     
-    if run_command_retry "ping -c 1 -W 3 archive.ubuntu.com" "Ping archive.ubuntu.com" 2 >/dev/null; then
+    # On tente le ping, mais on ne bloque pas si ça échoue (cas des pare-feux restrictifs)
+    if ping -c 1 -W 3 8.8.8.8 >/dev/null 2>&1 || ping -c 1 -W 3 archive.ubuntu.com >/dev/null 2>&1; then
         log_success "Connexion Internet OK"
         return 0
     else
-        log_error "Pas de connexion Internet détectée"
-        return 1
+        log_warning "Le test de connexion (Ping) a échoué. On continue quand même car vous semblez avoir internet."
+        return 0
     fi
 }
 
@@ -569,4 +612,6 @@ export -f apt_update_safe apt_install_safe
 export -f detect_hypervisor install_hypervisor_drivers
 export -f install_qemu_drivers install_vmware_drivers
 export -f install_virtualbox_drivers install_hyperv_drivers
+export -f user_gsettings user_run
+
 

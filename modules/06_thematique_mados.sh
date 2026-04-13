@@ -27,39 +27,31 @@ ASSETS_DIR="$PROJECT_ROOT/assets"
 # ==============================================================================
 # Choix du Thème (ROG / CYBER / CARBON)
 # ==============================================================================
-case "$MADOS_THEME" in
-    "CYBER")
-        THEME_COLOR='\033[1;35m' # Pink/Purp for Cyber
-        ZSH_LOGO_COLOR='\033[1;36m' # Cyan
-        WALLPAPER_NAME="MadCyber.png"
-        THEME_DESC="Cyberpunk Neon Edition"
-        ;;
-    "CARBON")
-        THEME_COLOR='\033[0;37m' # Gray
-        ZSH_LOGO_COLOR='\033[1;37m' # White
-        WALLPAPER_NAME="MadCarbon.png"
-        THEME_DESC="Carbon Stealth Edition"
-        ;;
-    *) # Default ROG
-        THEME_COLOR='\033[0;31m' # Red
-        ZSH_LOGO_COLOR='\033[1;31m' # Bold Red
-        WALLPAPER_NAME="MadRog.png"
-        THEME_DESC="Republic of Gamers Edition"
-        ;;
 esac
 
+# Détection de l'interface graphique (DE)
+export CURRENT_DE=$(user_run echo $XDG_CURRENT_DESKTOP | tr '[:upper:]' '[:lower:]')
+if [[ "$CURRENT_DE" == *"gnome"* ]]; then
+    MADOS_DE="GNOME"
+elif [[ "$CURRENT_DE" == *"kde"* ]] || [[ "$CURRENT_DE" == *"plasma"* ]]; then
+    MADOS_DE="KDE"
+else
+    MADOS_DE="UNKNOWN"
+fi
+
 echo -e "\n${THEME_COLOR}╔══════════════════════════════════════════════════════╗${NC}"
-echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 3.2 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
+echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 3.5 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
+echo -e "${THEME_COLOR}║${NC}   ${GRAY}Interface détectée : ${BOLD}$MADOS_DE${NC}                 ${THEME_COLOR}║${NC}"
 echo -e "${THEME_COLOR}╚══════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. OS Identity
 cat > /etc/os-release <<OSRELEASE
 NAME="MadOS ROG Edition"
-VERSION="3.2 (Ultimate)"
+VERSION="3.5 (Ultimate Stable)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="MadOS ROG Edition 3.2 ($THEME_DESC)"
-VERSION_ID="25.10"
+PRETTY_NAME="MadOS ROG Edition 3.5 ($THEME_DESC)"
+VERSION_ID="24.04"
 OSRELEASE
 
 echo "mados-rog" > /etc/hostname
@@ -113,22 +105,29 @@ POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 ZSHRC
 chown "$REAL_USER:$REAL_USER" "$USER_HOME/.zshrc"
 
-# 3. Wallpapers & SDDM
+# 3. Wallpapers
 echo -e "\n${THEME_COLOR}>>> ${WHITE}[3/5] ${BOLD}Intégration du Fond d'écran $WALLPAPER_NAME...${NC}"
 WALLPAPER_DIR="/usr/share/wallpapers/MadOS"
 sudo mkdir -p "$WALLPAPER_DIR"
 
+# Fallback links si les assets locaux manquent
+ROG_WALLPAPER_URL="https://raw.githubusercontent.com/T-Book/Wallpapers/master/ASUS_ROG_G751.jpg"
+
 if [ -f "$ASSETS_DIR/wallpapers/$WALLPAPER_NAME" ]; then
     sudo cp "$ASSETS_DIR/wallpapers/$WALLPAPER_NAME" "$WALLPAPER_DIR/default_wallpaper.png"
-    
-    # Sync sur SDDM
+else
+    echo -e "    ${GRAY}├─ Téléchargement du wallpaper ROG 4K de secours...${NC}"
+    sudo wget -q -O "$WALLPAPER_DIR/default_wallpaper.png" "$ROG_WALLPAPER_URL" || true
+fi
+
+# Application du wallpaper (KDE)
+if [ "$MADOS_DE" = "KDE" ]; then
     sudo mkdir -p /usr/share/sddm/themes/breeze/
     cat <<THEME_EOF | sudo tee /usr/share/sddm/themes/breeze/theme.conf.user > /dev/null
 [General]
 background=$WALLPAPER_DIR/default_wallpaper.png
 THEME_EOF
 
-    # Configurer l'application automatique du wallpaper pour la session KDE/GNOME
     sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.config/autostart"
     cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.config/autostart/set-wallpaper.desktop" >/dev/null
 [Desktop Entry]
@@ -139,6 +138,12 @@ NoDisplay=false
 Name=Set MadOS Wallpaper
 EOF
     sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/autostart/set-wallpaper.desktop"
+fi
+
+# Application du wallpaper (GNOME)
+if [ "$MADOS_DE" = "GNOME" ]; then
+    user_gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER_DIR/default_wallpaper.png"
+    user_gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER_DIR/default_wallpaper.png"
 fi
 
 # 4. GRUB Theme
@@ -192,9 +197,40 @@ if command -v papirus-folders &>/dev/null; then
     sudo papirus-folders -C red --theme Papirus-Dark 2>/dev/null || true
 fi
 
-# ---- SCULPTURE KDE (Mode 'Elite Gaming' / Windows-style) ----
-if command -v plasma-apply-lookandfeel &>/dev/null; then
-    echo -e "    ${GRAY}├─ Injection du Layout Plasma 6 (Barre en bas, Start menu)...${NC}"
+# ---- SCULPTURE BUREAU (GNOME & KDE) ----
+
+if [ "$MADOS_DE" = "GNOME" ]; then
+    echo -e "    ${GRAY}├─ Injection du Pack Transformation Win11 (GNOME)...${NC}"
+    
+    # 1. Désactiver le Dock Ubuntu
+    user_gsettings set org.gnome.shell.extensions.dash-to-dock autohide true 2>/dev/null || true
+    
+    # 2. Installer les extensions indispensables
+    INSTALLER_URL="https://raw.githubusercontent.com/brunelli/gnome-shell-extension-installer/master/gnome-shell-extension-installer"
+    wget -q "$INSTALLER_URL" -O /tmp/extension-installer
+    chmod +x /tmp/extension-installer
+    
+    # Dash to Panel (1160), ArcMenu (3628), Blur my Shell (3193)
+    user_run /tmp/extension-installer --yes 1160 3628 3193 || true
+    
+    # 3. Configuration Dash to Panel (Barre centrée)
+    user_gsettings set org.gnome.shell.extensions.dash-to-panel panel-position 'BOTTOM'
+    user_gsettings set org.gnome.shell.extensions.dash-to-panel taskbar-position 'CENTER'
+    user_gsettings set org.gnome.shell.extensions.dash-to-panel appicon-margin-bottom 2
+    user_gsettings set org.gnome.shell.extensions.dash-to-panel appicon-padding 4
+    
+    # 4. Configuration ArcMenu (Style Win11, bouton à GAUCHE comme demandé)
+    user_gsettings set org.gnome.shell.extensions.arcmenu menu-layout 'Windows 11'
+    user_gsettings set org.gnome.shell.extensions.arcmenu menu-button-appearance 'Icon'
+    user_gsettings set org.gnome.shell.extensions.arcmenu menu-button-icon 'Distro_Icon'
+    user_gsettings set org.gnome.shell.extensions.arcmenu arc-menu-placement 'Left'
+    
+    # 5. Thèmes & Icônes
+    user_gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark' # Fallback
+    user_gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
+    
+elif [ "$MADOS_DE" = "KDE" ]; then
+    echo -e "    ${GRAY}├─ Injection du Layout Plasma 6 (Elite Gaming)...${NC}"
     sudo -u "$REAL_USER" plasma-apply-lookandfeel -a org.kde.breezedark.desktop 2>/dev/null || true
     sudo -u "$REAL_USER" plasma-apply-colorscheme BreezeDark 2>/dev/null || true
 fi

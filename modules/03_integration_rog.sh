@@ -64,25 +64,44 @@ WIFI_PWR_ON_BAT=on
 EOF
 sudo systemctl enable tlp thermald 2>/dev/null || true
 
-# 3. ASUSCTL & SUPERGFXCTL via PPA (Plus rapide et stable)
+# 3. ASUSCTL & SUPERGFXCTL
 echo -e "\n    ${WHITE}├─ [ASUSCTL] Configuration des Dépôts Spécialisés ASUS-Linux...${NC}"
 
-# Ajout du PPA spécialisé pour asusctl/supergfxctl
+# Ajout du PPA Officiel
 sudo add-apt-repository ppa:lukas-moeller/asus-linux -y --no-update 2>/dev/null || true
 sudo apt update -q || true
 
 # Installation des outils officiels
 echo -e "    ${GRAY}├─ Déploiement asusctl, supergfxctl et control-center...${NC}"
 sudo apt install -y asusctl supergfxctl rog-control-center 2>/dev/null || {
-    echo -e "    ${YELLOW}⚠ Échec PPA - Envoi de la boucle de secours (Compilation)...${NC}"
-    # Fallback compilation si PPA indisponible (cas rare)
+    echo -e "    ${YELLOW}⚠ Échec PPA - Tentative de Compilation de Sauvetage...${NC}"
+    sudo apt install -y libudev-dev libfontconfig-dev libseat-dev libinput-dev libdbus-1-dev libxkbcommon-dev libgtk-3-dev pkg-config cmake clang libclang-dev || true
     if ! command -v cargo &>/dev/null; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y >/dev/null 2>&1
-        export PATH="$HOME/.cargo/bin:$PATH"
+        source "$HOME/.cargo/env"
     fi
-    # [Logique de backup ici si besoin, mais on privilégie le PPA]
+    
+    BUILD_DIR="/tmp/mados-asus-build"
+    mkdir -p "$BUILD_DIR" && cd "$BUILD_DIR"
+    
+    # asusctl compile
+    echo -e "    ${GRAY}├─ Compilation de asusctl...${NC}"
+    git clone --depth 1 https://gitlab.com/asus-linux/asusctl.git && cd asusctl
+    cargo build --release --locked && sudo make install PREFIX=/usr || true
+    cd ..
+    
+    # supergfxctl compile
+    echo -e "    ${GRAY}├─ Compilation de supergfxctl...${NC}"
+    git clone --depth 1 https://gitlab.com/asus-linux/supergfxctl.git && cd supergfxctl
+    cargo build --release --locked && sudo make install || true
 }
-    sudo systemctl daemon-reload || true
+sudo systemctl daemon-reload || true
+
+# 4. OpenRGB Integration
+echo -e "\n    ${WHITE}├─ [OPENRGB] Installation du contrôleur LED universel...${NC}"
+sudo add-apt-repository ppa:th337/openrgb -y --no-update 2>/dev/null || true
+sudo apt update -q || true
+sudo apt install -y openrgb 2>/dev/null || echo -e "    ${YELLOW}⚠ Échec installation OpenRGB.${NC}"
     
     # ---- NOUVEAU : Script RGB Dynamique (Réaction Température) ----
     echo -e "    ${GRAY}├─ Injection du Moniteur RGB Réactif (ASUS ROG)...${NC}"
