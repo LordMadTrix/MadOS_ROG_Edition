@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 16_zram_memoire.sh
+# MadOS ROG Edition 4.0 - 16_zram_memoire.sh
 # ==============================================================================
 # Phase: 16 - Compression Mémoire (ZRAM zstd)
 # ==============================================================================
@@ -13,11 +13,14 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 16 Configuration ZRAM (Compression Mémoire Ultra-Rapide)${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 16 : Configuration ZRAM v4.0 (Compression ZSTD)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 sudo apt-get update -q >/dev/null 2>&1 || true
@@ -45,7 +48,7 @@ EOF
 
 sudo sysctl --system >/dev/null 2>&1 || true
 
-sudo systemctl restart zramsetup >/dev/null 2>&1 || true
+sudo systemctl restart zramswap >/dev/null 2>&1 || sudo systemctl restart zram-config >/dev/null 2>&1 || true
 
 echo -e "    ${CYAN}✅ [SUCCÈS] Service ZRAM opérationnel. Durée de vie du SSD préservée et fluidité RAM assurée.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 16 Terminée.${NC}"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 36_obs_nvenc_streaming.sh
+# MadOS ROG Edition 4.0 - 36_obs_nvenc_streaming.sh
 # ==============================================================================
 # Phase: 36 - OBS Streamer-Ready (Pack Performance RTX NVENC)
 # ==============================================================================
@@ -8,10 +8,20 @@
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+
 export DEBIAN_FRONTEND=noninteractive
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🎥 ${WHITE}${BOLD}Phase 36 Déploiement du Pack Streaming MadOS (Pack OBS RTX)${NC}"
+echo -e "${RED}║${NC} 🎥 ${WHITE}${BOLD}Phase 36 : Déploiement du Pack Streaming MadOS v4.0 (Pack OBS RTX)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Installation de OBS Studio
@@ -64,7 +74,6 @@ EOF
 
 # 3. Création du raccourci Bureau MadStream
 echo -e "    ${WHITE}├─ [UI] Création de l'icône 'MadStream' sur le Bureau...${NC}"
-    # S'assurer que le dossier des raccourcis existe
     sudo -u "$REAL_USER" mkdir -p "$USER_HOME/.local/share/applications"
     cat << EOF | sudo -u "$REAL_USER" tee "$USER_HOME/.local/share/applications/MadStream_OBS.desktop" > /dev/null
 [Desktop Entry]
@@ -76,10 +85,14 @@ Terminal=false
 Type=Application
 Categories=AudioVideo;Recorder;
 EOF
-chmod +x "$USER_HOME/Desktop/MadStream_OBS.desktop" 2>/dev/null || true
+    sudo -u "$REAL_USER" mkdir -p "$USER_HOME/Desktop" "$USER_HOME/Bureau" 2>/dev/null || true
+    cp "$USER_HOME/.local/share/applications/MadStream_OBS.desktop" "$USER_HOME/Desktop/" 2>/dev/null || true
+    cp "$USER_HOME/.local/share/applications/MadStream_OBS.desktop" "$USER_HOME/Bureau/" 2>/dev/null || true
+    chmod +x "$USER_HOME/Desktop/MadStream_OBS.desktop" "$USER_HOME/Bureau/MadStream_OBS.desktop" 2>/dev/null || true
 
 if command -v gio &>/dev/null; then
-    sudo -u "$REAL_USER" gio set "$USER_HOME/Desktop/MadStream_OBS.desktop" metadata::trusted true
+    sudo -u "$REAL_USER" gio set "$USER_HOME/Desktop/MadStream_OBS.desktop" metadata::trusted true 2>/dev/null || true
+    sudo -u "$REAL_USER" gio set "$USER_HOME/Bureau/MadStream_OBS.desktop" metadata::trusted true 2>/dev/null || true
 fi
 
 echo -e "    ${CYAN}✅ [SUCCÈS] OBS Studio est configuré en mode 'E-Sport Stream'. Votre RTX est prête à diffuser !${NC}"

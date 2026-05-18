@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 33_mad_center_gui.sh
+# MadOS ROG Edition 4.0 - 33_mad_center_gui.sh
 # ==============================================================================
 # Phase: 33 - MadCenter GUI (Python Control Dashboard)
 # ==============================================================================
@@ -8,8 +8,18 @@
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🎨 ${WHITE}${BOLD}Phase 33 Déploiement du MadCenter ROG Dashboard (Interface GUI)${NC}"
+echo -e "${RED}║${NC} 🎨 ${WHITE}${BOLD}Phase 33 : Déploiement du MadCenter ROG Dashboard v4.0 (Interface GUI)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Installation des dépendances Python/Qt (Moteur Premium)
@@ -25,10 +35,18 @@ sudo ln -sf /usr/lib/x86_64-linux-gnu/libxcb-cursor.so.0 /usr/lib/x86_64-linux-g
 # 2. Déploiement du script Premium MadOS Control Center
 echo -e "    ${WHITE}├─ [CODE] Déploiement du MadOS Control Center Premium...${NC}"
 sudo mkdir -p /opt/mados-control-center
+
+# Définition du chemin des sources
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC_ASSETS="$SCRIPT_DIR/../assets"
+
 # On essaie de copier depuis les assets si disponibles, sinon on créé un placeholder fonctionnel
-if [ -f "/mnt/hgfs/mados/assets/mados_cc.py" ]; then
-    sudo cp /mnt/hgfs/mados/assets/mados_cc.py /opt/mados-control-center/mados_cc.py
-    sudo cp /mnt/hgfs/mados/assets/logo.png /opt/mados-control-center/icon.png
+if [ -f "$SRC_ASSETS/mados_cc.py" ]; then
+    sudo cp "$SRC_ASSETS/mados_cc.py" /opt/mados-control-center/mados_cc.py || true
+    sudo cp "$SRC_ASSETS/logo.png" /opt/mados-control-center/icon.png 2>/dev/null || true
+elif [ -f "/opt/mados-rog/assets/mados_cc.py" ]; then
+    sudo cp "/opt/mados-rog/assets/mados_cc.py" /opt/mados-control-center/mados_cc.py || true
+    sudo cp "/opt/mados-rog/assets/logo.png" /opt/mados-control-center/icon.png 2>/dev/null || true
 else
     # Si les assets sont absents pendant cette phase, on s'assure que le dossier existe pour plus tard
     sudo touch /opt/mados-control-center/README.txt
@@ -41,21 +59,16 @@ cat <<EOF > /tmp/MadOS.desktop
 Type=Application
 Name=MadOS Control Center
 Comment=Interface ROG pour MadOS
-Exec=sudo python3 /opt/mados-control-center/mados_cc.py
+Exec=python3 /opt/mados-control-center/mados_cc.py
 Icon=/opt/mados-control-center/icon.png
-Terminal=true
+Terminal=false
+StartupNotify=false
 Categories=System;Game;
 EOF
 
-# Copie sur "Desktop" et "Bureau" pour compatibilité FR/EN
-for d in "Desktop" "Bureau" "bureau" "desktop"; do
-    if [ -d "$USER_HOME/$d" ]; then
-        sudo cp /tmp/MadOS.desktop "$USER_HOME/$d/MadOS.desktop"
-        sudo chown "$REAL_USER":"$REAL_USER" "$USER_HOME/$d/MadOS.desktop"
-        chmod +x "$USER_HOME/$d/MadOS.desktop"
-        sudo -u "$REAL_USER" gio set "$USER_HOME/$d/MadOS.desktop" metadata::trusted true 2>/dev/null || true
-    fi
-done
+# Ne pas créer de raccourci ici : module 23 crée déjà MadOS_Control_Center.desktop
+# (évite le doublon sur le bureau)
+rm -f /tmp/MadOS.desktop 2>/dev/null || true
 
 echo -e "    ${CYAN}✅ [SUCCÈS] MadCenter Dashboard Premium est déployé.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 33 Terminée.${NC}"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 28_mados_cli.sh
+# MadOS ROG Edition 4.0 - 28_mados_cli.sh
 # ==============================================================================
 # Phase: 28 - Installation du Wrapper CLI 'mados'
 # ==============================================================================
@@ -9,10 +9,14 @@
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
 BOLD='\033[1m'
+NC='\033[0m'
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 28 Déploiement de l'Utilitaire CLI 'mados'${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 28 : Déploiement de l'Utilitaire CLI 'mados' v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Détection des sources
@@ -33,6 +37,7 @@ if [ -f "$TOOLS_DIR/mados.sh" ]; then
     sudo cp -r "$PROJECT_ROOT/modules" /opt/mados-rog/ 2>/dev/null || true
     sudo cp -r "$PROJECT_ROOT/lib" /opt/mados-rog/ 2>/dev/null || true
     sudo cp -r "$PROJECT_ROOT/assets" /opt/mados-rog/ 2>/dev/null || true
+    sudo cp "$PROJECT_ROOT/VERSION" /opt/mados-rog/VERSION 2>/dev/null || true
     
     echo -e "    ${GRAY}├─ Configuration des alias système...${NC}"
     REAL_USER=${SUDO_USER:-$USER}
@@ -42,7 +47,7 @@ if [ -f "$TOOLS_DIR/mados.sh" ]; then
     for rc in ".bashrc" ".zshrc"; do
         if [ -f "$USER_HOME/$rc" ]; then
             if ! grep -q "alias mados=" "$USER_HOME/$rc"; then
-                echo "alias mados='sudo /usr/local/bin/mados'" | sudo -u "$REAL_USER" tee -a "$USER_HOME/$rc" > /dev/null
+                echo "alias mados='/usr/local/bin/mados'" | sudo -u "$REAL_USER" tee -a "$USER_HOME/$rc" > /dev/null
             fi
         fi
     done

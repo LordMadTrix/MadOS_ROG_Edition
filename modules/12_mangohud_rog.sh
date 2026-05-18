@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 12_mangohud_rog.sh
+# MadOS ROG Edition 4.0 - 12_mangohud_rog.sh
 # ==============================================================================
 # Phase: 12 - Profil MangoHud ROG & GOverlay
 # ==============================================================================
@@ -13,11 +13,15 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 REAL_USER=${SUDO_USER:-$USER}
+USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 12 Génération du Profil MangoHud ROG Edition${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 12 : Génération du Profil MangoHud ROG Edition v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Installation de GOverlay si non présent

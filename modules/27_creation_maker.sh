@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 27_creation_maker.sh
+# MadOS ROG Edition 4.0 - 27_creation_maker.sh
 # ==============================================================================
 # Phase: 27 - Station Maker & IA
 # Intègre OrcaSlicer (Creality K1), LaserWeb (TwoTrees TTS) et optimise l'IA OpenClaw
@@ -15,6 +15,9 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -22,7 +25,7 @@ REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 27 Station Maker (Imprimante 3D & Graveur Laser)                 ${NC}${RED}║${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 27 : Station Maker v4.0 (3D & Laser)                             ${NC}${RED}║${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Droits USB (Crucial pour Klipper/LaserGRBL)

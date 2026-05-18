@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 25_sante_systeme.sh
+# MadOS ROG Edition 4.0 - 25_sante_systeme.sh
 # ==============================================================================
 # Phase: 25 - Diagnostic Santé Système MadOS
 # ==============================================================================
@@ -14,6 +14,9 @@ GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 # Thème Whiptail MadOS
 export NEWT_COLORS='
@@ -38,7 +41,7 @@ REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 25 Diagnostic Santé du Système MadOS${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 25 : Diagnostic Santé du Système MadOS v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 REPORT_FILE="/tmp/mados_health_$(date +%Y%m%d_%H%M%S).txt"
@@ -53,7 +56,7 @@ check_fail() { echo -e "    ${RED}✗ $1${NC}"; ((TOTAL++)); WARNINGS+="  - ✗ 
 # En-tête du rapport
 cat > "$REPORT_FILE" << HEADER
 =======================================================
-  MadOS ROG Edition — Rapport de Santé Système
+  MadOS ROG Edition 4.0 — Rapport de Santé Système
   Date : $(date '+%d/%m/%Y %H:%M')
   Machine : $(hostname) | Utilisateur : $REAL_USER
 =======================================================
@@ -74,7 +77,7 @@ echo -e "\n    ${GRAY}━━━━━━━━━━━━━━━━━━━�
 echo -e "    ${CYAN}[2/6] Interface Graphique${NC}"
 echo -e "    ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 if command -v plasmashell &>/dev/null; then
-    PLASMA_VER=$(plasmashell --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1)
+    PLASMA_VER=$(plasmashell --version 2>/dev/null | grep -oP '\d+(\.\d+)+' | head -1)
     echo "Plasma : $PLASMA_VER" >> "$REPORT_FILE"
     check_ok "KDE Plasma détecté (v$PLASMA_VER)"
 else
@@ -132,6 +135,7 @@ echo "" >> "$REPORT_FILE"
 echo "Score : $SCORE / $TOTAL" >> "$REPORT_FILE"
 [ -n "$WARNINGS" ] && echo -e "\nAvertissements :\n$WARNINGS" >> "$REPORT_FILE"
 
+[ "$TOTAL" -eq 0 ] && TOTAL=1
 PERCENT=$(( SCORE * 100 / TOTAL ))
 
 echo ""
@@ -174,9 +178,13 @@ echo -e "\n    ${WHITE}${BOLD}╔═══════════════�
 echo -e "    ${WHITE}${BOLD}║  VOTRE RÉSULTAT MAD-OS : ${CYAN}$TOTAL_SCORE / 100${NC}               ${WHITE}${BOLD}║${NC}"
 echo -e "    ${WHITE}${BOLD}╚═════════════════════════════════════════════════════╝${NC}"
 
-# Proposer d'afficher le rapport complet
-whiptail --title "MadOS 3.3 - 🏥 Diagnostic & Benchmark" \
-    --yesno "Score Global : $TOTAL_SCORE/100 (Santé: $PERCENT%)\n\nVoulez-vous consulter le rapport détaillé ?" 12 55 && \
-    whiptail --title "MadOS 3.3 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
+# En mode installation batch : pas de dialog interactif, juste le résumé en log
+if [ "${MADOS_BATCH_MODE:-false}" = "true" ]; then
+    echo -e "    ${CYAN}Rapport sauvegardé : $REPORT_FILE${NC}"
+else
+    whiptail --title "MadOS 4.0 - Diagnostic & Benchmark" \
+        --yesno "Score Global : $TOTAL_SCORE/100 (Santé: $PERCENT%)\n\nVoulez-vous consulter le rapport détaillé ?" 12 55 && \
+        whiptail --title "MadOS 4.0 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
+fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 25 Terminée.${NC}"

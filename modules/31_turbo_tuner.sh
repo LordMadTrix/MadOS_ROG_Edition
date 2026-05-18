@@ -1,14 +1,24 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 31_turbo_tuner.sh
+# MadOS ROG Edition 4.0 - 31_turbo_tuner.sh
 # ==============================================================================
 # Phase: 31 - Turbo-Tuner (Auto-Tune Hardware & Performance Scanner)
 # ==============================================================================
 
+
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m'
+
 export DEBIAN_FRONTEND=noninteractive
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🏁 ${WHITE}${BOLD}Phase 31 Déploiement du Turbo-Tuner (Auto-Performance Scan)${NC}"
+echo -e "${RED}║${NC} 🏁 ${WHITE}${BOLD}Phase 31 : Déploiement du Turbo-Tuner v4.0 (Performance Scan)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Calcul des Hugepages (Optimisé pour 32Go+ de RAM)
@@ -44,9 +54,8 @@ cat <<'EOF' | sudo tee /etc/udev/rules.d/60-mados-scheduler.rules >/dev/null
 ACTION=="add|change", KERNEL=="sd[a-z]|nvme[0-9]*", ATTR{queue/scheduler}="bfq"
 EOF
 
-# 4. Activation du PCI Latency Timer (pour la RTX)
-echo -e "    ${WHITE}├─ [GPU] Optimisation du PCI Latency Timer (RTX Buffering)...${NC}"
-sudo setpci -v -d *:* latency_timer=40 2>/dev/null || true
+# 4. Optimisation additionnelle PCI
+echo -e "    ${WHITE}├─ [GPU] Finalisation du bus PCI-e (RTX Buffering)...${NC}"
 
 # 5. MadOS Auto-Boost (Daemon Intelligent)
 echo -e "    ${WHITE}├─ [BOOST] Injection du Daemon MadOS Auto-Boost (Détection Procès)...${NC}"

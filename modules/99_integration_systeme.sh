@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 99_integration_systeme.sh
+# MadOS ROG Edition 4.0 - 99_integration_systeme.sh
 # ==============================================================================
 # Phase: 99 - Finalisation & Intégration Permanente
 # Rend l'installateur disponible via commande globale et nettoie l'OOBE.
@@ -12,9 +12,13 @@
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 GRAY='\033[0;37m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m'
 
 echo -e "\n${CYAN}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║${NC} 🔧 ${WHITE}${BOLD}Phase 99 Intégration Permanente au Système${NC}"
+echo -e "${CYAN}║${NC} 🔧 ${WHITE}${BOLD}Phase 99 : Intégration Permanente au Système v4.0${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 REAL_USER=${SUDO_USER:-$USER}
@@ -38,9 +42,10 @@ cat <<EOF > "$USER_HOME/Desktop/MadOS-Installer.desktop"
 Type=Application
 Name=MadOS Installer
 Comment=Relancer l'installateur MadOS
-Exec=gnome-terminal -- bash -c "mados-install"
+Exec=x-terminal-emulator -e bash -c "mados-install; read"
 Icon=utilities-terminal
 Terminal=false
+StartupNotify=false
 Categories=System;
 EOF
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 11_batterie_extreme.sh
+# MadOS ROG Edition 4.0 - 11_batterie_extreme.sh
 # ==============================================================================
-# Phase: 11 - Batterie Extrême (auto-cpufreq)
+# Phase: 11 - Batterie Extrême v4.0 (auto-cpufreq)
 # ==============================================================================
 
 # ==============================================================================
@@ -13,15 +13,32 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 11 Installation du gestionnaire Batterie Extrême${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 11 : Installation du gestionnaire Batterie Extrême v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
+# Détection VM — pas de batterie en VM
+_VIRT=$(systemd-detect-virt 2>/dev/null || echo "none")
+if [ "$_VIRT" != "none" ] && [ "$_VIRT" != "" ]; then
+    echo -e "    ${YELLOW}⚠️  [VM DÉTECTÉE : $_VIRT] Pas de batterie en VM — module ignoré.${NC}"
+    echo -e "\n    ${GREEN}✅ PHASE 11 : Skip VM — OK.${NC}\n"
+    exit 0
+fi
+
 # 1. Résolution des conflits système
-# Sur Ubuntu 24/25, power-profiles-daemon empêche auto-cpufreq de fonctionner correctement.
+# auto-cpufreq et power-profiles-daemon sont incompatibles.
+# Si asusctl est présent, il nécessite power-profiles-daemon → on laisse PPD et on skip auto-cpufreq.
+if command -v asusctl >/dev/null 2>&1; then
+    echo -e "    ${YELLOW}⚠️  asusctl détecté : power-profiles-daemon conservé (requis par asusctl). Module ignoré.${NC}"
+    echo -e "    ${WHITE}✅ [SKIP] Phase 11 ignorée (ROG matériel natif).${NC}"
+    exit 0
+fi
 echo -e "    ${GRAY}├─ Suppression des conflits (power-profiles-daemon)...${NC}"
 sudo systemctl disable --now power-profiles-daemon 2>/dev/null || true
 sudo apt purge -y power-profiles-daemon 2>/dev/null || true
@@ -30,8 +47,8 @@ sudo apt purge -y power-profiles-daemon 2>/dev/null || true
 if ! command -v auto-cpufreq >/dev/null 2>&1; then
     echo -e "    ${WHITE}├─ [DOWNLOAD] Recuperation du moteur auto-cpufreq...${NC}"
     TEMP_DIR=$(mktemp -d)
-    if git clone --depth=1 https://github.com/AdnanHodzic/auto-cpufreq.git "$TEMP_DIR" >/dev/null 2>&1; then
-        cd "$TEMP_DIR" && sudo ./auto-cpufreq-installer --install >/dev/null 2>&1
+    if timeout 120 git clone --depth=1 https://github.com/AdnanHodzic/auto-cpufreq.git "$TEMP_DIR" >/dev/null 2>&1; then
+        ( cd "$TEMP_DIR" && sudo ./auto-cpufreq-installer --install ) >/dev/null 2>&1 || true
         rm -rf "$TEMP_DIR"
     fi
 fi
@@ -39,7 +56,7 @@ fi
 if command -v auto-cpufreq >/dev/null 2>&1; then
     # On force la configuration initiale
     sudo auto-cpufreq --install >/dev/null 2>&1 || true
-    sudo systemctl enable --now auto-cpufreq >/dev/null 2>&1
+    sudo systemctl enable --now auto-cpufreq >/dev/null 2>&1 || true
     echo -e "    ${GREEN}✅ [SUCCÈS] auto-cpufreq est operationnel et le conflit power-profiles est regle.${NC}"
 else
     echo -e "    ${RED}❌ [ERREUR] Impossible d'installer le moteur de batterie.${NC}"

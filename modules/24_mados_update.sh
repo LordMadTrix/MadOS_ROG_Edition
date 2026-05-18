@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 24_mados_update.sh
+# MadOS ROG Edition 4.0 - 24_mados_update.sh
 # ==============================================================================
 # Phase: 24 - Mise à jour automatique MadOS
 # ==============================================================================
@@ -13,6 +13,9 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -21,7 +24,7 @@ INSTALL_DIR="/tmp/mados_update_$(date +%s)"
 REPO_URL="https://github.com/LordMadTrix/MadOS_ROG_Edition.git"
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 24 Mise à jour de MadOS ROG Edition${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 24 : Mise à jour de MadOS ROG Edition v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 echo -e "    ${GRAY}├─ Vérification de la connexion internet...${NC}"
@@ -40,7 +43,7 @@ fi
 
 CURRENT_SCRIPT="/tmp/mados_install_bootstrap"
 NEW_VERSION_FILE="$INSTALL_DIR/VERSION"
-CURRENT_VERSION_FILE="/opt/mados/VERSION"
+CURRENT_VERSION_FILE="/opt/mados-rog/VERSION"
 
 # Comparer les versions si le fichier existe
 if [ -f "$NEW_VERSION_FILE" ] && [ -f "$CURRENT_VERSION_FILE" ]; then
@@ -55,10 +58,18 @@ if [ -f "$NEW_VERSION_FILE" ] && [ -f "$CURRENT_VERSION_FILE" ]; then
 fi
 
 echo -e "    ${GRAY}├─ Application des permissions...${NC}"
-sudo chmod +x "$INSTALL_DIR/install_local.sh" "$INSTALL_DIR/modules/"*.sh || true
+sudo chmod +x "$INSTALL_DIR/install.sh" "$INSTALL_DIR/modules/"*.sh || true
+
+# En mode installation batch : juste apt upgrade, pas de menu interactif
+if [ "${MADOS_BATCH_MODE:-false}" = "true" ]; then
+    echo -e "    ${GRAY}├─ Mode installation : apt upgrade silencieux...${NC}"
+    sudo apt-get upgrade -y -qq 2>/dev/null || true
+    echo -e "    ${GREEN}✅ Mise à jour silencieuse effectuée.${NC}"
+    exit 0
+fi
 
 # Demander quels modules relancer
-CHOICE=$(whiptail --title "MadOS 3.0 - 🔄 Update Launcher" --menu \
+CHOICE=$(whiptail --title "MadOS 4.0 - Update Launcher" --menu \
     "Quelle mise à jour souhaitez-vous appliquer ?" 18 65 5 \
     "1" "Mise à jour Totale (tous les modules)" \
     "2" "Mise à jour Sélective (choisir les modules)" \
@@ -68,11 +79,11 @@ CHOICE=$(whiptail --title "MadOS 3.0 - 🔄 Update Launcher" --menu \
 case "$CHOICE" in
     1)
         echo -e "    ${WHITE}▶ Lancement de la mise à jour totale...${NC}"
-        cd "$INSTALL_DIR" && sudo bash install_local.sh
+        cd "$INSTALL_DIR" && sudo bash install.sh
         ;;
     2)
         echo -e "    ${WHITE}▶ Lancement du menu sélectif...${NC}"
-        cd "$INSTALL_DIR" && sudo bash install_local.sh
+        cd "$INSTALL_DIR" && sudo bash install.sh
         ;;
     3)
         echo -e "    ${GRAY}├─ Mise à jour des paquets système...${NC}"

@@ -2,14 +2,11 @@ import sys
 import subprocess
 import threading
 import os
-import json
-import re
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QStackedWidget,
-                             QMessageBox, QTextEdit, QProgressBar, QFrame, QLineEdit,
-                             QScrollArea, QGraphicsDropShadowEffect)
-from PyQt6.QtGui import QFont, QColor, QPalette, QLinearGradient, QBrush, QIcon
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QObject, QSize
+                             QTextEdit, QFrame, QScrollArea)
+
+from PyQt6.QtCore import QTimer, pyqtSignal
 
 # ── Style de Base (Premium Cyberpunk) ─────────────────────────────────────────
 STYLE_CYBER = """
@@ -302,13 +299,11 @@ class MadOSControlCenter(QMainWindow):
         self.log_signal.emit(f"<span style='color:#e8003d'>$ {cmd}</span>")
         def _worker():
             try:
-                # Si la commande est sudo, on tente pkexec pour l'UI, ou bash -c
-                final_cmd = cmd
-                if "sudo " in cmd:
-                    final_cmd = cmd.replace("sudo ", "pkexec ")
-                
-                out = subprocess.check_output(final_cmd, shell=True, stderr=subprocess.STDOUT, text=True, timeout=60)
-                self.log_signal.emit(f"<span style='color:#00ff88'>{out.strip()[:2000]}</span>")
+                final_cmd = cmd.replace("sudo ", "pkexec ") if "sudo " in cmd else cmd
+                with subprocess.Popen(final_cmd, shell=True, stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT, text=True) as proc:
+                    for line in proc.stdout:
+                        self.log_signal.emit(f"<span style='color:#00ff88'>{line.rstrip()}</span>")
             except Exception as e:
                 self.log_signal.emit(f"<span style='color:#ff4444'>ERREUR: {str(e)[:500]}</span>")
         threading.Thread(target=_worker, daemon=True).start()

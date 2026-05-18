@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 14_openclaw_ai.sh
+# MadOS ROG Edition 4.0 - 14_openclaw_ai.sh
 # ==============================================================================
 # Phase: 14 - Assistant IA OpenClaw
 # ==============================================================================
@@ -13,6 +13,9 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -20,12 +23,12 @@ REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 14 Déploiement Automatique de l'IA OpenClaw${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 14 : Déploiement Automatique de l'IA OpenClaw v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 echo -e "    ${GRAY}├─ Installation des dépendances systèmes (Node.js, Git)...${NC}"
 if ! command -v node >/dev/null 2>&1; then
-    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null 2>&1
+    curl -fsSL https://deb.nodesource.com/setup_23.x | sudo -E bash - >/dev/null 2>&1
     sudo apt-get install -y nodejs || true
 fi
 
@@ -33,19 +36,27 @@ sudo apt-get install -y git build-essential || true
 
 echo -e "    ${GRAY}├─ [INTELLIGENCE LOCALE] Installation du moteur Ollama...${NC}"
 if ! command -v ollama >/dev/null 2>&1; then
-    curl -fsSL https://ollama.com/install.sh | sudo -E bash - >/dev/null 2>&1
+    timeout 180 curl -fsSL --max-time 60 https://ollama.com/install.sh | sudo -E bash - >/dev/null 2>&1 || true
     sudo systemctl enable --now ollama >/dev/null 2>&1 || true
 fi
 
 OC_DIR="$USER_HOME/OpenClaw"
+sudo -u "$REAL_USER" mkdir -p "$OC_DIR"
 
-echo -e "    ${GRAY}├─ Clonage du dépôt OpenClaw...${NC}"
-if [ ! -d "$OC_DIR" ]; then
-    sudo -u "$REAL_USER" git clone --depth=1 https://github.com/openclaw/openclaw.git "$OC_DIR" >/dev/null 2>&1 || true
-else
-    echo -e "    ${GRAY}│  Le dossier existe déjà. Mise à jour via git pull...${NC}"
-    sudo -u "$REAL_USER" bash -c "cd '$OC_DIR' && git pull" >/dev/null 2>&1 || true
-fi
+echo -e "    ${GRAY}├─ Création du script OpenClaw local (IA Ollama)...${NC}"
+# OpenClaw = interface IA locale basée sur Ollama
+cat > "$OC_DIR/openclaw.sh" << 'OCEOF'
+#!/bin/bash
+echo -e "\033[0;31m╔══════════════════════════════════════════╗\033[0m"
+echo -e "\033[0;31m║\033[0m  \033[1;37mOpenClaw IA — MadOS ROG Edition\033[0m"
+echo -e "\033[0;31m╚══════════════════════════════════════════╝\033[0m"
+BEST=$(ollama list 2>/dev/null | tail -n +2 | awk '{print $1}' | grep -v "^$" | head -1)
+[ -z "$BEST" ] && echo "Ollama non trouvé." && exit 1
+echo -e "Modèle : \033[0;36m$BEST\033[0m  (Ctrl+D pour quitter)\n"
+ollama run "$BEST"
+OCEOF
+sudo chmod +x "$OC_DIR/openclaw.sh"
+sudo chown -R "$REAL_USER:$REAL_USER" "$OC_DIR"
 
 echo -e "    ${GRAY}├─ Configuration du cerveau IA (.env)...${NC}"
 cat <<ENV_EOF | sudo -u "$REAL_USER" tee "$OC_DIR/.env" >/dev/null
@@ -53,7 +64,7 @@ ALLOW_LOCAL_SHELL=true
 AUTO_APPROVE_SAFE_COMMANDS=true
 gateway.mode=local
 gateway.models.local=ollama
-DEFAULT_SYSTEM_PROMPT="Vous êtes OpenClaw, l'Intelligence Artificielle intégrée au noyau de MadOS ROG Edition (V3.0), un système Linux extrême forgé par LordMadTrix. Vous avez un accès direct au terminal. Votre but est d'assister le joueur dans l'optimisation E-Sport, le débogage système, et la gestion du hardware ASUS. Soyez analytique, direct, et répondez toujours en français avec un ton d'ingénierie tactique."
+DEFAULT_SYSTEM_PROMPT="Vous êtes OpenClaw, l'Intelligence Artificielle intégrée au noyau de MadOS ROG Edition (V4.0 NTSYNC Edition), un système Linux extrême forgé par LordMadTrix. Vous avez un accès direct au terminal. Votre but est d'assister le joueur dans l'optimisation E-Sport, le débogage système, et la gestion du hardware ASUS. Soyez analytique, direct, et répondez toujours en français avec un ton d'ingénierie tactique."
 ENV_EOF
 
 echo -e "    ${GRAY}├─ Compilation de l'IA (pnpm install & build) - Cela peut prendre 1 à 5 minutes selon le CPU...${NC}"
@@ -117,12 +128,12 @@ sudo -u "$REAL_USER" ln -sf "$USER_HOME/.config/systemd/user/openclaw.service" "
 
 sudo -u "$REAL_USER" XDG_RUNTIME_DIR="/run/user/$(id -u "$REAL_USER")" systemctl --user daemon-reload 2>/dev/null || true
 
-echo -e "    ${GRAY}├─ Création du Terminal Neuronal V3.0 (OpenClaw_Launcher.sh)...${NC}"
+echo -e "    ${GRAY}├─ Création du Terminal Neuronal V4.0 (OpenClaw_Launcher.sh)...${NC}"
 cat <<'LCH_EOF' | sudo -u "$REAL_USER" tee "$OC_DIR/OpenClaw_Launcher.sh" >/dev/null
 #!/bin/bash
 export NEWT_COLORS="root=black,black window=white,black border=red,black shadow=black,black title=white,red button=white,black actbutton=white,red compactbutton=white,black textbox=white,black listbox=white,black actlistbox=white,red sellistbox=white,black actsellistbox=white,red checkbox=white,black actcheckbox=white,red"
 while true; do
-  if ! CHOICE=$(whiptail --title "MadOS 3.0 - 🤖 Cœur Neuronal OpenClaw" --menu "Interface de Gestion de l'IA Locale" 19 68 7 \
+  if ! CHOICE=$(whiptail --title "MadOS 4.0 - 🤖 Cœur Neuronal OpenClaw" --menu "Interface de Gestion de l'IA Locale" 19 68 7 \
     "1" "Accéder au Terminal Neuronal (Web UI)" \
     "2" "Ouvrir le Canal de Communication Brut (TUI)" \
     "3" "Engager le Noyau IA (Démarrer Gateway)" \
@@ -159,7 +170,7 @@ while true; do
           google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
         fi
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 4.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     2)
@@ -167,20 +178,20 @@ while true; do
         clear
         cd "$HOME/OpenClaw" && node scripts/run-node.mjs tui
       else
-        whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 4.0 - OpenClaw" --msgbox "⚠️  [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     3)
       systemctl --user start openclaw.service
-      whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "✅ [SUCCÈS] Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 18789." 9 75
+      whiptail --title "MadOS 4.0 - OpenClaw" --msgbox "✅ [SUCCÈS] Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 18789." 9 75
       ;;
     4)
       systemctl --user stop openclaw.service
-      whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "🛑 Moteur OpenClaw arrêté avec succès." 8 60
+      whiptail --title "MadOS 4.0 - OpenClaw" --msgbox "🛑 Moteur OpenClaw arrêté avec succès." 8 60
       ;;
     5)
       systemctl --user restart openclaw.service
-      whiptail --title "MadOS 3.0 - OpenClaw" --msgbox "🔄 Moteur OpenClaw redémarré à neuf !" 8 60
+      whiptail --title "MadOS 4.0 - OpenClaw" --msgbox "🔄 Moteur OpenClaw redémarré à neuf !" 8 60
       ;;
     6)
       echo "=== DIAGNOSTIC OPENCLAW (DOCTOR) ===" > /tmp/oc_doctor.txt
@@ -188,7 +199,7 @@ while true; do
       systemctl --user status openclaw.service --no-pager | head -n 12 >> /tmp/oc_doctor.txt
       echo -e "\n--- DERNIERES ERREURS (LOGS) ---" >> /tmp/oc_doctor.txt
       journalctl --user -u openclaw.service -n 15 --no-pager >> /tmp/oc_doctor.txt
-      whiptail --title "MadOS 3.0 - OpenClaw Doctor 🩺" --scrolltext --textbox /tmp/oc_doctor.txt 22 80
+      whiptail --title "MadOS 4.0 - OpenClaw Doctor 🩺" --scrolltext --textbox /tmp/oc_doctor.txt 22 80
       ;;
   esac
 done

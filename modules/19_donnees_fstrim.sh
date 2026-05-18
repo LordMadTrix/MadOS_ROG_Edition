@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 19_donnees_fstrim.sh
+# MadOS ROG Edition 4.0 - 19_donnees_fstrim.sh
 # ==============================================================================
 # Phase: 19 - Automaintenance SSD & Logs (Fstrim)
 # ==============================================================================
@@ -13,9 +13,12 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 19 Déploiement Maintenance SSD & OS (Automatisé)${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 19 : Déploiement Maintenance SSD & OS v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Activation de la purge SSD hebdomadaire

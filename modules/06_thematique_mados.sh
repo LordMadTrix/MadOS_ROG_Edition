@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 06_thematique_mados.sh
+# MadOS ROG Edition 4.0 - 06_thematique_mados.sh
 # ==============================================================================
 # Phase: 6 - Identité OS complète + Visuals
 # Transforme le rendu pour correspondre au style ROG
@@ -14,11 +14,20 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+
+# Source common.sh si les fonctions user_run/user_gsettings ne sont pas exportées
+if ! declare -f user_run &>/dev/null; then
+    _LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/common.sh"
+    [ -f "$_LIB" ] && source "$_LIB" 2>/dev/null || [ -f "/opt/mados-rog/lib/common.sh" ] && source "/opt/mados-rog/lib/common.sh" 2>/dev/null || true
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -27,31 +36,54 @@ ASSETS_DIR="$PROJECT_ROOT/assets"
 # ==============================================================================
 # Choix du Thème (ROG / CYBER / CARBON)
 # ==============================================================================
+case "${MADOS_THEME:-ROG}" in
+    "CYBER")
+        THEME_DESC="Cyberpunk Neon"
+        THEME_COLOR='\033[0;35m'
+        ZSH_LOGO_COLOR='\033[0;35m'
+        WALLPAPER_NAME="cyberpunk_neon.png"
+        ;;
+    "CARBON")
+        THEME_DESC="Carbon Stealth"
+        THEME_COLOR='\033[0;37m'
+        ZSH_LOGO_COLOR='\033[0;37m'
+        WALLPAPER_NAME="carbon_stealth.png"
+        ;;
+    *)
+        THEME_DESC="ROG Classic"
+        THEME_COLOR='\033[0;31m'
+        ZSH_LOGO_COLOR='\033[0;31m'
+        WALLPAPER_NAME="rog_wallpaper.png"
+        ;;
 esac
 
-# Détection de l'interface graphique (DE)
-export CURRENT_DE=$(user_run echo $XDG_CURRENT_DESKTOP | tr '[:upper:]' '[:lower:]')
-if [[ "$CURRENT_DE" == *"gnome"* ]]; then
-    MADOS_DE="GNOME"
-elif [[ "$CURRENT_DE" == *"kde"* ]] || [[ "$CURRENT_DE" == *"plasma"* ]]; then
-    MADOS_DE="KDE"
+# Détection de l'interface graphique (DE) — utilise MADOS_DESKTOP si disponible
+if [ -n "${MADOS_DESKTOP:-}" ]; then
+    MADOS_DE="$MADOS_DESKTOP"
 else
-    MADOS_DE="UNKNOWN"
+    _DE_RAW=$(user_run echo "$XDG_CURRENT_DESKTOP" 2>/dev/null | tr '[:upper:]' '[:lower:]' || echo "")
+    if [[ "$_DE_RAW" == *"gnome"* ]]; then
+        MADOS_DE="GNOME"
+    elif [[ "$_DE_RAW" == *"kde"* ]] || [[ "$_DE_RAW" == *"plasma"* ]]; then
+        MADOS_DE="KDE"
+    else
+        MADOS_DE="KDE"  # Défaut MadOS
+    fi
 fi
 
 echo -e "\n${THEME_COLOR}╔══════════════════════════════════════════════════════╗${NC}"
-echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 3.5 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
+echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 4.0 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
 echo -e "${THEME_COLOR}║${NC}   ${GRAY}Interface détectée : ${BOLD}$MADOS_DE${NC}                 ${THEME_COLOR}║${NC}"
 echo -e "${THEME_COLOR}╚══════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. OS Identity
 cat > /etc/os-release <<OSRELEASE
 NAME="MadOS ROG Edition"
-VERSION="3.5 (Ultimate Stable)"
+VERSION="4.0 (Ultimate Stable)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="MadOS ROG Edition 3.5 ($THEME_DESC)"
-VERSION_ID="24.04"
+PRETTY_NAME="MadOS ROG Edition 4.0 ($THEME_DESC)"
+VERSION_ID="25.04"
 OSRELEASE
 
 echo "mados-rog" > /etc/hostname
@@ -65,17 +97,7 @@ echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██╔████╔██║████
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║\033[0m"
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║\033[0m"
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝\033[0m"
-echo -e "  \033[0;36m\033[1mMadOS 3.2 ($THEME_DESC)\033[0m  |  Kernel: \$(uname -r)"
-MOTD
-chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
-RESET='\033[0m'
-echo -e "${RED}${BOLD}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗${RESET}"
-echo -e "${RED}${BOLD}  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝${RESET}"
-echo -e "${RED}${BOLD}  ██╔████╔██║███████║██║  ██║██║   ██║███████╗${RESET}"
-echo -e "${RED}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║${RESET}"
-echo -e "${RED}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║${RESET}"
-echo -e "${RED}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝${RESET}"
-echo -e "  \${CYAN}\${BOLD}MadOS ROG Edition 2.6\${RESET}  |  Kernel: \$(uname -r)"
+echo -e "  \033[0;36m\033[1mMadOS 4.0 ($THEME_DESC)\033[0m  |  Kernel: \$(uname -r)"
 MOTD
 chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
 
@@ -84,10 +106,12 @@ echo -e "\n${RED}>>> ${WHITE}[2/5] ${BOLD}Déploiement Console ZSH & Neofetch...
 chsh -s /bin/zsh "$REAL_USER" 2>/dev/null || true
 
 if [ ! -d "$USER_HOME/.oh-my-zsh" ]; then
-    sudo -u "$REAL_USER" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended 2>/dev/null || true
+    # RUNZSH=no CHSH=no : évite que le script lance zsh interactif et bloque sans TTY
+    sudo -u "$REAL_USER" env RUNZSH=no CHSH=no \
+        timeout 90 sh -c "$(curl -fsSL --max-time 30 https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 2>/dev/null || true
 fi
 if [ ! -d "$USER_HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]; then
-    sudo -u "$REAL_USER" git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$USER_HOME/.oh-my-zsh/custom/themes/powerlevel10k" 2>/dev/null || true
+    sudo -u "$REAL_USER" timeout 120 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$USER_HOME/.oh-my-zsh/custom/themes/powerlevel10k" 2>/dev/null || true
 fi
 
 cat > "$USER_HOME/.zshrc" <<'ZSHRC'
@@ -155,7 +179,7 @@ sudo apt install -y git tar || true
 # Téléchargement de distro-grub-themes
 GRUB_THEME_DIR="/tmp/grub-themes"
 rm -rf "$GRUB_THEME_DIR" 2>/dev/null || true
-git clone --depth=1 https://github.com/AdisonCavani/distro-grub-themes.git "$GRUB_THEME_DIR" >/dev/null 2>&1 || true
+timeout 120 git clone --depth=1 https://github.com/AdisonCavani/distro-grub-themes.git "$GRUB_THEME_DIR" >/dev/null 2>&1 || true
 
 if [ -d "$GRUB_THEME_DIR" ]; then
     echo -e "    ${GRAY}├─ Déploiement du thème GRUB (ROG/Cyberpunk)...${NC}"
@@ -192,7 +216,7 @@ echo -e "\n${RED}>>> ${WHITE}[5/5] ${BOLD}Sculpture du Bureau (ROG Windows-Style
 sudo apt install -y papirus-icon-theme plymouth plymouth-theme-spinner dconf-cli 2>/dev/null || true
 
 # Application des dossiers rouges Papirus
-wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/install.sh | sh 2>/dev/null || true
+timeout 60 wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/install.sh | timeout 60 sh 2>/dev/null || true
 if command -v papirus-folders &>/dev/null; then
     sudo papirus-folders -C red --theme Papirus-Dark 2>/dev/null || true
 fi

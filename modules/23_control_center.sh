@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 23_control_center.sh
+# MadOS ROG Edition 4.0 - 23_control_center.sh
 # ==============================================================================
 
 # ==============================================================================
@@ -11,12 +11,15 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 # Module 23 : Installation interface GUI - MadOS Control Center
 # ==========================================
 
 echo -e "\n${RED}========================================================================${NC}"
-echo -e "${RED}║${NC} ${WHITE}${BOLD}[23/23] Déploiement du MadOS Control Center (GUI)${NC}"
+echo -e "${RED}║${NC} ${WHITE}${BOLD}[23/23] Déploiement du MadOS Control Center v4.0 (GUI)${NC}"
 echo -e "${RED}========================================================================${NC}"
 
 echo -e "    ${GRAY}├─ Installation des dépendances Python (PyQt6)...${NC}"
@@ -36,7 +39,7 @@ if [ -f "$(dirname "$0")/../assets/logo.png" ]; then
     sudo cp "$(dirname "$0")/../assets/logo.png" "$APP_DIR/icon.png" 2>/dev/null || true
 fi
 
-REAL_USER=${SUDO_USER:-$(who am i | awk '{print $1}')}
+REAL_USER=${SUDO_USER:-$USER}
 if [ -n "$REAL_USER" ]; then
     USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
     sudo -u "$REAL_USER" mkdir -p "$USER_HOME/Bureau" "$USER_HOME/Desktop" 2>/dev/null || true
@@ -45,7 +48,7 @@ if [ -n "$REAL_USER" ]; then
     cat <<EOF | sudo tee "$USER_HOME/Desktop/MadOS_Control_Center.desktop" > /dev/null
 [Desktop Entry]
 Name=MadOS Control Center
-Comment=Performance, IA OpenClaw, Diagnostic, Mises à jour
+Comment=Performance, IA OpenClaw, Diagnostic, Mises à jour (v4.0 NTSYNC)
 Exec=python3 /opt/mados-control-center/mados_cc.py
 Icon=/opt/mados-control-center/icon.png
 Terminal=false

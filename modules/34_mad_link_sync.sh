@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 34_mad_link_sync.sh
+# MadOS ROG Edition 4.0 - 34_mad_link_sync.sh
 # ==============================================================================
 # Phase: 34 - MadLink Device Sync (Smartphone & PC Coupling)
 # ==============================================================================
@@ -8,8 +8,18 @@
 REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🔗 ${WHITE}${BOLD}Phase 34 Déploiement de MadLink (Sync Smartphone & PC)${NC}"
+echo -e "${RED}║${NC} 🔗 ${WHITE}${BOLD}Phase 34 : Déploiement de MadLink v4.0 (Sync Smartphone & PC)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Installation du Moteur KDE Connect

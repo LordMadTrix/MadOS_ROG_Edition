@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - lib/common.sh
+# MadOS ROG Edition 4.0 - lib/common.sh
 # ==============================================================================
 # Fonctions communes, logging, gestion d'erreurs et rollback
 # ==============================================================================
@@ -79,7 +79,7 @@ init_mados_logging() {
     touch "$MADOS_CHECKPOINT_FILE" "$MADOS_STATUS_FILE" 2>/dev/null || true
     
     log_info "═══════════════════════════════════════════════════════════"
-    log_info "MadOS ROG Edition 3.5 - Démarrage Installation"
+    log_info "MadOS ROG Edition 4.0 - Démarrage Installation"
     log_info "Date: $(date '+%Y-%m-%d %H:%M:%S')"
     log_info "Utilisateur: $USER"
     log_info "═══════════════════════════════════════════════════════════"
@@ -183,7 +183,7 @@ run_command_retry() {
         else
             if [ $attempt -lt $max_retries ]; then
                 log_warning "${description} échouée (tentative $attempt/$max_retries) - Nouvelle tentative dans ${RETRY_DELAY}s..."
-                sleep "$RETRY_DELAY"
+                ( trap '' INT; sleep "$RETRY_DELAY" ) 2>/dev/null; true
             else
                 log_error "${description} échouée après $max_retries tentatives"
                 return 1
@@ -211,7 +211,7 @@ save_checkpoint() {
 }
 
 skip_if_completed() {
-    local module=$1
+    local module="$1"
     if [ -f "$STATE_FILE" ] && grep -q "^$module:OK" "$STATE_FILE"; then
         log_info "Module $module déjà complété (skip)."
         return 0
@@ -225,17 +225,7 @@ reset_install_state() {
 }
 
 get_completed_modules() {
-    grep "OK:" "$MADOS_CHECKPOINT_FILE" 2>/dev/null | cut -d: -f2 | sort -u
-}
-
-skip_if_completed() {
-    local module="$1"
-    
-    if grep -q "OK:${module}" "$MADOS_CHECKPOINT_FILE" 2>/dev/null; then
-        log_warning "${module} déjà exécuté - SKIP"
-        return 0
-    fi
-    return 1
+    [ -f "$STATE_FILE" ] && grep ":OK:" "$STATE_FILE" | cut -d: -f1 | sort -u
 }
 
 # ==============================================================================
@@ -335,35 +325,66 @@ apt_install_safe() {
 # Rapport d'Installation
 # ==============================================================================
 
+# ==============================================================================
+# Helpers Visuels — Barre de progression, Headers, Steps
+# ==============================================================================
+
+print_module_header() {
+    local desc="$1" attempt="${2:-1}" max="${3:-3}"
+    local cur="${MADOS_MODULE_CURRENT:-0}" tot="${MADOS_MODULE_TOTAL:-1}"
+    [ "$tot" -le 0 ] && tot=1
+    local pct=$(( cur * 100 / tot ))
+    [ "$pct" -gt 100 ] && pct=100
+    local filled=$(( cur * 40 / tot ))
+    [ "$filled" -gt 40 ] && filled=40
+    local empty=$(( 40 - filled ))
+    local bar_g="" bar_e=""
+    [ "$filled" -gt 0 ] && bar_g=$(printf '█%.0s' $(seq 1 "$filled"))
+    [ "$empty"  -gt 0 ] && bar_e=$(printf '░%.0s' $(seq 1 "$empty"))
+
+    echo -e "\n${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${CYAN}$(printf '[%02d/%02d]' "$cur" "$tot")${NC}  ${WHITE}${BOLD}${desc}${NC}"
+    echo -e "  ${GREEN}${bar_g}${GRAY}${bar_e}${NC}  ${WHITE}${pct}%${NC}  ${GRAY}━  Tentative ${attempt}/${max}${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+}
+
+print_step()    { echo -e "    ${RED}▶${NC}  ${WHITE}$*${NC}"; }
+print_ok()      { echo -e "    ${GREEN}✓${NC}  $*"; }
+print_warn_v()  { echo -e "    ${YELLOW}⚠${NC}  ${YELLOW}$*${NC}"; }
+print_err_v()   { echo -e "    ${RED}✗${NC}  ${RED}$*${NC}"; }
+print_section() {
+    echo -e "\n  ${GRAY}──────────────────────────────────────────────────────────────${NC}"
+    echo -e "  ${CYAN}${BOLD}  $*${NC}"
+    echo -e "  ${GRAY}──────────────────────────────────────────────────────────────${NC}\n"
+}
+
 print_installation_report() {
     local total_time=$SECONDS
     local minutes=$((total_time / 60))
-    local seconds=$((total_time % 60))
-    
-    clear
-    echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${RED}║${NC} ${GREEN}✓${NC} ${WHITE}${BOLD}Installation MadOS 3.0 Terminée${NC}"
-    echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
-    
-    echo -e "${CYAN}📊 Rapport de l'Installation:${NC}"
-    echo -e "  ${GRAY}├─ Durée: ${minutes}m ${seconds}s${NC}"
-    echo -e "  ${GRAY}├─ Logs complets: ${MADOS_LOG_DIR}/mados_install.log${NC}"
-    echo -e "  ${GRAY}├─ Backups: ${MADOS_BACKUP_DIR}${NC}"
-    echo -e "  ${GRAY}├─ Checkpoints: ${MADOS_CHECKPOINT_FILE}${NC}"
-    
-    if [ -f "$MADOS_ERRORS_FILE" ] && [ -s "$MADOS_ERRORS_FILE" ]; then
-        echo -e "  ${RED}├─ Erreurs: $(wc -l < $MADOS_ERRORS_FILE) erreur(s) enregistrée(s)${NC}"
-        echo -e "  ${GRAY}└─ Détails: ${MADOS_ERRORS_FILE}${NC}"
+    local secs=$((total_time % 60))
+    local mods="${MADOS_MODULE_CURRENT:-?}/${MADOS_MODULE_TOTAL:-?}"
+    local kernel
+    kernel=$(uname -r 2>/dev/null || echo "N/A")
+    local errors=0
+    [ -f "$MADOS_ERRORS_FILE" ] && [ -s "$MADOS_ERRORS_FILE" ] && errors=$(wc -l < "$MADOS_ERRORS_FILE")
+
+    echo -e ""
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${GREEN}✓${NC}  ${WHITE}${BOLD}MADOS 4.0 — DÉPLOIEMENT TERMINÉ${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${GRAY}Durée      :${NC}  ${WHITE}${minutes}m ${secs}s${NC}"
+    echo -e "  ${GRAY}Modules    :${NC}  ${WHITE}${mods} complétés${NC}"
+    if [ "$errors" -eq 0 ]; then
+        echo -e "  ${GRAY}Erreurs    :${NC}  ${GREEN}Aucune${NC}"
     else
-        echo -e "  ${GREEN}└─ ✓ Aucune erreur détectée${NC}"
+        echo -e "  ${GRAY}Erreurs    :${NC}  ${RED}${errors} enregistrée(s) → ${MADOS_ERRORS_FILE}${NC}"
     fi
-    
-    echo ""
-    echo -e "${YELLOW}📁 Prochaines étapes:${NC}"
-    echo -e "  1. Redémarrez le système: ${GREEN}sudo reboot${NC}"
-    echo -e "  2. Consultez les logs: ${GREEN}sudo cat ${MADOS_LOG_DIR}/mados_install.log${NC}"
-    echo -e "  3. En cas de problème: ${GREEN}sudo cat ${MADOS_CHECKPOINT_FILE}${NC}"
-    echo ""
+    echo -e "  ${GRAY}Kernel     :${NC}  ${CYAN}${kernel}${NC}"
+    echo -e "  ${GRAY}Logs       :${NC}  ${GRAY}${MADOS_LOG_DIR}/mados_install.log${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e ""
+    echo -e "  ${YELLOW}Prochaine étape :${NC}  ${GREEN}sudo reboot${NC}"
+    echo -e ""
 }
 
 # ==============================================================================
@@ -613,5 +634,6 @@ export -f detect_hypervisor install_hypervisor_drivers
 export -f install_qemu_drivers install_vmware_drivers
 export -f install_virtualbox_drivers install_hyperv_drivers
 export -f user_gsettings user_run
+export -f print_module_header print_step print_ok print_warn_v print_err_v print_section
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 20_esport_usb_1000hz.sh
+# MadOS ROG Edition 4.0 - 20_esport_usb_1000hz.sh
 # ==============================================================================
 # Phase: 20 - E-Sport Zero Latency (USB Udev Rules)
 # ==============================================================================
@@ -13,9 +13,12 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 20 Tuning E-Sport : Input Lag & Latence Périphériques${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 20 : Tuning E-Sport v4.0 (Zéro Latence USB)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 UDEV_RULES_FILE="/etc/udev/rules.d/99-usb-latency.rules"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 10_son_demarrage.sh
+# MadOS ROG Edition 4.0 - 10_son_demarrage.sh
 # ==============================================================================
 # Phase: 10 - Son d'ouverture de session ROG
 # ==============================================================================
@@ -13,13 +13,17 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
+USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 10 Installation du Son de Démarrage ROG${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 10 : Installation du Son de Démarrage ROG v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 sudo apt install -y sox libsox-fmt-all sound-theme-freedesktop >/dev/null 2>&1 || true
 
@@ -45,7 +49,7 @@ EOF
     cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/Documents/mados_welcome.sh" >/dev/null
 #!/bin/bash
 sleep 5
-spd-say -v fr-fr -r -20 "MadOS 3.3 Engagé. Puissance au maximum. Bienvenue Maître \$(whoami)."
+spd-say -v fr-fr -r -20 "MadOS 4.0 Engagé. Synchronisation N-T-Sync active. Bienvenue Maître $(whoami)."
 EOF
     sudo chmod +x "$USER_HOME/Documents/mados_welcome.sh" || true
     

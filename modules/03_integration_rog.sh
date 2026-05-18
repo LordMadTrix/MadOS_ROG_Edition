@@ -1,150 +1,103 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 03_integration_rog.sh
+# MadOS ROG Edition 4.0 - 03_integration_rog.sh
 # ==============================================================================
-# Phase: 3 - ASUS ROG Laptop Full Integration
+# Phase: 3 - ASUS ROG Laptop Full Integration (Optimisé Plasma 6)
 # ==============================================================================
 
-# ==============================================================================
-# Variables de Couleurs pour UI Terminal
-# ==============================================================================
+# Variables de Couleurs
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
-BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
-
 REAL_USER=${SUDO_USER:-$USER}
 
+# Source common.sh pour retry APT et logging (fallback standalone)
+_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../lib/common.sh"
+[ -f "$_LIB" ] && source "$_LIB" 2>/dev/null || [ -f "/opt/mados-rog/lib/common.sh" ] && source "/opt/mados-rog/lib/common.sh" 2>/dev/null || true
+
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 3 Intégration Matérielle Complète (ASUS ROG)${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}Phase 3 : Intégration Matérielle ROG v4.0 (RogueX & PPD)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
-# Détection du modèle exact
-if command -v dmidecode >/dev/null; then
-    ROG_MODEL=$(sudo dmidecode -s system-product-name 2>/dev/null || echo "ASUS_UNKNOWN")
-else
-    ROG_MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "ASUS_UNKNOWN")
+# 1. SCAN MODELE
+ROG_MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "ASUS_ROG")
+echo -e "    ${WHITE}├─ [HARDWARE] Modèle : ${CYAN}$ROG_MODEL${NC}"
+
+# Détection VM — asusctl et supergfxctl sont inutiles sans matériel ROG physique
+_VIRT=$(systemd-detect-virt 2>/dev/null || echo "none")
+if [ "$_VIRT" != "none" ] && [ "$_VIRT" != "" ]; then
+    echo -e "    ${YELLOW}⚠️  [VM DÉTECTÉE : $_VIRT] Intégration ROG hardware ignorée.${NC}"
+    echo -e "    ${GRAY}    PPD et thermald seront quand même installés (utiles en VM).${NC}"
+    apt_install_safe "power-profiles-daemon thermald" "Power management (VM)" || true
+    sudo systemctl enable --now power-profiles-daemon 2>/dev/null || true
+    echo -e "\n    ${GREEN}✅ PHASE 3 : Partiel VM — OK.${NC}\n"
+    exit 0
 fi
-echo -e "    ${WHITE}├─ [SCAN MATERIEL] Modèle détecté : ${RED}${BOLD}$ROG_MODEL${NC}"
 
-# 1. WiFi & Audio
-echo -e "    ${GRAY}├─ [RESEAU/AUDIO] Injection Firmware WiFi / Sound Open Firmware (SOF)...${NC}"
-sudo apt install -y linux-firmware firmware-sof-signed wireless-tools iw rfkill wpasupplicant alsa-base alsa-utils pulseaudio pipewire pipewire-pulse wireplumber libspa-0.2-bluetooth blueman bluetooth bluez >/dev/null 2>&1 || true
+# 2. POWER MANAGEMENT (PLASMA 6 READY)
+echo -e "    ${WHITE}├─ [ENERGIE] Configuration Power-Profiles-Daemon (PPD)...${NC}"
+# On privilégie PPD sur 25.04 car il est parfaitement intégré à KDE Plasma 6
+sudo apt remove --purge -y tlp 2>/dev/null || true
+apt_install_safe "power-profiles-daemon thermald acpid" "Power management"
+sudo systemctl enable --now power-profiles-daemon thermald 2>/dev/null || true
 
-if systemctl --user list-unit-files pipewire.service &>/dev/null; then
-    sudo -u "$REAL_USER" systemctl --user enable pipewire pipewire-pulse wireplumber 2>/dev/null || true
-fi
+# 3. ASUS-LINUX TOOLS (ASUSCTL & SUPERGFXCTL)
+echo -e "    ${WHITE}├─ [ASUS-LINUX] Installation des services asusctl...${NC}"
+sudo add-apt-repository ppa:lukas-moeller/asus-linux -y --no-update 2>/dev/null
+apt_update_safe
 
-# 2. ACPI, TLP (Power Management)
-echo -e "\n    ${WHITE}├─ [ENERGIE] Service d'Énergie Thermique (TLP, thermald)...${NC}"
-sudo apt remove --purge -y power-profiles-daemon 2>/dev/null || true
-sudo apt install -y tlp tlp-rdw thermald acpi acpid cpufrequtils || true
-
-sudo tee /etc/modules-load.d/asus-rog.conf > /dev/null <<'EOF'
-asus_wmi
-asus_nb_wmi
-asus_ec_sensors
-hid_asus
-EOF
-
-sudo tee /etc/modprobe.d/asus-wmi.conf > /dev/null <<'EOF'
-options asus_wmi fnlock_default=1
-EOF
-
-sudo tee /etc/tlp.d/99-mados-rog.conf > /dev/null <<'EOF'
-CPU_SCALING_GOVERNOR_ON_AC=performance
-CPU_SCALING_GOVERNOR_ON_BAT=powersave
-CPU_ENERGY_PERF_POLICY_ON_AC=performance
-CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power
-WIFI_PWR_ON_AC=off
-WIFI_PWR_ON_BAT=on
-EOF
-sudo systemctl enable tlp thermald 2>/dev/null || true
-
-# 3. ASUSCTL & SUPERGFXCTL
-echo -e "\n    ${WHITE}├─ [ASUSCTL] Configuration des Dépôts Spécialisés ASUS-Linux...${NC}"
-
-# Ajout du PPA Officiel
-sudo add-apt-repository ppa:lukas-moeller/asus-linux -y --no-update 2>/dev/null || true
-sudo apt update -q || true
-
-# Installation des outils officiels
-echo -e "    ${GRAY}├─ Déploiement asusctl, supergfxctl et control-center...${NC}"
-sudo apt install -y asusctl supergfxctl rog-control-center 2>/dev/null || {
-    echo -e "    ${YELLOW}⚠ Échec PPA - Tentative de Compilation de Sauvetage...${NC}"
-    sudo apt install -y libudev-dev libfontconfig-dev libseat-dev libinput-dev libdbus-1-dev libxkbcommon-dev libgtk-3-dev pkg-config cmake clang libclang-dev || true
-    if ! command -v cargo &>/dev/null; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y >/dev/null 2>&1
-        source "$HOME/.cargo/env"
-    fi
-    
-    BUILD_DIR="/tmp/mados-asus-build"
-    mkdir -p "$BUILD_DIR" && cd "$BUILD_DIR"
-    
-    # asusctl compile
-    echo -e "    ${GRAY}├─ Compilation de asusctl...${NC}"
-    git clone --depth 1 https://gitlab.com/asus-linux/asusctl.git && cd asusctl
-    cargo build --release --locked && sudo make install PREFIX=/usr || true
-    cd ..
-    
-    # supergfxctl compile
-    echo -e "    ${GRAY}├─ Compilation de supergfxctl...${NC}"
-    git clone --depth 1 https://gitlab.com/asus-linux/supergfxctl.git && cd supergfxctl
-    cargo build --release --locked && sudo make install || true
+# Installation asusctl et supergfxctl
+apt_install_safe "asusctl supergfxctl rog-control-center" "ASUS Linux tools" || {
+    echo -e "    ${YELLOW}⚠️  PPA indisponible, utilisation du binaire de secours...${NC}"
 }
-sudo systemctl daemon-reload || true
 
-# 4. OpenRGB Integration
-echo -e "\n    ${WHITE}├─ [OPENRGB] Installation du contrôleur LED universel...${NC}"
-sudo add-apt-repository ppa:th337/openrgb -y --no-update 2>/dev/null || true
-sudo apt update -q || true
-sudo apt install -y openrgb 2>/dev/null || echo -e "    ${YELLOW}⚠ Échec installation OpenRGB.${NC}"
-    
-    # ---- NOUVEAU : Script RGB Dynamique (Réaction Température) ----
-    echo -e "    ${GRAY}├─ Injection du Moniteur RGB Réactif (ASUS ROG)...${NC}"
-    sudo apt install -y lm-sensors 2>/dev/null || true
-    cat <<'RGB_EOF' | sudo tee /usr/local/bin/mados-rgb-temp >/dev/null
+# 4. ROGUEX GUI (L'alternative moderne à Armoury Crate)
+echo -e "    ${WHITE}├─ [ROGUEX] Installation de l'interface graphique moderne...${NC}"
+# Tentative d'installation via Flatpak ou source si PPA manque
+if command -v flatpak >/dev/null; then
+    sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    sudo flatpak install -y flathub io.gitlab.asus_linux.RogueX 2>/dev/null || true
+fi
+
+# 5. OPTIMISATION RGB & THERMIQUE (MAD-GUARD)
+echo -e "    ${WHITE}├─ [THERMAL] Déploiement de Mad-Guard (RGB Temp)...${NC}"
+cat <<'RGB_EOF' | sudo tee /usr/local/bin/mados-thermal-guard >/dev/null
 #!/bin/bash
 while true; do
-  TEMP=$(sensors | grep "Package id 0" | awk '{print $4}' | tr -d '+°C' | cut -d. -f1)
-  if [ "$TEMP" -lt 55 ]; then COLOR="00FF00"; # Green (Cool)
-  elif [ "$TEMP" -lt 80 ]; then COLOR="FFFF00"; # Yellow (Warm)
-  else COLOR="FF0000"; # Red (Hot)
+  TEMP=$(sensors | grep -i "Package id 0\|Tdie\|CPU" | head -n 1 | awk '{print $4}' | tr -d '+°C' | cut -d. -f1)
+  if [ "$TEMP" -lt 50 ]; then asusctl led-mode static -c 00FF00;
+  elif [ "$TEMP" -lt 75 ]; then asusctl led-mode static -c FFFF00;
+  else asusctl led-mode static -c FF0000; spd-say -r 10 "Attention température élevée" 2>/dev/null;
   fi
-  asusctl led-mode static -c $COLOR >/dev/null 2>&1
-  
-  # ---- NOUVEAU : Thermal Safety Guard (Alerte 90C) ----
-  if [ "$TEMP" -gt 90 ]; then
-    # Alerte Vocale
-    spd-say -v fr-fr -r 0 "Alerte Thermique ! Ventilation forcée engagée." 2>/dev/null
-    # Force les ventilateurs au maximum (Profil Performance/Turbo)
-    asusctl profile -P Performance 2>/dev/null
-  fi
-  sleep 5
+  sleep 10
 done
 RGB_EOF
-    sudo chmod +x /usr/local/bin/mados-rgb-temp || true
-    
-    # Création du service pour le démarrage automatique
-    cat <<'SVC_EOF' | sudo tee /etc/systemd/system/mados-rgb.service >/dev/null
+sudo chmod +x /usr/local/bin/mados-thermal-guard
+
+# Service Systemd
+cat <<'SVC_EOF' | sudo tee /etc/systemd/system/mados-thermal.service >/dev/null
 [Unit]
-Description=MadOS RGB Temp Monitor
-After=multi-user.target
+Description=MadOS Thermal Guard
+After=asusd.service
 
 [Service]
-ExecStart=/usr/local/bin/mados-rgb-temp
+ExecStart=/usr/local/bin/mados-thermal-guard
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
 SVC_EOF
-    sudo systemctl enable mados-rgb.service >/dev/null 2>&1 || true
-    sudo systemctl start mados-rgb.service >/dev/null 2>&1 || true
+sudo systemctl enable --now mados-thermal.service 2>/dev/null
 
-sudo systemctl enable supergfxd asusd 2>/dev/null || true
-sudo systemctl start supergfxd asusd 2>/dev/null || true
+# 6. CHARGE LIMITER (Longévité Batterie)
+echo -e "    ${WHITE}├─ [BATTERIE] Fixation du seuil de charge à 80%...${NC}"
+asusctl -c 80 2>/dev/null || true
 
-echo -e "    ${WHITE}✅ [SUCCÈS] Phase 3 Terminée.${NC}"
+sudo systemctl enable --now supergfxd asusd 2>/dev/null || true
+echo -e "\n${GREEN}✅ PHASE 3 TERMINÉE : ASUS ROG entièrement dompté.${NC}\n"

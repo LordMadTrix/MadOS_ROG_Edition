@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 22_cpu_undervolt.sh
+# MadOS ROG Edition 4.0 - 22_cpu_undervolt.sh
 # ==============================================================================
 # Module 22 : Tuning CPU (Undervolt & Overclock)
 # ==============================================================================
@@ -13,10 +13,21 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 echo -e "\n${RED}========================================================================${NC}"
 echo -e "${RED}║${NC} ${WHITE}${BOLD}[22/23] Application du Profil Thermique : ${YELLOW}${MADOS_TDP_PROFILE:-EQUILIBRE}${NC}"
 echo -e "${RED}========================================================================${NC}"
+
+# Détection VM — undervolt sans matériel physique = inutile
+_VIRT=$(systemd-detect-virt 2>/dev/null || echo "none")
+if [ "$_VIRT" != "none" ] && [ "$_VIRT" != "" ]; then
+    echo -e "    ${YELLOW}⚠️  [VM DÉTECTÉE : $_VIRT] Undervolt/TDP ignoré en VM.${NC}"
+    echo -e "\n    ${GREEN}✅ MODULE 22 : Skip VM — OK.${NC}\n"
+    exit 0
+fi
 
 CPU_VENDOR=$(lscpu | awk '/Vendor ID/ || /Fournisseur/ {print $3}' | head -n1)
 
@@ -27,7 +38,7 @@ if [ "$CPU_VENDOR" = "AuthenticAMD" ]; then
     
     RYZEN_DIR="/opt/RyzenAdj"
     if [ ! -d "$RYZEN_DIR" ]; then
-        sudo git clone --depth=1 https://github.com/FlyGoat/RyzenAdj.git "$RYZEN_DIR" >/dev/null 2>&1 || true
+        sudo timeout 120 git clone --depth=1 https://github.com/FlyGoat/RyzenAdj.git "$RYZEN_DIR" >/dev/null 2>&1 || true
         sudo bash -c "cd '$RYZEN_DIR' && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make" >/dev/null 2>&1 || true
         sudo cp "$RYZEN_DIR/build/ryzenadj" /usr/local/bin/ryzenadj || true
         sudo rm -rf "$RYZEN_DIR/build" # Nettoyage post-compilation
@@ -57,7 +68,7 @@ RemainAfterExit=yes
 WantedBy=multi-user.target sleep.target
 EOF
         sudo systemctl daemon-reload || true
-        sudo systemctl enable --now mados-amd-thermal.service >/dev/null 2>&1
+        sudo systemctl enable --now mados-amd-thermal.service >/dev/null 2>&1 || true
     fi
     
 elif [ "$CPU_VENDOR" = "GenuineIntel" ]; then

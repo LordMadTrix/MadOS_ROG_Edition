@@ -1,8 +1,8 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 Ultimate - install.sh
+# MadOS ROG Edition 4.0 Ultimate - install.sh
 # ==============================================================================
-# Optimized for Ubuntu 24.04 LTS (Stable)
+# Optimized for Ubuntu 25.04 "Plucky Puffin" (NTSYNC & Plasma 6)
 # ==============================================================================
 
 # ==============================================================================
@@ -73,8 +73,9 @@ main() {
     trap 'sudo rm -f /usr/sbin/policy-rc.d' EXIT
 
     # ---- BLOCAGE SNAPD (Performance Boost) ----
-    sudo systemctl stop snapd.service snapd.socket 2>/dev/null || true
-    sudo systemctl disable snapd.service snapd.socket 2>/dev/null || true
+    echo -e "${GRAY}    ├─ Neutralisation de Snapd (Politique No-Snap)...${NC}"
+    sudo systemctl stop snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
+    sudo systemctl disable snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
     sudo tee /etc/apt/preferences.d/nosnap.pref > /dev/null <<EOF
 Package: snapd
 Pin: release a=*
@@ -84,7 +85,14 @@ EOF
     # ---- INITIALISATION CORE ----
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     export PROJECT_ROOT="$SCRIPT_DIR"
-    [ -f "$SCRIPT_DIR/lib/common.sh" ] && source "$SCRIPT_DIR/lib/common.sh" || { echo "Erreur lib/common.sh"; exit 1; }
+    if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
+        source "$SCRIPT_DIR/lib/common.sh"
+    else
+        echo "ERREUR CRITIQUE: lib/common.sh non trouvé!"
+        exit 1
+    fi
+    [ -f "$SCRIPT_DIR/lib/dashboard.sh" ] && source "$SCRIPT_DIR/lib/dashboard.sh" || true
+    [ -f "$SCRIPT_DIR/lib/config.conf" ] && source "$SCRIPT_DIR/lib/config.conf"
     
     wait_for_apt
     ensure_nala
@@ -93,8 +101,16 @@ EOF
     echo -e "${GRAY}    ├─ Restauration du support LVM & Coretools...${NC}"
     sudo apt-get install -y lvm2 coreutils thin-provisioning-tools 2>/dev/null || true
 
+    # Forcer la désinstallation de v4l2loopback-dkms s'il est resté dans un état de crash
+    if dpkg -l | grep -q "v4l2loopback-dkms"; then
+        echo -e "${GRAY}    ├─ Neutralisation du pilote caméra corrompu...${NC}"
+        sudo apt-get purge -y v4l2loopback-dkms 2>/dev/null || true
+    fi
+
     setup_error_traps
     init_mados_logging
+    # Réinitialiser le log d'erreurs à chaque nouveau run pour un comptage précis
+    sudo truncate -s 0 "${MADOS_LOG_DIR}/mados_errors.log" 2>/dev/null || true
 
     clear
     echo -e "${RED}"
@@ -106,68 +122,9 @@ EOF
     echo -e "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝ "
     echo -ne "${NC}"
     echo -e "${RED}     ╔══════════════════════════════╗${NC}"
-    echo -e "${RED}     ║   Ultimate MadOS 3.5 Stable  ║${NC}"
-    echo -e "${RED}     ║     Edition Kubuntu LTS      ║${NC}"
+    echo -e "${RED}     ║    Ultimate MadOS 4.0 Stable  ║${NC}"
+    echo -e "${RED}     ║     Edition ROG NTSYNC       ║${NC}"
     echo -e "${RED}     ╚══════════════════════════════╝${NC}\n"
-
-    # ---- BOMBE ANTI-SNAP : On bloque tout de suite l'ennemi ----
-    sudo systemctl stop snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
-    sudo systemctl disable snapd.service snapd.socket snapd.seeded.service 2>/dev/null || true
-    sudo tee /etc/apt/preferences.d/nosnap.pref > /dev/null <<EOF
-Package: snapd
-Pin: release a=*
-Pin-Priority: -10
-EOF
-
-    # ==============================================================================
-    # Charger les fonctions communes
-    # ==============================================================================
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    export PROJECT_ROOT="$SCRIPT_DIR"
-    if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
-        source "$SCRIPT_DIR/lib/common.sh"
-    else
-        echo "ERREUR CRITIQUE: lib/common.sh non trouvé!"
-        exit 1
-    fi
-    
-    # Initialiser les optimisations
-    wait_for_apt
-    ensure_nala
-
-    # 🚧 RÉPARATION CRITIQUE : Recolier les morceau si crash précédent 🚧
-    echo -e "${YELLOW}[!] Nettoyage des résidus et restauration des systèmes de fichiers...${NC}"
-    # Désactivation temporaire des erreurs pour purger les éléments bloquants
-    sudo dpkg --configure -a 2>/dev/null || true
-    sudo apt-get install -f -y 2>/dev/null || true
-    
-    # Restauration impérative du support LVM/Disque (Fix pour l'erreur initramfs /dev/mapper)
-    echo -e "${GRAY}    ├─ Restauration du support LVM (Disques Virtuels)...${NC}"
-    sudo apt-get install -y lvm2 coreutils thin-provisioning-tools 2>/dev/null || true
-
-    # Forcer la désinstallation de v4l2loopback-dkms s'il est resté dans un état de crash (Bug Critique identifié)
-    if dpkg -l | grep -q "v4l2loopback-dkms"; then
-        echo -e "${GRAY}    ├─ Neutralisation du pilote caméra corrompu...${NC}"
-        sudo apt-get purge -y v4l2loopback-dkms 2>/dev/null || true
-    fi
-    # Initialiser les pièges d'erreur et logs
-    setup_error_traps
-    init_mados_logging
-
-    clear
-    echo ""
-    echo -e "${RED}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗ ${NC}"
-    echo -e "${RED}  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝ ${NC}"
-    echo -e "${RED}  ██╔████╔██║███████║██║  ██║██║   ██║███████╗ ${NC}"
-    echo -e "${WHITE}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║ ${NC}"
-    echo -e "${WHITE}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║ ${NC}"
-    echo -e "${WHITE}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝ ${NC}"
-    echo ""
-    echo -e "${RED}     ╔══════════════════════════════╗${NC}"
-    echo -e "${RED}     ║    INSTALLATEUR MadOS 3.0    ║${NC}"
-    echo -e "${RED}     ║     by LordMadTrix           ║${NC}"
-    echo -e "${RED}     ╚══════════════════════════════╝${NC}"
-    echo ""
 
     echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${CYAN}  [1/1] Vérifications Pré-Installation...${NC}"
@@ -185,12 +142,13 @@ EOF
             sudo mkdir -p "$TMP_RUN"
             
             # Copie sélective pour éviter les fichiers lourds (ISO, VM)
-            echo -e "${GRAY}    ├─ Clonage du cœur MadOS (lib, modules, scripts)...${NC}"
-            for item in "lib" "modules" "scripts" "assets" "docs"; do
+            echo -e "${GRAY}    ├─ Clonage du cœur MadOS (lib, modules, tools, assets)...${NC}"
+            for item in "lib" "modules" "tools" "scripts" "assets" "docs"; do
                 [ -d "$SCRIPT_DIR/$item" ] && sudo cp -rf "$SCRIPT_DIR/$item" "$TMP_RUN/" || true
             done
             sudo cp -f "$SCRIPT_DIR"/*.sh "$TMP_RUN/" 2>/dev/null || true
             sudo cp -f "$SCRIPT_DIR"/*.md "$TMP_RUN/" 2>/dev/null || true
+            sudo cp -f "$SCRIPT_DIR/VERSION" "$TMP_RUN/" 2>/dev/null || true
             sudo cp -f "$SCRIPT_DIR"/.nojekyll "$TMP_RUN/" 2>/dev/null || true
             
             echo -e "${GREEN}[OK] Proxy local établi dans /opt. Vérification de l'intégrité...${NC}"
@@ -199,7 +157,7 @@ EOF
                  echo -e "${RED}[!] Échec critique du clonage vers /opt. Repli sur source originale...${NC}"
             else
                  cd "$TMP_RUN"
-                 sudo bash ./install_local.sh "$@"
+                 sudo bash ./install.sh "$@"
                  exit $?
             fi
         fi
@@ -264,25 +222,43 @@ APTCONF
         echo -e "${GRAY}    Réseau OK, pas de fix DNS nécessaire.${NC}"
     fi
 
-    # 3. Mirror Switch Global : Remplacer TOUS les miroirs régionaux par l'archive principale
-    # Supporte l'ancien format /etc/apt/sources.list et le nouveau format DEB822 (24.04+)
-    echo -e "${GRAY}    Bascule vers les serveurs de l'archive globale (Stabilité Max)...${NC}"
-    
-    # Backup
-    sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak 2>/dev/null || true
-    [ -f /etc/apt/sources.list.d/ubuntu.sources ] && sudo cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak 2>/dev/null || true
+    # 3. Détection EOL Ubuntu & Activation universe/multiverse
+    echo -e "${GRAY}    Détection EOL Ubuntu et configuration des dépôts...${NC}"
 
-    # Remplacement dans l'ancien format .list
-    sudo sed -i 's|http://[a-z][a-z]\.archive\.ubuntu\.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list 2>/dev/null || true
-    
-    # Remplacement dans le nouveau format DEB822 (utilisé par Ubuntu 24.10+)
-    if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
-        sudo sed -i 's|[a-z][a-z]\.archive\.ubuntu\.com|archive.ubuntu.com|g' /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+    # EOL Detection: si archive.ubuntu.com ne sert plus ce codename → basculer sur old-releases
+    _CODENAME=$(. /etc/os-release 2>/dev/null && echo "${VERSION_CODENAME:-}")
+    if [ -n "$_CODENAME" ] && [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+        if grep -q "archive\.ubuntu\.com" /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null; then
+            echo -ne "${GRAY}    Test archive.ubuntu.com/$_CODENAME...${NC}"
+            if ! curl -sf --max-time 8 "https://archive.ubuntu.com/ubuntu/dists/$_CODENAME/Release" >/dev/null 2>&1; then
+                echo -e " ${YELLOW}EOL détecté !${NC}"
+                echo -e "${YELLOW}    ⚠️  Ubuntu $_CODENAME est EOL — bascule sur old-releases.ubuntu.com...${NC}"
+                sudo sed -i \
+                    -e 's|http://archive\.ubuntu\.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' \
+                    -e 's|http://security\.ubuntu\.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' \
+                    /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+                echo -e "${GREEN}    Miroir old-releases configuré.${NC}"
+            else
+                echo -e " ${GREEN}OK${NC}"
+            fi
+        fi
     fi
 
-    # 3. Installation immédiate des propriétés logicielles (requis pour add-apt-repository)
-    echo -e "${GRAY}    Préparation des outils de dépôts (software-properties-common)...${NC}"
-    sudo apt-get update -o Acquire::Retries=3 -qq >/dev/null 2>&1
+    # Format DEB822 (Ubuntu 24.10+) : activer universe/multiverse si absent
+    if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+        sudo sed -i 's/^Components: main restricted$/Components: main restricted universe multiverse/'         /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+        sudo sed -i 's/^Components: main$/Components: main restricted universe multiverse/'                    /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+        sudo sed -i 's/^Components: main restricted universe$/Components: main restricted universe multiverse/' /etc/apt/sources.list.d/ubuntu.sources 2>/dev/null || true
+    fi
+
+    # Ancien format .list : activer universe/multiverse
+    if grep -q "^deb " /etc/apt/sources.list 2>/dev/null; then
+        sudo sed -i '/^deb.*ubuntu.*main/{/universe/! s/$/ universe multiverse/}' /etc/apt/sources.list 2>/dev/null || true
+    fi
+
+    # Mise à jour du cache APT (afficher les vraies erreurs)
+    echo -e "${GRAY}    Préparation des outils de dépôts et mise à jour du cache...${NC}"
+    sudo apt-get update -o Acquire::Retries=3 2>&1 | grep -E "^Err|^W:|^Hit|^Get" | head -10 || true
     sudo apt-get install -y software-properties-common dirmngr gpg curl wget 2>/dev/null || true
 
 
@@ -300,17 +276,19 @@ root=black,black
 window=white,black
 border=red,black
 shadow=black,black
-title=white,red
-button=white,black
-actbutton=white,red
+title=black,red
+button=red,black
+actbutton=black,red
 compactbutton=white,black
 textbox=white,black
 listbox=white,black
-actlistbox=white,red
-sellistbox=white,black
-actsellistbox=white,red
+actlistbox=black,red
+sellistbox=black,red
+actsellistbox=black,red
 checkbox=white,black
-actcheckbox=white,red
+actcheckbox=black,red
+entry=white,black
+label=white,black
 '
 
     # ---- MENU DE BIENVENUE (OOBE) ----
@@ -318,7 +296,7 @@ actcheckbox=white,red
         installation_totale --silent
     else
         local WELCOME_CHOICE
-        WELCOME_CHOICE=$(whiptail --title "MadOS 3.5 - BIENVENUE" \
+        WELCOME_CHOICE=$(whiptail --title "MadOS 4.0 - BIENVENUE" \
             --menu "Choisissez votre mode d'entrée dans la matrice :" 15 65 2 \
             "1" "AUTO : Installation Totale (Recommandé ROG)" \
             "2" "MENU : Sélection Personnalisée (Expert)" 3>&1 1>&2 2>&3)
@@ -334,59 +312,68 @@ actcheckbox=white,red
 run_module() {
     local SCRIPT="$1"
     local DESCRIPTION="${2:-}"
-    
+
     export CURRENT_MODULE="$SCRIPT"
-    
+    export CURRENT_MODULE_DESC="$DESCRIPTION"
+    export MADOS_MODULE_CURRENT=$(( ${MADOS_MODULE_CURRENT:-0} + 1 ))
+
+    dashboard_update 2>/dev/null || true
+
     # Vérifier si module déjà exécuté avec succès
     if skip_if_completed "$SCRIPT"; then
+        echo -e "  ${GRAY}⏭  [$(printf '%02d/%02d' "$MADOS_MODULE_CURRENT" "${MADOS_MODULE_TOTAL:-?}")]  ${DESCRIPTION} — déjà complété, skip${NC}"
         return 0
     fi
-    
+
     local attempt=1
     local max_attempts=3
-    
+
     while [ $attempt -le $max_attempts ]; do
-        echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════╗${NC}"
-        echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Injection : ${SCRIPT}${NC}"
-        echo -e "${RED}║${NC} 📌 ${GRAY}${DESCRIPTION}${NC}"
-        echo -e "${RED}║${NC} 📊 ${GRAY}Tentative ${attempt}/${max_attempts}${NC}"
-        echo -e "${RED}╚══════════════════════════════════════════════════════════════════╝${NC}\n"
-        
+        # print_module_header remplacé par le dashboard en haut
+        [ "$attempt" -gt 1 ] && echo -e "\n  ${YELLOW}♻  Tentative $attempt/$max_attempts : $DESCRIPTION${NC}"
         log_info "Exécution du module: $SCRIPT (tentative $attempt/$max_attempts)"
         
-        if bash "$MODULES_DIR/$SCRIPT" 2>&1 | tee -a "$MADOS_LOG_DIR/mados_install.log"; then
+        # Protection SIGINT : en mode batch les modules ne doivent pas être tués par Ctrl+C
+        ( trap '' INT TERM; bash "$MODULES_DIR/$SCRIPT" ) 2>&1 | tee -a "$MADOS_LOG_DIR/mados_install.log"
+        local exit_code=${PIPESTATUS[0]}
+        if [ "$exit_code" -eq 0 ]; then
             # Succès - enregistrer le checkpoint
             save_checkpoint "$SCRIPT" "OK"
             log_success "Module $SCRIPT complété avec succès"
             return 0
         else
             # Échec
-            local exit_code=$?
             log_error "Échec du module $SCRIPT (code: $exit_code)"
+            dashboard_error 2>/dev/null || true
             
             if [ $attempt -lt $max_attempts ]; then
                 log_warning "Nouvelle tentative du module $SCRIPT dans 10 secondes..."
                 sleep 10
             else
-                # Max tentatives atteintes - demander à l'utilisateur
+                # Max tentatives atteintes
+                if [ "${MADOS_BATCH_MODE:-false}" = "true" ]; then
+                    log_warning "Batch mode: $SCRIPT ignoré après $max_attempts tentatives (installation continue)"
+                    save_checkpoint "$SCRIPT" "SKIPPED_ERROR"
+                    return 0
+                fi
                 local CHOICE
-                CHOICE=$(whiptail --title "MadOS 3.0 - ERREUR MODULE" --menu "Le script $SCRIPT a échoué après $max_attempts tentatives.\n\nConsultez les logs: $MADOS_LOG_DIR/mados_install.log" 15 65 3 \
+                CHOICE=$(whiptail --title "MadOS 4.0 - ERREUR MODULE" --menu "Le script $SCRIPT a échoué après $max_attempts tentatives.\n\nConsultez les logs: $MADOS_LOG_DIR/mados_install.log" 15 65 3 \
                     "1" "Réessayer encore une fois" \
                     "2" "Ignorer l'erreur et continuer" \
                     "3" "Arrêter l'installation" 3>&1 1>&2 2>&3)
-                
+
                 if [ -z "$CHOICE" ]; then CHOICE="3"; fi
-                
+
                 case $CHOICE in
-                    1) 
+                    1)
                         ((attempt--))  # Relancer une fois
                         ;;
-                    2) 
+                    2)
                         log_warning "Ignorance de l'erreur sur $SCRIPT. L'installation continue."
                         save_checkpoint "$SCRIPT" "SKIPPED_ERROR"
                         return 0
                         ;;
-                    3) 
+                    3)
                         log_error "Installation arrêtée par l'utilisateur"
                         print_installation_report
                         exit 1
@@ -413,7 +400,7 @@ menu_principal() {
 
     # Détection d'une installation interrompue
     if [ -f "$STATE_FILE" ]; then
-        if (whiptail --title "MadOS 3.0 - REPRISE DÉTECTÉE" \
+        if (whiptail --title "MadOS 4.0 - REPRISE DÉTECTÉE" \
             --yesno "Une installation précédente semble avoir été interrompue.\n\nSouhaitez-vous REPRENDRE l'installation là où elle s'est arrêtée ?\n(Répondre 'Non' effacera l'ancien état)" 12 65); then
             log_info "Reprise de l'installation demandée par l'utilisateur."
         else
@@ -421,7 +408,7 @@ menu_principal() {
         fi
     fi
 
-    if CHOIX=$(whiptail --title "MadOS 3.0 - Menu Principal" \
+    if CHOIX=$(whiptail --title "MadOS 4.0 - Menu Principal" \
         --cancel-button "Quitter" \
         --ok-button "Sélectionner" \
         --menu "Choisissez le profil d'installation pour votre machine :" 16 75 3 \
@@ -449,10 +436,10 @@ installation_totale() {
     local CHOIX_BONUS
     if [ "$SILENT_MODE" = "true" ]; then
         # Sélection par défaut (Tout ce qui est à 'ON' d'habitude)
-        CHOIX_BONUS="SNAP PROT SOND BATT MANG OLAM NET ZRAM ADS SSD USB BOOT THEM VOLT TUNE STLT DASH LINK PLMY OBSP GUI CLI SAN"
+        CHOIX_BONUS="SNAP PROT SOND BATT MANG OLAM NET ZRAM ADS SSD USB BOOT VOLT TUNE STLT DASH LINK PLMY OBSP GUI CLI SAN"
     else
         # Affichage des options facultatives auto-sélectionnées ou non
-        if ! CHOIX_BONUS=$(whiptail --title "MadOS 3.0 - Options Bonus (Déploiement Total)" \
+        if ! CHOIX_BONUS=$(whiptail --title "MadOS 4.0 - Options Bonus (Déploiement Total)" \
             --checklist "Espace pour (dés)activer, Entrée pour valider.\nLes fonctions vitales sont cochées par défaut." 20 65 12 \
             "SNAP" "Bouclier Système Timeshift" ON \
             "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
@@ -471,7 +458,6 @@ installation_totale() {
             "SSD"  "Maintenance NVMe (Auto Fstrim)" ON \
             "USB"  "Zero Latency E-Sport (Polling forcée)" ON \
             "BOOT" "Démarrage Éclair (Initramfs LZ4)" ON \
-            "THEM" "Choix du Thème Visuel (ROG / Cyber / Carbon)" ON \
             "VOLT" "Undervolt CPU / Thermiques 85C" ON \
             "TUNE" "Turbo-Tuner (Auto-Benchmark & Hugepages)" ON \
             "STLT" "Stealth-Mode (Privacité Totale & Anti-Télémétrie)" ON \
@@ -496,7 +482,7 @@ installation_totale() {
         if [ "$SILENT_MODE" = "true" ]; then
             export MADOS_TDP_PROFILE="EQUILIBRE"
         else
-            if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 3.0 - Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+            if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 4.0 - Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
                 "SILENCE" "Bridage 25W - Calme Absolu" OFF \
                 "EQUILIBRE" "Stock 45W - Usine (Défaut)" ON \
                 "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
@@ -520,7 +506,7 @@ installation_totale() {
     if [ "$SILENT_MODE" = "true" ]; then
         export MADOS_THEME="ROG"
     else
-        if ! export MADOS_THEME=$(whiptail --title "MadOS 3.0 - Charte Graphique" --radiolist "Quel style visuel appliquer ?" 12 60 3 \
+        if ! export MADOS_THEME=$(whiptail --title "MadOS 4.0 - Charte Graphique" --radiolist "Quel style visuel appliquer ?" 12 60 3 \
             "ROG" "ROG Classic (Rouge & Noir)" ON \
             "CYBER" "Cyberpunk Neon (Bleu & Rose)" OFF \
             "CARBON" "Carbon Stealth (Gris & Noir)" OFF 3>&1 1>&2 2>&3); then
@@ -547,9 +533,20 @@ installation_totale() {
     set +u
     set +o pipefail
 
+    # ---- Comptage précis des modules à exécuter ----
+    export MADOS_MODULE_CURRENT=0
+    local _total=7  # 00 01 02 03 04 06 99 — toujours présents
+    [ "$MADOS_DESKTOP" = "KDE" ] && ((_total++))  # 05 KDE
+    for _b in SNAP PROT NTFS SOND BATT MANG STRM CLAW NET ZRAM ADS DEV SSD USB BOOT VOLT GUI UPD SAN VR MAK CLI OLAM EMU TUNE STLT DASH LINK PLMY OBSP; do
+        [[ "$CHOIX_BONUS" == *"$_b"* ]] && ((_total++))
+    done
+    export MADOS_MODULE_TOTAL=$_total
+    export MADOS_BATCH_MODE=true   # Désactive les dialogs interactifs dans les modules
+    dashboard_init 2>/dev/null || true
+
     # Modules obligatoires
     run_module "00_nettoyage_ubuntu.sh" "Purification du système & Dépôts"
-    run_module "01_noyau_xanmod.sh"     "Injection du Noyau XanMod EDGE"
+    run_module "01_noyau_xanmod.sh"     "Injection du Noyau XanMod MAIN"
     run_module "02_pilotes_gpu_auto.sh" "Détection Pilotes Graphiques"
     run_module "03_integration_rog.sh"  "Couplage Hardware (asusctl)"
     run_module "04_arsenal_logiciel.sh" "Logiciels Gamers & IA"
@@ -571,29 +568,28 @@ installation_totale() {
     [[ "$CHOIX_BONUS" == *"MANG"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
     [[ "$CHOIX_BONUS" == *"STRM"* ]] && run_module "13_pack_streamer.sh" "OBS Streamer Pack"
     [[ "$CHOIX_BONUS" == *"CLAW"* ]] && run_module "14_openclaw_ai.sh" "Installation Agent IA"
-    [[ "$CHOIX_BONUS" == *"OLAM"* ]] && run_module "29_ollama_ia_locale.sh" "IA Local MadChat (Ollama)"
     [[ "$CHOIX_BONUS" == *"NET"* ]]  && run_module "15_reseau_antilag.sh" "Réseau eSport BBR+ (Low Latency)"
     [[ "$CHOIX_BONUS" == *"ZRAM"* ]] && run_module "16_zram_memoire.sh" "Compression RAM"
     [[ "$CHOIX_BONUS" == *"ADS"* ]]  && run_module "17_bouclier_antipub.sh" "Patch Fichier Hosts"
     [[ "$CHOIX_BONUS" == *"DEV"* ]]  && run_module "18_pack_pro_dev.sh" "Déploiement IDE & VM"
-    [[ "$CHOIX_BONUS" == *"EMU"* ]]  && run_module "30_emudeck_retro.sh" "Retro-Console EmuDeck"
     [[ "$CHOIX_BONUS" == *"SSD"* ]]  && run_module "19_donnees_fstrim.sh" "Trim Auto SSD"
     [[ "$CHOIX_BONUS" == *"USB"* ]]  && run_module "20_esport_usb_1000hz.sh" "Zero Latency USB"
     [[ "$CHOIX_BONUS" == *"BOOT"* ]] && run_module "21_boot_eclair.sh" "Fast Boot System"
-    [[ "$CHOIX_BONUS" == *"THEM"* ]] && run_module "06_thematique_mados.sh" "Choix du Thème Visuel"
     [[ "$CHOIX_BONUS" == *"VOLT"* ]] && run_module "22_cpu_undervolt.sh" "Protection Thermique"
     [[ "$CHOIX_BONUS" == *"GUI"* ]]  && run_module "23_control_center.sh" "Panneau de Contrôle GUI"
     [[ "$CHOIX_BONUS" == *"UPD"* ]]  && run_module "24_mados_update.sh" "Mise à jour MadOS depuis GitHub"
-    [[ "$CHOIX_BONUS" == *"CLI"* ]]  && run_module "28_mados_cli.sh" "Installation Utilitaire CLI 'mados'"
     [[ "$CHOIX_BONUS" == *"SAN"* ]]  && run_module "25_sante_systeme.sh" "Diagnostic Santé du Système"
+    [[ "$CHOIX_BONUS" == *"VR"* ]]   && run_module "26_vr_oculus_quest.sh" "Intégration VR (Meta Quest)"
+    [[ "$CHOIX_BONUS" == *"MAK"* ]]  && run_module "27_creation_maker.sh" "Station Maker (Imprimante 3D & Laser)"
+    [[ "$CHOIX_BONUS" == *"CLI"* ]]  && run_module "28_mados_cli.sh" "Installation Utilitaire CLI 'mados'"
+    [[ "$CHOIX_BONUS" == *"OLAM"* ]] && run_module "29_ollama_ia_locale.sh" "IA Local MadChat (Ollama)"
+    [[ "$CHOIX_BONUS" == *"EMU"* ]]  && run_module "30_emudeck_retro.sh" "Retro-Console EmuDeck"
     [[ "$CHOIX_BONUS" == *"TUNE"* ]] && run_module "31_turbo_tuner.sh" "Auto-Performance (Turbo-Tuner)"
     [[ "$CHOIX_BONUS" == *"STLT"* ]] && run_module "32_stealth_privacy.sh" "Confidentialité Totale (Stealth-Mode)"
     [[ "$CHOIX_BONUS" == *"DASH"* ]] && run_module "33_mad_center_gui.sh" "Tableau de Bord MadCenter Dashboard"
     [[ "$CHOIX_BONUS" == *"LINK"* ]] && run_module "34_mad_link_sync.sh" "Synchronisation Smartphone (MadLink)"
     [[ "$CHOIX_BONUS" == *"PLMY"* ]] && run_module "35_plymouth_animated.sh" "Boot Splash Pulsar ROG"
     [[ "$CHOIX_BONUS" == *"OBSP"* ]] && run_module "36_obs_nvenc_streaming.sh" "Pack OBS Streamer (RTX)"
-    [[ "$CHOIX_BONUS" == *"VR"* ]]   && run_module "26_vr_oculus_quest.sh" "Intégration VR (Meta Quest)"
-    [[ "$CHOIX_BONUS" == *"MAK"* ]]  && run_module "27_creation_maker.sh" "Station Maker (Imprimante 3D & Laser)"
     run_module "99_integration_systeme.sh" "Finalisation & Intégration Système"
 
     cloture_installation
@@ -601,7 +597,7 @@ installation_totale() {
 
 installation_custom() {
     local CHOIX_ALL
-    if ! CHOIX_ALL=$(whiptail --title "MadOS 3.0 - Déploiement Custom (Expert)" \
+    if ! CHOIX_ALL=$(whiptail --title "MadOS 4.0 - Déploiement Custom (Expert)" \
         --checklist "Espace pour sélectionner, Entrée pour valider :" 20 65 12 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
@@ -609,7 +605,7 @@ installation_custom() {
         "03_rog" "Intégration Hardware ASUS" OFF \
         "04_soft" "Arsenal logiciel (Steam, Discord...)" OFF \
         "05_kde" "Injecter KDE Plasma 6 Wayland" ON \
-        "06_them" "Thème visuel MadOS" OFF \
+        "06_them" "Thème visuel (ROG/Cyber/Carbon)" OFF \
         "07_snap" "Bouclier Snapshots Timeshift" OFF \
         "08_prot" "Performances Proton-GE / GameScope" OFF \
         "09_ntfs" "Auto-montage disques NTFS" OFF \
@@ -618,36 +614,35 @@ installation_custom() {
         "12_mang" "MangoHud MadOS Edition" OFF \
         "13_strm" "Pack OBS Stream" OFF \
         "14_claw" "Assistant IA OpenClaw" OFF \
-        "29_olam" "IA Locale MadChat (Ollama)" OFF \
         "15_net" "Optimisation Réseau eSport BBR+" OFF \
         "16_zrm" "Compression Mémoire ZRAM" OFF \
         "17_ads" "Bouclier Anti-Pub" OFF \
         "18_dev" "Pack Développeur (VSCode, Docker)" OFF \
-        "30_emu" "Retro-Console EmuDeck" OFF \
         "19_ssd" "Auto-Trim NVMe" OFF \
         "20_usb" "Polling Rate USB 1000Hz" OFF \
         "21_bot" "Fix Boot Ultra-Rapide (LZ4)" OFF \
         "22_vlt" "Undervolt CPU Auto" OFF \
         "23_gui" "MadOS Control Center" OFF \
-        "06_them" "Thème visuel (ROG/Cyber/Carbon)" OFF \
         "24_upd" "Updater GitHub" OFF \
-        "28_cli" "Utilitaire CLI 'mados'" OFF \
         "25_san" "Diagnostics Système" OFF \
+        "26_vr" "Casque VR (Meta Quest, ALVR)" OFF \
+        "27_mak" "Station Maker (3D & Laser)" OFF \
+        "28_cli" "Utilitaire CLI 'mados'" OFF \
+        "29_olam" "IA Locale MadChat (Ollama)" OFF \
+        "30_emu" "Retro-Console EmuDeck" OFF \
         "31_tun" "Turbo-Tuner (Performances i9/RTX)" OFF \
         "32_stl" "Stealth-Mode Privacy" OFF \
         "33_dsh" "MadCenter Dashboard (GUI)" OFF \
         "34_lnk" "MadLink (Sync Mobile)" OFF \
         "35_plm" "Boot Splash Animé (Plymouth)" OFF \
-        "36_obs" "Pack OBS RTX Stream" OFF \
-        "26_vr" "Casque VR (Meta Quest, ALVR)" OFF \
-        "27_mak" "Station Maker (3D & Laser)" OFF 3>&1 1>&2 2>&3); then
+        "36_obs" "Pack OBS RTX Stream" OFF 3>&1 1>&2 2>&3); then
         
         menu_principal
         return
     fi
 
     if [[ "$CHOIX_ALL" == *"22_vlt"* ]]; then
-        if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 3.0 - Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 70 4 \
+        if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 4.0 - Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 70 4 \
             "SILENCE" "Bridage 25W - Calme Absolu" OFF \
             "EQUILIBRE" "Stock 45W - Normal (Défaut)" ON \
             "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
@@ -662,10 +657,18 @@ installation_custom() {
     echo -e "${RED}Début du protocole custom...${NC}\n"
     sleep 2
 
-    # ---- BOUNCLIER DE CONTINUITÉ DÉPLOYÉ ----
-    # On désactive la "paranoïa" de Bash pour que l'installation ne s'arrête PAS 
     set +u
     set +o pipefail
+
+    # ---- Comptage précis des modules sélectionnés ----
+    export MADOS_MODULE_CURRENT=0
+    local _total=2  # 05_kde + 99 toujours présents
+    for _f in 00_clean 01_kern 02_gpu 03_rog 04_soft 06_them 07_snap 08_prot 09_ntfs 10_snd 11_batt 12_mang 13_strm 14_claw 15_net 16_zrm 17_ads 18_dev 19_ssd 20_usb 21_bot 22_vlt 23_gui 24_upd 25_san 26_vr 27_mak 28_cli 29_olam 30_emu 31_tun 32_stl 33_dsh 34_lnk 35_plm 36_obs; do
+        [[ "$CHOIX_ALL" == *"$_f"* ]] && ((_total++))
+    done
+    export MADOS_MODULE_TOTAL=$_total
+    export MADOS_BATCH_MODE=true   # Désactive les dialogs interactifs dans les modules
+    dashboard_init 2>/dev/null || true
 
     [[ "$CHOIX_ALL" == *"00_clean"* ]] && run_module "00_nettoyage_ubuntu.sh" "Purification du système"
     [[ "$CHOIX_ALL" == *"01_kern"* ]] && run_module "01_noyau_xanmod.sh" "Injection du Noyau"
@@ -682,37 +685,35 @@ installation_custom() {
     [[ "$CHOIX_ALL" == *"12_mang"* ]] && run_module "12_mangohud_rog.sh" "MangoHud Profil"
     [[ "$CHOIX_ALL" == *"13_strm"* ]] && run_module "13_pack_streamer.sh" "OBS et Capture"
     [[ "$CHOIX_ALL" == *"14_claw"* ]] && run_module "14_openclaw_ai.sh" "Agent IA OpenClaw"
+    [[ "$CHOIX_ALL" == *"15_net"* ]]  && run_module "15_reseau_antilag.sh" "TCP BBR+ Anti-Lag"
+    [[ "$CHOIX_ALL" == *"16_zrm"* ]]  && run_module "16_zram_memoire.sh" "Swap ZRAM"
+    [[ "$CHOIX_ALL" == *"17_ads"* ]]  && run_module "17_bouclier_antipub.sh" "Hosts StevenBlack"
+    [[ "$CHOIX_ALL" == *"18_dev"* ]]  && run_module "18_pack_pro_dev.sh" "Pack Docker/QEMU"
+    [[ "$CHOIX_ALL" == *"19_ssd"* ]]  && run_module "19_donnees_fstrim.sh" "SSD Auto Trim"
+    [[ "$CHOIX_ALL" == *"20_usb"* ]]  && run_module "20_esport_usb_1000hz.sh" "USB Mod E-Sport"
+    [[ "$CHOIX_ALL" == *"21_bot"* ]]  && run_module "21_boot_eclair.sh" "GRUB Initramfs Lz4"
+    [[ "$CHOIX_ALL" == *"22_vlt"* ]]  && run_module "22_cpu_undervolt.sh" "Undervolt & Thermiques"
+    [[ "$CHOIX_ALL" == *"23_gui"* ]]  && run_module "23_control_center.sh" "Interface Control Center"
+    [[ "$CHOIX_ALL" == *"24_upd"* ]]  && run_module "24_mados_update.sh" "Mise à jour depuis GitHub"
+    [[ "$CHOIX_ALL" == *"25_san"* ]]  && run_module "25_sante_systeme.sh" "Diagnostic Santé"
+    [[ "$CHOIX_ALL" == *"26_vr"* ]]   && run_module "26_vr_oculus_quest.sh" "Suite VR Meta Quest"
+    [[ "$CHOIX_ALL" == *"27_mak"* ]]  && run_module "27_creation_maker.sh" "Station Maker (Imprimante 3D & Laser)"
+    [[ "$CHOIX_ALL" == *"28_cli"* ]]  && run_module "28_mados_cli.sh" "Installation Utilitaire CLI 'mados'"
     [[ "$CHOIX_ALL" == *"29_olam"* ]] && run_module "29_ollama_ia_locale.sh" "IA MadChat (Ollama)"
-    run_module "05_bureau_kde_plasma.sh" "KDE Plasma 6"
-    [[ "$CHOIX_ALL" == *"15_net"* ]] && run_module "15_reseau_antilag.sh" "TCP BBR+ Anti-Lag"
-    [[ "$CHOIX_ALL" == *"16_zrm"* ]] && run_module "16_zram_memoire.sh" "Swap ZRAM"
-    [[ "$CHOIX_ALL" == *"17_ads"* ]] && run_module "17_bouclier_antipub.sh" "Hosts StevenBlack"
-    [[ "$CHOIX_ALL" == *"18_dev"* ]] && run_module "18_pack_pro_dev.sh" "Pack Docker/QEMU"
-    [[ "$CHOIX_ALL" == *"30_emu"* ]] && run_module "30_emudeck_retro.sh" "Retro-Console EmuDeck"
-    [[ "$CHOIX_ALL" == *"19_ssd"* ]] && run_module "19_donnees_fstrim.sh" "SSD Auto Trim"
-    [[ "$CHOIX_ALL" == *"20_usb"* ]] && run_module "20_esport_usb_1000hz.sh" "USB Mod E-Sport"
-    [[ "$CHOIX_ALL" == *"21_bot"* ]] && run_module "21_boot_eclair.sh" "GRUB Initramfs Lz4"
-    [[ "$CHOIX_ALL" == *"22_vlt"* ]] && run_module "22_cpu_undervolt.sh" "Undervolt & Thermiques"
-    [[ "$CHOIX_ALL" == *"23_gui"* ]] && run_module "23_control_center.sh" "Interface Control Center"
-    [[ "$CHOIX_ALL" == *"06_them"* ]] && run_module "06_thematique_mados.sh" "Esthétique MadOS"
-    [[ "$CHOIX_ALL" == *"24_upd"* ]] && run_module "24_mados_update.sh" "Mise à jour depuis GitHub"
-    [[ "$CHOIX_ALL" == *"28_cli"* ]] && run_module "28_mados_cli.sh" "Installation Utilitaire CLI 'mados'"
-    [[ "$CHOIX_ALL" == *"25_san"* ]] && run_module "25_sante_systeme.sh" "Diagnostic Santé"
-    [[ "$CHOIX_ALL" == *"31_tun"* ]] && run_module "31_turbo_tuner.sh" "Performances Turbo-Tuner"
-    [[ "$CHOIX_ALL" == *"32_stl"* ]] && run_module "32_stealth_privacy.sh" "Confidentialité Stealth-Mode"
-    [[ "$CHOIX_ALL" == *"33_dsh"* ]] && run_module "33_mad_center_gui.sh" "Dashboard MadCenter"
-    [[ "$CHOIX_ALL" == *"34_lnk"* ]] && run_module "34_mad_link_sync.sh" "Sync MadLink"
-    [[ "$CHOIX_ALL" == *"35_plm"* ]] && run_module "35_plymouth_animated.sh" "Boot Pulsar Animé"
-    [[ "$CHOIX_ALL" == *"36_obs"* ]] && run_module "36_obs_nvenc_streaming.sh" "Pack OBS RTX Stream"
-    [[ "$CHOIX_ALL" == *"26_vr"* ]] && run_module "26_vr_oculus_quest.sh" "Suite VR Meta Quest"
-    [[ "$CHOIX_ALL" == *"27_mak"* ]] && run_module "27_creation_maker.sh" "Station Maker (Imprimante 3D & Laser)"
+    [[ "$CHOIX_ALL" == *"30_emu"* ]]  && run_module "30_emudeck_retro.sh" "Retro-Console EmuDeck"
+    [[ "$CHOIX_ALL" == *"31_tun"* ]]  && run_module "31_turbo_tuner.sh" "Performances Turbo-Tuner"
+    [[ "$CHOIX_ALL" == *"32_stl"* ]]  && run_module "32_stealth_privacy.sh" "Confidentialité Stealth-Mode"
+    [[ "$CHOIX_ALL" == *"33_dsh"* ]]  && run_module "33_mad_center_gui.sh" "Dashboard MadCenter"
+    [[ "$CHOIX_ALL" == *"34_lnk"* ]]  && run_module "34_mad_link_sync.sh" "Sync MadLink"
+    [[ "$CHOIX_ALL" == *"35_plm"* ]]  && run_module "35_plymouth_animated.sh" "Boot Pulsar Animé"
+    [[ "$CHOIX_ALL" == *"36_obs"* ]]  && run_module "36_obs_nvenc_streaming.sh" "Pack OBS RTX Stream"
     run_module "99_integration_systeme.sh" "Finalisation & Intégration Système"
 
     cloture_installation
 }
 
 mode_destruction() {
-    if whiptail --title "MadOS 3.0 - MODE DESTRUCTION" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 70; then
+    if whiptail --title "MadOS 4.0 - MODE DESTRUCTION" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 70; then
         clear
         run_module "00_nettoyage_ubuntu.sh" "Purification Extrême de l'Hôte"
         sleep 2
@@ -721,40 +722,45 @@ mode_destruction() {
 }
 
 cloture_installation() {
-    clear
-    echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${RED}║${NC} 🏁 ${WHITE}${BOLD}Séquence de Clôture MadOS 3.5 Ultimate-Test${NC}"
-    echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
+    local REAL_USER="${SUDO_USER:-$USER}"
+    local USER_HOME
+    USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+
+    dashboard_done    2>/dev/null || true
+    dashboard_cleanup 2>/dev/null || true
 
     # ---- RÉPARATION DES PERMISSIONS (Fix Écran Noir) ----
-    echo -e "    ${GRAY}├─ [REPAIR] Restauration des droits utilisateur sur $USER_HOME...${NC}"
+    print_step "Restauration des droits utilisateur sur $USER_HOME..."
     sudo chown -R "$REAL_USER:$REAL_USER" "$USER_HOME" >/dev/null 2>&1 || true
     sudo chmod -R u+rw "$USER_HOME" >/dev/null 2>&1 || true
 
-    # Vérification et installation asynchrone de netcat pour l'upload
-    if ! command -v nc &>/dev/null; then
-        echo -e "${GRAY}    Installation de netcat-openbsd pour le diagnostic...${NC}"
-        sudo apt-get install -y netcat-openbsd -qq >/dev/null 2>&1
+    # ---- RAPPORT VISUEL TERMINAL ----
+    clear
+    print_installation_report
+
+    # ---- DIALOG FINAL ----
+    local _errors=0
+    [ -f "$MADOS_ERRORS_FILE" ] && [ -s "$MADOS_ERRORS_FILE" ] && _errors=$(wc -l < "$MADOS_ERRORS_FILE")
+    local _statut="OPÉRATIONNEL"
+    [ "$_errors" -gt 0 ] && _statut="OPÉRATIONNEL ─ ${_errors} avertissement(s)"
+
+    if [ "${MADOS_BATCH_MODE:-false}" = "true" ]; then
+        echo -e "\n${GREEN}✅ MADOS EST ACTIF — Statut : $_statut${NC}"
+        echo -e "${GRAY}Modules : ${MADOS_MODULE_CURRENT:-?}/${MADOS_MODULE_TOTAL:-?} | Logs : $MADOS_LOG_DIR/mados_install.log${NC}"
+        echo -e "${YELLOW}Redémarrez manuellement pour activer le Kernel XanMod et KDE Plasma 6.${NC}\n"
+        exit 0
     fi
 
-    echo -e "${CYAN}📡 Génération du rapport de mission (Termbin)...${NC}"
-    local ACTUAL_LOG="$MADOS_LOG_DIR/mados_install.log"
-    local LOG_URL="https://termbin.com/indisponible"
-    
-    if [ -f "$ACTUAL_LOG" ]; then
-        LOG_URL=$(tail -n 10000 "$ACTUAL_LOG" | nc termbin.com 9999 2>/dev/null || echo "Échec de l'upload")
-    fi
-
-    # UI Finale Premium
-    whiptail --title "MadOS 3.5 — DÉPLOIEMENT TERMINÉ 🚀" --msgbox \
-    "MAD-OS EST MAINTENANT ACTIF SUR VOTRE SYSTÈME !\n\n\
-    [STATUT] : OPÉRATIONNEL\n\
-    [LOG DIAG] : $LOG_URL\n\n\
-    Prochaines étapes :\n\
-    1. Redémarrez pour charger le Kernel XanMod.\n\
-    2. Le bureau KDE Plasma 6 (MadEdition) sera actif.\n\
-    3. Vos modules Turbo-Tuner & Stealth-Mode sont scellés.\n\n\
-    Bon jeu, $(whoami) !" 18 70
+    whiptail --title "MadOS 4.0 — DÉPLOIEMENT TERMINÉ" --msgbox \
+    "MADOS EST ACTIF SUR VOTRE SYSTÈME !\n\n\
+Statut  : $_statut\n\
+Modules : ${MADOS_MODULE_CURRENT:-?}/${MADOS_MODULE_TOTAL:-?} complétés\n\
+Logs    : $MADOS_LOG_DIR/mados_install.log\n\n\
+Prochaines étapes :\n\
+  1. Redémarrez — le Kernel XanMod 6.14+ se charge\n\
+  2. KDE Plasma 6 MadEdition sera actif\n\
+  3. Tapez 'mados help' pour la CLI MadOS\n\n\
+Bon jeu, $REAL_USER !" 18 68
 
     if whiptail --title "SÉQUENCE DE REDÉMARRAGE" --yesno "Voulez-vous engager le redémarrage immédiat ?" 10 50; then
         clear

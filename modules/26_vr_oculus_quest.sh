@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 26_vr_oculus_quest.sh
+# MadOS ROG Edition 4.0 - 26_vr_oculus_quest.sh
 # ==============================================================================
 # Couleurs
 # ==============================================================================
@@ -14,6 +14,9 @@ GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 # Thème Whiptail MadOS
 export NEWT_COLORS='
@@ -38,7 +41,7 @@ REAL_USER=${SUDO_USER:-$USER}
 USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${BLUE}======================================================${NC}"
-echo -e "${CYAN}   19. Intégration VR (Meta Quest 3, ALVR, SideQuest)${NC}"
+echo -e "${CYAN}   26. Intégration VR v4.0 (Meta Quest 3, ALVR, SideQuest)${NC}"
 echo -e "${BLUE}======================================================${NC}"
 echo -e "${YELLOW}[!] Ce module configure le support natif pour les casques Meta Quest.${NC}"
 
@@ -61,7 +64,7 @@ fi
 
 # Création du dossier /opt/VR si nécessaire
 sudo mkdir -p /opt/MadOS_VR
-sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR
+sudo chown -R "$REAL_USER:$REAL_USER" /opt/MadOS_VR
 
 # 3. Installation de SideQuest
 echo -e "\n${BLUE}[+] Installation de SideQuest (Sideloading & Gestion Casque)...${NC}"
@@ -79,7 +82,7 @@ if [ -n "$SQ_LATEST_TAG" ]; then
         sudo mkdir -p /opt/MadOS_VR/SideQuest
         if sudo tar -xf "$SQ_PATH" -C /opt/MadOS_VR/SideQuest --strip-components=1 2>/dev/null; then
             sudo rm -f "$SQ_PATH" || true
-            sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/SideQuest || true
+            sudo chown -R "$REAL_USER:$REAL_USER" /opt/MadOS_VR/SideQuest || true
             
             # Création du raccourci
             echo -e "    ${GRAY}├─ Création du raccourci Bureau pour SideQuest...${NC}"
@@ -122,7 +125,7 @@ if [ -n "$ALVR_LATEST_TAG" ]; then
             if [ -f "/opt/MadOS_VR/ALVR/ALVR Launcher" ]; then
                 sudo mv "/opt/MadOS_VR/ALVR/ALVR Launcher" "/opt/MadOS_VR/ALVR/alvr_launcher"
             fi
-            sudo chown -R $REAL_USER:$REAL_USER /opt/MadOS_VR/ALVR
+            sudo chown -R "$REAL_USER:$REAL_USER" /opt/MadOS_VR/ALVR
             
             # Création du raccourci
             echo -e "    ${GRAY}├─ Création du raccourci Bureau pour ALVR Launcher...${NC}"

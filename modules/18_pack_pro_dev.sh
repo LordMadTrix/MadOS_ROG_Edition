@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 18_pack_pro_dev.sh
+# MadOS ROG Edition 4.0 - 18_pack_pro_dev.sh
 # ==============================================================================
 # Phase: 18 - Pack Professionnel / Virt / Dev
 # ==============================================================================
@@ -13,13 +13,16 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 18 Installation de l'écosystème Pro Dev & Virtualisation${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 18 : Installation de l'écosystème Pro Dev & Virtualisation v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Docker

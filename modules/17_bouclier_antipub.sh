@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 17_bouclier_antipub.sh
+# MadOS ROG Edition 4.0 - 17_bouclier_antipub.sh
 # ==============================================================================
 # Phase: 17 - Bouclier Anti-Pub / Malwares (Hosts)
 # ==============================================================================
@@ -13,9 +13,12 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+NC='\033[0m'
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 17 Déploiement du Bouclier Anti-Pub Global (Fichier Hosts)${NC}"
+echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 17 : Déploiement du Bouclier Anti-Pub Global v4.0${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 HOSTS_URL="https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
@@ -43,7 +46,7 @@ EOF
 
     echo -e "    ${CYAN}✅ [SUCCÈS] Plus de 100 000 serveurs publicitaires et malicieux bloqués au niveau du noyau réseau.${NC}"
 else
-    echo -e "    ${YELLOW}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Échec du téléchargement. Le bouclier n'a pas été appliqué.${NC}"
+    echo -e "    ${YELLOW}⚠️  [ATTENTION] Échec du téléchargement. Le bouclier n'a pas été appliqué.${NC}"
 fi
 
 rm -f "$TEMP_HOSTS"

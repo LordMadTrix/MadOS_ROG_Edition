@@ -1,14 +1,24 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 35_plymouth_animated.sh
+# MadOS ROG Edition 4.0 - 35_plymouth_animated.sh
 # ==============================================================================
 # Phase: 35 - Plymouth Animated (Boot Splash ROG Eye Pulse)
 # ==============================================================================
 
+
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+GRAY='\033[0;37m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m'
+
 export DEBIAN_FRONTEND=noninteractive
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${RED}║${NC} 🌀 ${WHITE}${BOLD}Phase 35 Déploiement du Splash Screen Animé (Plymouth Pulsar)${NC}"
+echo -e "${RED}║${NC} 🌀 ${WHITE}${BOLD}Phase 35 : Déploiement du Splash Screen Animé v4.0 (Plymouth Pulsar)${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Installation des outils Plymouth
@@ -46,7 +56,7 @@ EOF
 cat <<'EOF' | sudo tee /usr/share/plymouth/themes/mados-pulsar/mados-pulsar.plymouth >/dev/null
 [Plymouth Theme]
 Name=MadOS ROG Pulse
-Description=Animated pulsing ROG logo for MadOS 3.5
+Description=Animated pulsing ROG logo for MadOS 4.0
 ModuleName=script
 
 [script]
@@ -54,9 +64,20 @@ ImageDir=/usr/share/plymouth/themes/mados-pulsar
 ScriptFile=/usr/share/plymouth/themes/mados-pulsar/mados-pulsar.script
 EOF
 
-# Copie du logo ROG (on utilise l'image déjà présente dans les assets si possible)
-if [ -f "/usr/share/wallpapers/MadOS/default_wallpaper.png" ]; then
-    sudo cp "/usr/share/wallpapers/MadOS/default_wallpaper.png" "/usr/share/plymouth/themes/mados-pulsar/logo.png" || true
+# Copie du logo ROG — priorité au vrai logo, fallback wallpaper
+LOGO_SRC=""
+for candidate in \
+    "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../assets/logo.png" \
+    "/opt/mados-rog/assets/logo.png" \
+    "/usr/share/wallpapers/MadOS/default_wallpaper.png"; do
+    if [ -f "$candidate" ]; then
+        LOGO_SRC="$candidate"
+        break
+    fi
+done
+if [ -n "$LOGO_SRC" ]; then
+    sudo convert "$LOGO_SRC" -resize 250x250 "/usr/share/plymouth/themes/mados-pulsar/logo.png" 2>/dev/null \
+        || sudo cp "$LOGO_SRC" "/usr/share/plymouth/themes/mados-pulsar/logo.png" || true
 fi
 
 # 3. Activation du Thème
