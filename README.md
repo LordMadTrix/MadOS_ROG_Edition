@@ -58,5 +58,16 @@ MadOS_ROG_Edition/
 
 ---
 
+## 🪟 Sur Windows ? Voir **MadTweak**
+
+MadOS a un petit frère pour l'autre moitié du dual-boot : **[MadTweak](https://github.com/LordMadTrix/madtweak)** optimise Windows 10 / 11 avec 127 tweaks réversibles, un audit complet et une annulation exacte — même philosophie, même identité ROG.
+
+| | MadOS ROG Edition | [MadTweak](https://github.com/LordMadTrix/madtweak) |
+|---|---|---|
+| **Système** | Kubuntu 24.04 LTS | Windows 10 / 11 |
+| **Rôle** | **Installe et transforme** un système neuf | **Ajuste et nettoie** un système existant |
+
+---
+
 ## 📜 License
 **MIT License** - Libre et Open Source. Fait avec ❤️ par LordMadTrix.
