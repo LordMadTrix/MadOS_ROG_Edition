@@ -4,3 +4,11 @@
 *.py text eol=lf
 *.md text eol=lf
 *.txt text eol=lf
+# config.conf est charge par bash (source) : en CRLF, chaque ligne se termine par
+# un  invisible et bash echoue avec "$'': command not found".
+*.conf text eol=lf
+*.tsv  text eol=lf
+# Les binaires ne doivent subir aucune conversion.
+*.png binary
+*.jpg binary
+*.svg text eol=lf
