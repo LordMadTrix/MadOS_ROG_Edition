@@ -58,6 +58,22 @@ MadOS_ROG_Edition/
 
 ---
 
+## 🛡️ Sécurité & réversibilité
+
+Trois garde-fous, repris de son pendant Windows [MadTweak](https://github.com/LordMadTrix/madtweak) :
+
+```bash
+sudo bash install.sh --dry-run        # SIMULATION : montre tout, n'écrit rien
+sudo bash install.sh --list-backups   # ce qui a été sauvegardé, donc restaurable
+sudo bash install.sh --restore        # remet les fichiers dans leur état d'origine
+```
+
+- **Mode simulation** — toute action passant par `run_action` affiche ce qu'elle *ferait* au lieu de le faire. À lancer au moins une fois avant une vraie installation.
+- **Manifeste de sauvegarde** — chaque fichier sauvegardé est indexé (`original → sauvegarde → date`) dans `manifeste.tsv`. Sans cet index, un backup horodaté ne dit plus de quel fichier il provient : c'est lui qui rend la restauration possible.
+- **Un module refuse de nuire** — plutôt que d'appliquer un réglage néfaste sur *cette* machine-ci, il appelle `refuser_reglage "raison"` et explique pourquoi. Un refus n'est pas un échec.
+
+---
+
 ## 🪟 Sur Windows ? Voir **MadTweak**
 
 MadOS a un petit frère pour l'autre moitié du dual-boot : **[MadTweak](https://github.com/LordMadTrix/madtweak)** optimise Windows 10 / 11 avec 127 tweaks réversibles, un audit complet et une annulation exacte — même philosophie, même identité ROG.

@@ -46,8 +46,43 @@ main() {
     for arg in "$@"; do
         case $arg in
             --auto|-y) AUTO_FLAG=true ;;
+            # Simulation : montre ce qui serait fait, sans rien modifier.
+            --dry-run|--simulation) export DRY_RUN="yes" ;;
+            # Remet les fichiers sauvegardés par MadOS dans leur état d'origine.
+            --restore) MADOS_ACTION="restore" ;;
+            --list-backups) MADOS_ACTION="list" ;;
+            --help|-h) MADOS_ACTION="help" ;;
         esac
     done
+
+    case "${MADOS_ACTION:-}" in
+        help)
+            cat <<'AIDE'
+MadOS ROG Edition - options
+
+  sudo bash install.sh                 Installation complete
+  sudo bash install.sh --auto          Installation sans questions
+  sudo bash install.sh --dry-run       SIMULATION : montre tout, n'ecrit rien
+  sudo bash install.sh --list-backups  Liste les fichiers sauvegardes
+  sudo bash install.sh --restore       Restaure les fichiers sauvegardes
+  sudo bash install.sh --help          Cette aide
+AIDE
+            exit 0 ;;
+        list)
+            source "$(dirname "$0")/lib/config.conf" 2>/dev/null || true
+            source "$(dirname "$0")/lib/common.sh" 2>/dev/null || true
+            list_backups
+            exit $? ;;
+        restore)
+            source "$(dirname "$0")/lib/config.conf" 2>/dev/null || true
+            source "$(dirname "$0")/lib/common.sh" 2>/dev/null || true
+            restore_all
+            exit $? ;;
+    esac
+
+    if is_dry_run 2>/dev/null || [ "${DRY_RUN:-no}" = "yes" ]; then
+        echo -e "[1;33m[SIMULATION] Aucune modification ne sera ecrite sur ce systeme.[0m"
+    fi
 
     export DEBIAN_FRONTEND=noninteractive
     export NEEDRESTART_MODE=l

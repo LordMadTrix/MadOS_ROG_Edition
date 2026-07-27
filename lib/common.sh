@@ -242,14 +242,125 @@ skip_if_completed() {
 # Sauvegarde des fichiers importants
 # ==============================================================================
 
+# ==============================================================================
+# MODE SIMULATION (DRY_RUN)
+#
+# DRY_RUN était déclaré dans config.conf mais n'était lu nulle part : le mode
+# simulation était annoncé sans exister. Toute action destructive doit désormais
+# passer par run_action, qui affiche ce qu'elle FERAIT au lieu de le faire.
+# ==============================================================================
+is_dry_run() {
+    case "${DRY_RUN,,}" in
+        yes|true|1|oui) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+log_simu() {
+    local msg="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+    echo -e "${CYAN}[${timestamp}]${NC} ${YELLOW}[SIMULATION]${NC} ${msg}"
+    echo "[${timestamp}] [SIMULATION] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
+}
+
+run_action() {
+    # Usage : run_action "ce que ça ferait, en clair" commande arg1 arg2...
+    # En simulation, rien n'est exécuté : seule la description est affichée.
+    local description="$1"
+    shift
+
+    if is_dry_run; then
+        log_simu "$description"
+        return 0
+    fi
+    "$@"
+}
+
+refuser_reglage() {
+    # Un module refuse de nuire : plutôt qu'appliquer un réglage néfaste SUR CETTE
+    # machine-ci, il explique pourquoi il ne le fait pas. Un refus n'est pas un échec.
+    local raison="$1"
+    log_warning "RÉGLAGE REFUSÉ (il nuirait sur cette machine) : ${raison}"
+    return 0
+}
+
+# ==============================================================================
+# Sauvegarde & Restauration
+# ==============================================================================
 backup_file() {
     local file="$1"
     local backup_name="${2:-$(basename $file).bak.$(date +%s)}"
-    
+
     if [ -f "$file" ]; then
-        sudo cp "$file" "${MADOS_BACKUP_DIR}/${backup_name}" 2>/dev/null || true
+        if is_dry_run; then
+            log_simu "sauvegarderait ${file}"
+            return 0
+        fi
+
+        sudo mkdir -p "$MADOS_BACKUP_DIR" 2>/dev/null || true
+        sudo cp -p "$file" "${MADOS_BACKUP_DIR}/${backup_name}" 2>/dev/null || true
+
+        # Le manifeste est ce qui rend la restauration possible : sans lui, un backup
+        # horodaté ne dit plus de QUEL fichier il provient.
+        printf '%s	%s	%s
+' "$file" "${MADOS_BACKUP_DIR}/${backup_name}" "$(date '+%Y-%m-%d %H:%M:%S')"             | sudo tee -a "$MADOS_BACKUP_MANIFEST" >/dev/null 2>&1 || true
+
         log_info "Fichier sauvegardé: ${file} → ${backup_name}"
     fi
+}
+
+list_backups() {
+    # Affiche ce qui a été sauvegardé, et donc ce qui est restaurable.
+    if [ ! -f "$MADOS_BACKUP_MANIFEST" ]; then
+        log_warning "Aucune sauvegarde enregistrée (manifeste absent)."
+        return 1
+    fi
+
+    echo -e "${CYAN}Fichiers sauvegardés par MadOS :${NC}"
+    local n=0
+    while IFS=$'	' read -r original sauvegarde date_bk; do
+        [ -z "$original" ] && continue
+        n=$((n + 1))
+        printf '  %2d. %s
+      sauvegardé le %s
+' "$n" "$original" "$date_bk"
+    done < "$MADOS_BACKUP_MANIFEST"
+    echo -e "${CYAN}${n} fichier(s) restaurable(s).${NC}"
+}
+
+restore_all() {
+    # Remet chaque fichier sauvegardé à sa place, du plus ancien au plus récent :
+    # si un même fichier a été sauvegardé plusieurs fois, la PREMIÈRE sauvegarde
+    # (l'état d'origine, avant toute intervention de MadOS) doit gagner en dernier.
+    if [ ! -f "$MADOS_BACKUP_MANIFEST" ]; then
+        log_error "Aucun manifeste de sauvegarde : rien à restaurer."
+        return 1
+    fi
+
+    local ok=0 echecs=0
+    while IFS=$'	' read -r original sauvegarde date_bk; do
+        [ -z "$original" ] && continue
+        if [ ! -f "$sauvegarde" ]; then
+            log_error "Sauvegarde introuvable pour ${original}"
+            echecs=$((echecs + 1))
+            continue
+        fi
+        if is_dry_run; then
+            log_simu "restaurerait ${original}"
+            ok=$((ok + 1))
+            continue
+        fi
+        if sudo cp -p "$sauvegarde" "$original" 2>/dev/null; then
+            ok=$((ok + 1))
+        else
+            log_error "Échec de restauration : ${original}"
+            echecs=$((echecs + 1))
+        fi
+    done < <(tac "$MADOS_BACKUP_MANIFEST")
+
+    log_info "${ok} fichier(s) restauré(s), ${echecs} échec(s)."
+    [ "$echecs" -eq 0 ]
 }
 
 restore_file() {
