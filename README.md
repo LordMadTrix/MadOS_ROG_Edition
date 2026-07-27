@@ -85,5 +85,19 @@ MadOS a un petit frère pour l'autre moitié du dual-boot : **[MadTweak](https:/
 
 ---
 
+## 💛 Remerciements
+
+MadOS est développé sur mon temps libre et restera gratuit. Merci à celles et ceux qui
+le soutiennent via [GitHub Sponsors](https://github.com/sponsors/LordMadTrix) — les
+sponsors qui le souhaitent sont crédités ici.
+
+<!-- SPONSORS:DEBUT -->
+*Aucun sponsor pour l'instant — cette section attend son premier nom.*
+<!-- SPONSORS:FIN -->
+
+Merci aussi à celles et ceux qui signalent un bug ou testent sur une configuration
+différente de la mienne : c'est ce qui permet à un script qui touche au noyau et aux
+pilotes de rester sûr sur des machines que je ne possède pas.
+
 ## 📜 License
 **MIT License** - Libre et Open Source. Fait avec ❤️ par LordMadTrix.
