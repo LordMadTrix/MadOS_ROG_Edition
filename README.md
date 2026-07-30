@@ -2,7 +2,9 @@
   <img src="assets/logo.png" alt="MadOS ROG Logo" width="300" />
 
   # 🔴 MadOS ROG Edition 3.5 Ultimate Stable
-  
+
+  ### La branche Linux de [MadTweak](https://github.com/LordMadTrix/madtweak)
+
   **La transformation ultime pour votre ASUS ROG sous Kubuntu 24.04 LTS**
   
   *Framework d'installation post-boot ultra-robuste optimisé pour la stabilité et la performance.*
@@ -76,7 +78,7 @@ sudo bash install.sh --restore        # remet les fichiers dans leur état d'ori
 
 ## 🪟 Sur Windows ? Voir **MadTweak**
 
-MadOS a un petit frère pour l'autre moitié du dual-boot : **[MadTweak](https://github.com/LordMadTrix/madtweak)** optimise Windows 10 / 11 avec 127 tweaks réversibles, un audit complet et une annulation exacte — même philosophie, même identité ROG.
+MadOS a un petit frère pour l'autre moitié du dual-boot : **[MadTweak](https://github.com/LordMadTrix/madtweak)** optimise Windows 10 / 11 avec 155 tweaks réversibles, un audit complet et une annulation exacte — même philosophie, même identité ROG.
 
 | | MadOS ROG Edition | [MadTweak](https://github.com/LordMadTrix/madtweak) |
 |---|---|---|
