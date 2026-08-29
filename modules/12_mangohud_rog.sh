@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 12_mangohud_rog.sh
+# MadOS ROG Edition 3.5 - 12_mangohud_rog.sh
 # ==============================================================================
 # Phase: 12 - Profil MangoHud ROG & GOverlay
 # ==============================================================================
@@ -14,19 +14,25 @@ GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
 
+[ -f "$PROJECT_ROOT/lib/common.sh" ] && source "$PROJECT_ROOT/lib/common.sh"
+
 REAL_USER=${SUDO_USER:-$USER}
+USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 12 Génération du Profil MangoHud ROG Edition${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # Installation de GOverlay si non présent
-sudo apt install -y goverlay || true
+run_action "installerait le paquet goverlay" sudo apt install -y goverlay || true
 
 # Création de la configuration MangoHud
 MANGO_DIR="$USER_HOME/.config/MangoHud"
-sudo -u "$REAL_USER" mkdir -p "$MANGO_DIR"
+run_action "créerait le dossier $MANGO_DIR" sudo -u "$REAL_USER" mkdir -p "$MANGO_DIR"
 
+if is_dry_run; then
+    log_simu "écrirait le profil MangoHud.conf (couleurs ROG) dans $MANGO_DIR"
+else
 cat <<'EOF' | sudo -u "$REAL_USER" tee "$MANGO_DIR/MangoHud.conf" >/dev/null
 ### MadOS ROG Edition - MangoHud Profile
 legacy_layout=false
@@ -56,6 +62,7 @@ frametime
 frame_timing=1
 histogram
 EOF
+fi
 
 echo -e "    ${GRAY}✅ [SUCCÈS] Fichier MangoHud.conf généré aux couleurs ROG.${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 12 Terminée.${NC}"

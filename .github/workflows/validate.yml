@@ -7,28 +7,70 @@ on:
     branches: [ main ]
 
 jobs:
-  shellcheck:
-    name: ShellCheck (Lint Bash)
+  syntaxe:
+    name: Syntaxe Bash (bloquant)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install ShellCheck
-        run: sudo apt-get install -y shellcheck
-
-      - name: Lint Menu_Installation_ROG.sh
-        run: shellcheck -S warning -e SC2034,SC2155,SC1091 Menu_Installation_ROG.sh || true
-
-      - name: Lint all modules
+      # Ce controle est le garde-fou principal : il aurait bloque les deux
+      # erreurs de syntaxe parties en production (06_thematique_mados.sh et
+      # 02_pilotes_gpu_auto.sh). Il DOIT rester bloquant -- pas de "|| true".
+      - name: Analyse syntaxique de tous les scripts
         run: |
-          for script in modules/*.sh; do
-            echo "→ Checking $script"
-            shellcheck -S warning -e SC2034,SC2155,SC1091 "$script" || true
+          echec=0
+          for script in install.sh lib/*.sh modules/*.sh; do
+            [ -f "$script" ] || continue
+            if bash -n "$script" 2>/tmp/err; then
+              echo "OK    $script"
+            else
+              echo "ECHEC $script"
+              sed 's/^/        /' /tmp/err
+              echec=1
+            fi
           done
+          if [ "$echec" -ne 0 ]; then
+            echo "::error::Au moins un script ne passe pas l'analyse syntaxique Bash."
+            exit 1
+          fi
+          echo "Tous les scripts passent bash -n."
 
-      - name: Lint install.sh
-        run: shellcheck -S warning -e SC2034,SC2155,SC1091 install.sh || true
+      # Un module reference par install.sh mais absent du depot casse
+      # l'installation en silence (cas install_local.sh). On verifie donc que
+      # chaque module appele existe reellement.
+      - name: Verifier que les modules appeles existent
+        run: |
+          echec=0
+          for module in $(grep -oE 'run_module "[^"]+"' install.sh | cut -d'"' -f2 | sort -u); do
+            if [ -f "modules/$module" ]; then
+              echo "OK    modules/$module"
+            else
+              echo "ECHEC modules/$module est appele par install.sh mais n'existe pas"
+              echec=1
+            fi
+          done
+          if [ "$echec" -ne 0 ]; then
+            echo "::error::install.sh appelle un module absent du depot."
+            exit 1
+          fi
+
+  shellcheck:
+    name: ShellCheck (informatif)
+    runs-on: ubuntu-latest
+    # Non bloquant DE FACON EXPLICITE : le job apparait en echec dans l'UI mais
+    # ne bloque pas la fusion. C'est different d'un "|| true", qui faisait
+    # passer le job au vert quoi qu'il arrive et masquait tout.
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
+
+      - name: Lint install.sh, lib/ et modules/
+        run: shellcheck -S warning -e SC2034,SC2155,SC1091 install.sh lib/*.sh modules/*.sh
 
   pages:
     name: GitHub Pages — Verify index.html
@@ -38,18 +80,17 @@ jobs:
         uses: actions/checkout@v4
 
       # La page vit dans docs/, pas a la racine : c'est de la que GitHub Pages la
-      # sert (source = branche main, chemin /docs). Ce controle cherchait index.html
-      # a la racine et echouait donc depuis avril -- la meme meprise qui faisait
-      # renvoyer 404 au site lui-meme.
+      # sert (source = branche main, chemin /docs).
       - name: Check docs/index.html exists
         run: |
           if [ ! -f docs/index.html ]; then
-            echo "ERROR: docs/index.html is missing!"
+            echo "::error::docs/index.html is missing!"
             exit 1
           fi
-          echo "docs/index.html is present ✓"
+          echo "docs/index.html is present"
 
       - name: Validate HTML structure
         run: |
-          grep -q "<title>" docs/index.html && echo "Title tag found ✓" || echo "Warning: No title tag"
-          grep -q "install" docs/index.html && echo "Install command found ✓" || echo "Warning: No install command in page"
+          grep -q "<title>" docs/index.html || { echo "::error::No title tag"; exit 1; }
+          grep -q "git clone" docs/index.html || { echo "::error::La page ne propose pas la methode d'installation par git clone"; exit 1; }
+          echo "Structure de la page OK"

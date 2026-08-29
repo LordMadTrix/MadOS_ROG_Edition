@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 09_montage_ntfs.sh
+# MadOS ROG Edition 3.5 - 09_montage_ntfs.sh
 # ==============================================================================
 # Phase: 9 - Montage Automatique des jeux NTFS
 # ==============================================================================
@@ -13,6 +13,8 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
+
+[ -f "$PROJECT_ROOT/lib/common.sh" ] && source "$PROJECT_ROOT/lib/common.sh"
 
 REAL_USER=${SUDO_USER:-$USER}
 USER_UID=$(id -u "$REAL_USER")
@@ -51,18 +53,29 @@ if [ "$TARGET_DRIVE" == "q" ]; then exit 0; fi
 if sudo blkid | grep -q "$TARGET_DRIVE"; then
     UUID=$(sudo blkid -s UUID -o value "$TARGET_DRIVE")
     MOUNT_POINT="/mnt/Jeux_Windows"
-    
-    sudo mkdir -p "$MOUNT_POINT"
-    
+
+    run_action "créerait le point de montage $MOUNT_POINT" sudo mkdir -p "$MOUNT_POINT"
+
     # Check si déjà dans fstab
     if grep -q "$UUID" /etc/fstab; then
-        echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Le disque est déjà configuré dans /etc/fstab.${NC}"
+        echo -e "    ${RED}⚠️  [ATTENTION] Le disque est déjà configuré dans /etc/fstab.${NC}"
     else
         echo -e "    ${GRAY}├─ Ajout de l'entrée fstab optimisée Steam...${NC}"
-        sudo apt install -y ntfs-3g > /dev/null 2>&1 || true
-        echo "UUID=$UUID $MOUNT_POINT ntfs-3g uid=$USER_UID,gid=$USER_GID,rw,user,exec,umask=000,utf8 0 0" | sudo tee -a /etc/fstab > /dev/null
-        sudo mount -a || echo -e "    ${RED}⚠️  [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] [ATTENTION] Erreur lors du montage automatique.${NC}"
-        echo -e "    ${GREEN}✅ [SUCCÈS] Disque monté avec succès dans $MOUNT_POINT !${NC}"
+        run_action "installerait ntfs-3g" sudo apt install -y ntfs-3g > /dev/null 2>&1 || true
+        if is_dry_run; then
+            log_simu "ajouterait l'entrée fstab pour UUID=$UUID sur $MOUNT_POINT puis monterait (mount -a)"
+        else
+            backup_file "/etc/fstab"
+            echo "UUID=$UUID $MOUNT_POINT ntfs-3g uid=$USER_UID,gid=$USER_GID,rw,user,exec,umask=000,utf8 0 0" | sudo tee -a /etc/fstab > /dev/null
+            # Le message de succes etait affiche SANS CONDITION, juste apres le
+            # message d erreur : deux lignes contradictoires a la suite.
+            if sudo mount -a; then
+                echo -e "    ${GREEN}✅ [SUCCÈS] Disque monté dans $MOUNT_POINT.${NC}"
+            else
+                echo -e "    ${RED}⚠️  [ATTENTION] Échec du montage. L entrée fstab est en place ;${NC}"
+                echo -e "    ${GRAY}    vérifiez-la avec : ${GREEN}sudo mount -a${NC}"
+            fi
+        fi
     fi
 else
     echo -e "    ${RED}❌ [ERREUR] Périphérique invalide.${NC}"

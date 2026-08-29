@@ -1,9 +1,11 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 25_sante_systeme.sh
+# MadOS ROG Edition 3.5 - 25_sante_systeme.sh
 # ==============================================================================
 # Phase: 25 - Diagnostic Santé Système MadOS
 # ==============================================================================
+
+[ -f "$PROJECT_ROOT/lib/common.sh" ] && source "$PROJECT_ROOT/lib/common.sh"
 
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
@@ -152,31 +154,54 @@ fi
 echo -e "\n    ${GRAY}Rapport complet sauvegardé dans : ${WHITE}$REPORT_FILE${NC}"
 
 # 8. Benchmark de Performance (Validation MadOS)
-echo -e "\n    ${CYAN}📊 [BENCHMARK] Test de stress et validation performance...${NC}"
-sudo apt install -y sysbench bc >/dev/null 2>&1 || true
+# Ce bloc lancait un stress CPU sur tous les coeurs et 10 Go de transfert
+# memoire SANS garde --dry-run, puis ouvrait un whiptail bloquant -- y compris
+# en installation automatique, ou personne n'est la pour repondre.
+TOTAL_SCORE="$PERCENT"
 
-# Test CPU (Calcul des nombres premiers)
-echo -ne "    ${GRAY}├─ Test du processeur (CPU)... ${NC}"
-CPU_SCORE=$(sysbench cpu --cpu-max-prime=20000 --threads=$(nproc) run | grep "events per second" | awk '{print $4}')
-echo -e "${GREEN}${BOLD}$CPU_SCORE ops/sec${NC}"
+if is_dry_run; then
+    log_simu "lancerait un benchmark sysbench (CPU tous coeurs + 10 Go memoire) et proposerait le rapport detaille"
+elif [ -n "${MADOS_SILENT:-}" ]; then
+    echo -e "\n    ${GRAY}📊 [BENCHMARK] Ignoré en mode automatique (test de stress long).${NC}"
+else
+    echo -e "\n    ${CYAN}📊 [BENCHMARK] Test de stress et validation performance...${NC}"
+    run_action "installerait sysbench et bc pour le benchmark" sudo apt install -y sysbench bc >/dev/null 2>&1 || true
 
-# Test RAM (Vitesse d'accès séquentiel)
-echo -ne "    ${GRAY}├─ Test de la mémoire (RAM)... ${NC}"
-RAM_SCORE=$(sysbench memory --memory-block-size=1M --memory-total-size=10G run | grep "transferred" | awk -F'[(|)]' '{print $2}')
-echo -e "${GREEN}${BOLD}$RAM_SCORE${NC}"
+    if command -v sysbench >/dev/null 2>&1; then
+        # Test CPU (Calcul des nombres premiers)
+        echo -ne "    ${GRAY}├─ Test du processeur (CPU)... ${NC}"
+        CPU_SCORE=$(sysbench cpu --cpu-max-prime=20000 --threads="$(nproc)" run 2>/dev/null | grep "events per second" | awk '{print $4}')
+        echo -e "${GREEN}${BOLD}${CPU_SCORE:-N/A} ops/sec${NC}"
 
-# Calcul du Score Global MadOS (Normalisation simple)
-SCORE_MATH=$(echo "$CPU_SCORE / 10" | bc 2>/dev/null || echo "0")
-TOTAL_SCORE=$(($PERCENT + (SCORE_MATH / 100)))
+        # Test RAM (Vitesse d'accès séquentiel)
+        echo -ne "    ${GRAY}├─ Test de la mémoire (RAM)... ${NC}"
+        RAM_SCORE=$(sysbench memory --memory-block-size=1M --memory-total-size=10G run 2>/dev/null | grep "transferred" | awk -F'[(|)]' '{print $2}')
+        echo -e "${GREEN}${BOLD}${RAM_SCORE:-N/A}${NC}"
+
+        # sysbench renvoie un DECIMAL ("1234.56") : $(( )) ne gere pas les
+        # flottants et l'ancien calcul plantait sur une erreur de syntaxe.
+        # On tronque a l'entier avant toute arithmetique.
+        CPU_ENTIER=$(printf '%s' "${CPU_SCORE:-0}" | cut -d. -f1)
+        case "$CPU_ENTIER" in
+            ''|*[!0-9]*) CPU_ENTIER=0 ;;
+        esac
+        TOTAL_SCORE=$(( PERCENT + CPU_ENTIER / 1000 ))
+        [ "$TOTAL_SCORE" -gt 100 ] && TOTAL_SCORE=100
+    else
+        echo -e "    ${YELLOW}├─ sysbench indisponible : benchmark ignoré.${NC}"
+    fi
+fi
 
 # Rapport Final Dynamique
 echo -e "\n    ${WHITE}${BOLD}╔═════════════════════════════════════════════════════╗${NC}"
 echo -e "    ${WHITE}${BOLD}║  VOTRE RÉSULTAT MAD-OS : ${CYAN}$TOTAL_SCORE / 100${NC}               ${WHITE}${BOLD}║${NC}"
 echo -e "    ${WHITE}${BOLD}╚═════════════════════════════════════════════════════╝${NC}"
 
-# Proposer d'afficher le rapport complet
-whiptail --title "MadOS 3.3 - 🏥 Diagnostic & Benchmark" \
-    --yesno "Score Global : $TOTAL_SCORE/100 (Santé: $PERCENT%)\n\nVoulez-vous consulter le rapport détaillé ?" 12 55 && \
-    whiptail --title "MadOS 3.3 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
+# Proposer d'afficher le rapport complet — jamais en automatique ni en simulation.
+if ! is_dry_run && [ -z "${MADOS_SILENT:-}" ]; then
+    whiptail --title "MadOS 3.5 - 🏥 Diagnostic & Benchmark" \
+        --yesno "Score Global : $TOTAL_SCORE/100 (Santé: $PERCENT%)\n\nVoulez-vous consulter le rapport détaillé ?" 12 55 && \
+        whiptail --title "MadOS 3.5 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
+fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 25 Terminée.${NC}"

@@ -1,10 +1,12 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 06_thematique_mados.sh
+# MadOS ROG Edition 3.5 - 06_thematique_mados.sh
 # ==============================================================================
 # Phase: 6 - Identité OS complète + Visuals
 # Transforme le rendu pour correspondre au style ROG
 # ==============================================================================
+
+[ -f "$PROJECT_ROOT/lib/common.sh" ] && source "$PROJECT_ROOT/lib/common.sh"
 
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
@@ -27,17 +29,43 @@ ASSETS_DIR="$PROJECT_ROOT/assets"
 # ==============================================================================
 # Choix du Thème (ROG / CYBER / CARBON)
 # ==============================================================================
+# MADOS_THEME est exporté par install.sh. Valeur de repli "ROG" pour que le
+# module reste exécutable seul (et sous set -u).
+case "${MADOS_THEME:-ROG}" in
+    "CYBER")
+        THEME_COLOR='\033[1;35m'      # Magenta/violet Cyberpunk
+        ZSH_LOGO_COLOR='\033[1;36m'   # Cyan
+        WALLPAPER_NAME="MadCyber.png"
+        THEME_DESC="Cyberpunk Neon Edition"
+        ;;
+    "CARBON")
+        THEME_COLOR='\033[0;37m'      # Gris
+        ZSH_LOGO_COLOR='\033[1;37m'   # Blanc
+        WALLPAPER_NAME="MadCarbon.png"
+        THEME_DESC="Carbon Stealth Edition"
+        ;;
+    *)  # ROG par défaut
+        THEME_COLOR='\033[0;31m'      # Rouge
+        ZSH_LOGO_COLOR='\033[1;31m'   # Rouge gras
+        WALLPAPER_NAME="MadRog.png"
+        THEME_DESC="Republic of Gamers Edition"
+        ;;
 esac
 
 # Détection de l'interface graphique (DE)
-export CURRENT_DE=$(user_run echo $XDG_CURRENT_DESKTOP | tr '[:upper:]' '[:lower:]')
-if [[ "$CURRENT_DE" == *"gnome"* ]]; then
-    MADOS_DE="GNOME"
-elif [[ "$CURRENT_DE" == *"kde"* ]] || [[ "$CURRENT_DE" == *"plasma"* ]]; then
-    MADOS_DE="KDE"
-else
-    MADOS_DE="UNKNOWN"
+# Detection de l'interface graphique via detecter_bureau() (lib/common.sh).
+# $XDG_CURRENT_DESKTOP etait developpe cote root : toujours vide.
+# MADOS_DESKTOP est exporte par install.sh ; on le reutilise s'il est present,
+# sinon on detecte nous-memes (cas d'un lancement du module en solo).
+MADOS_DE="${MADOS_DESKTOP:-}"
+if [ -z "$MADOS_DE" ]; then
+    if type detecter_bureau >/dev/null 2>&1; then
+        MADOS_DE="$(detecter_bureau)"
+    else
+        MADOS_DE="UNKNOWN"
+    fi
 fi
+export CURRENT_DE="$MADOS_DE"
 
 echo -e "\n${THEME_COLOR}╔══════════════════════════════════════════════════════╗${NC}"
 echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 3.5 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
@@ -45,6 +73,9 @@ echo -e "${THEME_COLOR}║${NC}   ${GRAY}Interface détectée : ${BOLD}$MADOS_DE
 echo -e "${THEME_COLOR}╚══════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. OS Identity
+if is_dry_run; then
+    log_simu "écrirait /etc/os-release, /etc/hostname et le MOTD MadOS ROG"
+else
 cat > /etc/os-release <<OSRELEASE
 NAME="MadOS ROG Edition"
 VERSION="3.5 (Ultimate Stable)"
@@ -56,6 +87,14 @@ OSRELEASE
 
 echo "mados-rog" > /etc/hostname
 hostname mados-rog 2>/dev/null || true
+backup_file "/etc/hosts"
+# Sans l'entrée correspondante dans /etc/hosts, chaque sudo affiche
+# "unable to resolve host mados-rog" et attend la résolution DNS.
+if grep -qE '^127\.0\.1\.1[[:space:]]' /etc/hosts 2>/dev/null; then
+    sed -i 's/^127\.0\.1\.1[[:space:]].*/127.0.1.1\tmados-rog/' /etc/hosts
+else
+    printf '127.0.1.1\tmados-rog\n' >> /etc/hosts
+fi
 
 cat > /etc/update-motd.d/00-mados-header <<MOTD
 #!/bin/bash
@@ -65,22 +104,16 @@ echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██╔████╔██║████
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║\033[0m"
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║\033[0m"
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝\033[0m"
-echo -e "  \033[0;36m\033[1mMadOS 3.2 ($THEME_DESC)\033[0m  |  Kernel: \$(uname -r)"
+echo -e "  \033[0;36m\033[1mMadOS 3.5 ($THEME_DESC)\033[0m  |  Kernel: \$(uname -r)"
 MOTD
 chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
-RESET='\033[0m'
-echo -e "${RED}${BOLD}  ███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗${RESET}"
-echo -e "${RED}${BOLD}  ████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝${RESET}"
-echo -e "${RED}${BOLD}  ██╔████╔██║███████║██║  ██║██║   ██║███████╗${RESET}"
-echo -e "${RED}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║${RESET}"
-echo -e "${RED}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║${RESET}"
-echo -e "${RED}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝${RESET}"
-echo -e "  \${CYAN}\${BOLD}MadOS ROG Edition 2.6\${RESET}  |  Kernel: \$(uname -r)"
-MOTD
-chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
+fi
 
 # 2. ZSH & P10K
 echo -e "\n${RED}>>> ${WHITE}[2/5] ${BOLD}Déploiement Console ZSH & Neofetch...${NC}"
+if is_dry_run; then
+    log_simu "changerait le shell par défaut vers zsh, installerait oh-my-zsh + powerlevel10k et écrirait ~/.zshrc"
+else
 chsh -s /bin/zsh "$REAL_USER" 2>/dev/null || true
 
 if [ ! -d "$USER_HOME/.oh-my-zsh" ]; then
@@ -104,10 +137,15 @@ POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 ZSHRC
 chown "$REAL_USER:$REAL_USER" "$USER_HOME/.zshrc"
+fi
 
 # 3. Wallpapers
 echo -e "\n${THEME_COLOR}>>> ${WHITE}[3/5] ${BOLD}Intégration du Fond d'écran $WALLPAPER_NAME...${NC}"
 WALLPAPER_DIR="/usr/share/wallpapers/MadOS"
+
+if is_dry_run; then
+    log_simu "déploierait le fond d'écran MadOS dans $WALLPAPER_DIR et l'appliquerait via $MADOS_DE"
+else
 sudo mkdir -p "$WALLPAPER_DIR"
 
 # Fallback links si les assets locaux manquent
@@ -145,10 +183,14 @@ if [ "$MADOS_DE" = "GNOME" ]; then
     user_gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER_DIR/default_wallpaper.png"
     user_gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER_DIR/default_wallpaper.png"
 fi
+fi
 
 # 4. GRUB Theme
 echo -e "\n${RED}>>> ${WHITE}[4/5] ${BOLD}Installation d'un Thème GRUB Premium...${NC}"
 
+if is_dry_run; then
+    log_simu "installerait le thème GRUB Cyberpunk (téléchargement, édition de /etc/default/grub, update-grub)"
+else
 # Installation des prérequis de thème
 sudo apt install -y git tar || true
 
@@ -186,9 +228,14 @@ if [ -d "$GRUB_THEME_DIR" ]; then
 else
     echo -e "    ${GRAY}├─ Échec du téléchargement du thème GRUB. (Ignoré)${NC}"
 fi
+fi
 
 # 5. Accent Rouge & Papirus Icons (Transformation Windows-Style)
 echo -e "\n${RED}>>> ${WHITE}[5/5] ${BOLD}Sculpture du Bureau (ROG Windows-Style)...${NC}"
+
+if is_dry_run; then
+    log_simu "installerait Papirus/Plymouth/dconf-cli, appliquerait les dossiers rouges Papirus et sculpterait le bureau ($MADOS_DE)"
+else
 sudo apt install -y papirus-icon-theme plymouth plymouth-theme-spinner dconf-cli 2>/dev/null || true
 
 # Application des dossiers rouges Papirus
@@ -252,10 +299,14 @@ BackgroundAlternate=200,0,0
 BackgroundNormal=255,0,0
 KDEGLOBALS
 sudo chown "$REAL_USER:$REAL_USER" "$USER_HOME/.config/kdeglobals"
+fi
 
 # Plymouth Custom Theme Setup
 if [ -f "$ASSETS_DIR/logo.png" ]; then
     echo -e "    ${GRAY}├─ Construction du thème de démarrage Plymouth (MadOS ROG)...${NC}"
+    if is_dry_run; then
+        log_simu "construirait et activerait le thème Plymouth MadOS ROG (assets, update-alternatives, update-initramfs)"
+    else
     sudo DEBIAN_FRONTEND=noninteractive apt install -y imagemagick plymouth-label >/dev/null 2>&1 || true
     
     PLY_DIR="/usr/share/plymouth/themes/mados-rog"
@@ -306,6 +357,7 @@ SCRIPT_EOF
     
     echo -e "    ${GRAY}├─ Recompilation du Kernel et de l'initramfs (Patientez svp)...${NC}"
     sudo update-initramfs -u >/dev/null 2>&1 || true
+    fi
 fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 6 Terminée.${NC}"

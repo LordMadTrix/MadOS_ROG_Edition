@@ -1,10 +1,12 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 07_snapshots_systeme.sh
+# MadOS ROG Edition 3.5 - 07_snapshots_systeme.sh
 # ==============================================================================
 # Phase: 7 - Instantanés (Timeshift)
 # Configure un point de sauvegarde système par sécurité
 # ==============================================================================
+
+[ -f "$PROJECT_ROOT/lib/common.sh" ] && source "$PROJECT_ROOT/lib/common.sh"
 
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
@@ -23,7 +25,7 @@ echo -e "${RED}╚════════════════════�
 
 # Installation
 if ! command -v timeshift &>/dev/null; then
-    sudo apt install -y timeshift || true
+    run_action "installerait le paquet timeshift" sudo apt install -y timeshift || true
 fi
 
 # Basic check if root is btrfs
@@ -31,7 +33,7 @@ ROOT_FSTYPE=$(df -T / | awk 'NR==2 {print $2}')
 
 if [ "$ROOT_FSTYPE" == "btrfs" ]; then
     echo -e "    ${WHITE}├─ [BTRFS] Mode snapshot ultra-rapide activé.${NC}"
-    sudo timeshift --btrfs --create --comments "Sauvegarde MadOS Initiale" > /dev/null 2>&1 || true
+    run_action "créerait un snapshot Timeshift BTRFS initial" sudo timeshift --btrfs --create --comments "Sauvegarde MadOS Initiale" > /dev/null 2>&1 || true
 else
     echo -e "    ${GRAY}├─ [RSYNC] Mode standard RSYNC activé.${NC}"
     # On ne lance pas par défaut un rsync complet (trop long), on se contente de l'installer

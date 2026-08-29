@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - lib/common.sh
+# MadOS ROG Edition 3.5 - lib/common.sh
 # ==============================================================================
 # Fonctions communes, logging, gestion d'erreurs et rollback
 # ==============================================================================
@@ -55,12 +55,66 @@ user_run() {
 }
 
 
+# ==============================================================================
+# Détection de l'environnement de bureau
+# ==============================================================================
+# `$(user_run echo $XDG_CURRENT_DESKTOP)` ne marchait pas : la variable est
+# developpee par le shell ROOT avant d'etre passee a sudo, et root ne l'a pas
+# dans son environnement. Le resultat etait donc toujours vide, le test tombait
+# systematiquement dans le `else`, et KDE etait force -- y compris sur une
+# machine GNOME, rendant tout le chemin "Transformation Win11 GNOME" inatteignable.
+#
+# On interroge donc, dans l'ordre : la session logind de l'utilisateur, puis les
+# processus de session reellement en cours, puis les paquets installes.
+# Renvoie "KDE", "GNOME" ou "UNKNOWN".
+detecter_bureau() {
+    local utilisateur="${SUDO_USER:-$USER}"
+    local brut=""
+
+    # 1. logind : source d'autorite quand une session graphique est ouverte.
+    if command -v loginctl >/dev/null 2>&1; then
+        local sid
+        sid=$(loginctl show-user "$utilisateur" -p Display --value 2>/dev/null)
+        [ -z "$sid" ] && sid=$(loginctl list-sessions --no-legend 2>/dev/null | awk -v u="$utilisateur" '$3==u {print $1; exit}')
+        [ -n "$sid" ] && brut=$(loginctl show-session "$sid" -p Desktop --value 2>/dev/null)
+    fi
+
+    # 2. Processus de session : fiable meme sans logind exploitable.
+    if [ -z "$brut" ]; then
+        if pgrep -u "$utilisateur" -x plasmashell >/dev/null 2>&1; then
+            brut="KDE"
+        elif pgrep -u "$utilisateur" -x gnome-shell >/dev/null 2>&1; then
+            brut="GNOME"
+        fi
+    fi
+
+    # 3. Dernier recours : ce qui est installe.
+    if [ -z "$brut" ]; then
+        if command -v plasmashell >/dev/null 2>&1; then
+            brut="KDE"
+        elif command -v gnome-shell >/dev/null 2>&1; then
+            brut="GNOME"
+        fi
+    fi
+
+    case "$(echo "$brut" | tr '[:upper:]' '[:lower:]')" in
+        *kde*|*plasma*) echo "KDE" ;;
+        *gnome*|*ubuntu*) echo "GNOME" ;;
+        *) echo "UNKNOWN" ;;
+    esac
+}
+
 # Chemins critiques
 export MADOS_LOG_DIR="/var/log/mados"
 export MADOS_BACKUP_DIR="/var/lib/mados_backup"
 export MADOS_CHECKPOINT_FILE="/tmp/mados_checkpoint.log"
 export MADOS_ERRORS_FILE="${MADOS_LOG_DIR}/mados_errors.log"
 export MADOS_STATUS_FILE="/tmp/mados_status.txt"
+# Défini ICI (pas seulement dans config.conf) : en installation réelle, install.sh
+# ne source config.conf que dans les branches --list-backups/--restore. Sans cette
+# ligne, backup_file() écrivait dans un chemin vide -- le fichier était bien copié,
+# mais jamais indexé, donc jamais retrouvable par --list-backups/--restore.
+export MADOS_BACKUP_MANIFEST="${MADOS_BACKUP_MANIFEST:-$MADOS_BACKUP_DIR/manifeste.tsv}"
 
 # Compteurs de tentatives
 export RETRY_COUNT=3
@@ -86,8 +140,12 @@ init_mados_logging() {
     
     # DNS Fix : Stabilisation pour les installations réseau fragiles (VM / WiFi)
     if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
-        log_warning "Instabilité réseau détectée. Injection de DNS de secours..."
-        printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" | sudo tee /etc/resolv.conf > /dev/null || true
+        if is_dry_run; then
+            log_simu "détecterait une instabilité réseau et écrirait des DNS de secours dans /etc/resolv.conf"
+        else
+            log_warning "Instabilité réseau détectée. Injection de DNS de secours..."
+            printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" | sudo tee /etc/resolv.conf > /dev/null || true
+        fi
     fi
 }
 
@@ -99,7 +157,7 @@ log_info() {
     local msg="$1"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
-    echo -e "${CYAN}[${timestamp}]${NC} ${GREEN}[INFO]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo -e "${CYAN}[${timestamp}]${NC} ${GREEN}[INFO]${NC} ${msg}"
     echo "[${timestamp}] [INFO] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
 }
 
@@ -107,7 +165,7 @@ log_error() {
     local msg="$1"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
-    echo -e "${RED}[${timestamp}]${NC} ${RED}[ERREUR]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo -e "${RED}[${timestamp}]${NC} ${RED}[ERREUR]${NC} ${msg}"
     echo "[${timestamp}] [ERREUR] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" "$MADOS_ERRORS_FILE" >/dev/null 2>&1 || true
 }
 
@@ -115,7 +173,7 @@ log_warning() {
     local msg="$1"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
-    echo -e "${YELLOW}[${timestamp}]${NC} ${YELLOW}[ATTENTION]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo -e "${YELLOW}[${timestamp}]${NC} ${YELLOW}[ATTENTION]${NC} ${msg}"
     echo "[${timestamp}] [ATTENTION] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
 }
 
@@ -123,7 +181,7 @@ log_success() {
     local msg="$1"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
-    echo -e "${GREEN}[${timestamp}]${NC} ${GREEN}[✓ SUCCÈS]${NC} ${msg}" | tee -a "$MADOS_LOG_DIR/mados_install.log" 2>/dev/null
+    echo -e "${GREEN}[${timestamp}]${NC} ${GREEN}[✓ SUCCÈS]${NC} ${msg}"
     echo "[${timestamp}] [SUCCÈS] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
 }
 
@@ -224,19 +282,18 @@ reset_install_state() {
     log_info "État d'installation réinitialisé."
 }
 
+# Lit le MEME fichier et le MEME format que save_checkpoint, qui ecrit
+# "<module>:<statut>:<horodatage>" dans STATE_FILE. L'ancienne version lisait
+# MADOS_CHECKPOINT_FILE en cherchant "OK:<module>" -- deux fichiers et deux
+# formats differents, donc jamais aucune correspondance : la reprise
+# d'installation ne fonctionnait pas.
 get_completed_modules() {
-    grep "OK:" "$MADOS_CHECKPOINT_FILE" 2>/dev/null | cut -d: -f2 | sort -u
+    [ -f "$STATE_FILE" ] || return 0
+    grep -E ':(OK|SKIPPED_ERROR):' "$STATE_FILE" 2>/dev/null | cut -d: -f1 | sort -u
 }
 
-skip_if_completed() {
-    local module="$1"
-    
-    if grep -q "OK:${module}" "$MADOS_CHECKPOINT_FILE" 2>/dev/null; then
-        log_warning "${module} déjà exécuté - SKIP"
-        return 0
-    fi
-    return 1
-}
+# Une seule definition. Il y en avait deux : la seconde ecrasait silencieusement
+# la premiere (la correcte) au chargement du fichier.
 
 # ==============================================================================
 # Sauvegarde des fichiers importants
@@ -250,11 +307,23 @@ skip_if_completed() {
 # passer par run_action, qui affiche ce qu'elle FERAIT au lieu de le faire.
 # ==============================================================================
 is_dry_run() {
-    case "${DRY_RUN,,}" in
+    # local ... = "${DRY_RUN:-no}" et pas "${DRY_RUN,,}" directement : install.sh
+    # tourne sous "set -u", et une installation NORMALE (sans --dry-run) n'exporte
+    # jamais DRY_RUN du tout -- confirmé en testant pour de vrai sous WSL2 : sans
+    # ce filet, cette ligne plantait tout de suite avec "DRY_RUN: unbound
+    # variable", AVANT même la première vraie commande. Le mode simulation aurait
+    # fait planter le mode réel.
+    local valeur="${DRY_RUN:-no}"
+    case "${valeur,,}" in
         yes|true|1|oui) return 0 ;;
         *) return 1 ;;
     esac
 }
+
+# Compte les lignes [SIMULATION] émises dans la session en cours : c'est ce qui
+# permet au bilan final ("N modification(s) auraient été faites") de dire quelque
+# chose de mesuré plutôt qu'un simple "terminé".
+export MADOS_SIMU_COUNT=0
 
 log_simu() {
     local msg="$1"
@@ -262,6 +331,7 @@ log_simu() {
 
     echo -e "${CYAN}[${timestamp}]${NC} ${YELLOW}[SIMULATION]${NC} ${msg}"
     echo "[${timestamp}] [SIMULATION] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
+    MADOS_SIMU_COUNT=$((MADOS_SIMU_COUNT + 1))
 }
 
 run_action() {
@@ -453,7 +523,7 @@ print_installation_report() {
     
     clear
     echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${RED}║${NC} ${GREEN}✓${NC} ${WHITE}${BOLD}Installation MadOS 3.0 Terminée${NC}"
+    echo -e "${RED}║${NC} ${GREEN}✓${NC} ${WHITE}${BOLD}Installation MadOS 3.5 Terminée${NC}"
     echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
     
     echo -e "${CYAN}📊 Rapport de l'Installation:${NC}"
@@ -723,6 +793,12 @@ export -f apt_update_safe apt_install_safe
 export -f detect_hypervisor install_hypervisor_drivers
 export -f install_qemu_drivers install_vmware_drivers
 export -f install_virtualbox_drivers install_hyperv_drivers
-export -f user_gsettings user_run
+export -f user_gsettings user_run detecter_bureau
+# Portes de simulation : sans elles ici, un module qui appelle run_action dans son
+# propre sous-processus (bash "$MODULES_DIR/$SCRIPT") echouait en "command not
+# found" -- verifie en pratique, pas suppose. La retape des 38 modules ajoute
+# aussi un "source common.sh" par fichier (plus robuste que compter sur l'export),
+# mais cette ligne reste le filet pour tout code qui n'aurait pas encore ce source.
+export -f run_action is_dry_run refuser_reglage log_simu
 
 

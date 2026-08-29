@@ -1,8 +1,13 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - hyperviseur_drivers.sh
+# MadOS ROG Edition 3.5 - hyperviseur_drivers.sh
 # ==============================================================================
 # Installation optimisée des drivers pour QEMU, VMware, VirtualBox et Hyper-V
+#
+# OUTIL MANUEL : ce script n'est PAS appele par install.sh, qui invoque
+# directement detect_hypervisor() et install_hypervisor_drivers() de
+# lib/common.sh. Il sert de point d'entree autonome pour relancer la detection
+# et afficher un diagnostic :  sudo bash modules/hyperviseur_drivers.sh
 # ==============================================================================
 
 # Charger les fonctions communes

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 18_pack_pro_dev.sh
+# MadOS ROG Edition 3.5 - 18_pack_pro_dev.sh
 # ==============================================================================
 # Phase: 18 - Pack Professionnel / Virt / Dev
 # ==============================================================================
@@ -14,6 +14,8 @@ GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
 
+[ -f "$PROJECT_ROOT/lib/common.sh" ] && source "$PROJECT_ROOT/lib/common.sh"
+
 export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
@@ -24,33 +26,37 @@ echo -e "${RED}╚════════════════════�
 
 # Docker
 echo -e "    ${GRAY}├─ Installation de Docker...${NC}"
-sudo apt-get update -q || true
-sudo apt-get install -y docker.io docker-compose-v2 git-lfs || true
+run_action "rafraîchirait les index APT (apt-get update)" sudo apt-get update -q || true
+run_action "installerait docker.io, docker-compose-v2, git-lfs" sudo apt-get install -y docker.io docker-compose-v2 git-lfs || true
 
 # Add user to docker group
-sudo usermod -aG docker "$REAL_USER" || true
-sudo systemctl enable --now docker >/dev/null 2>&1 || true
+run_action "ajouterait $REAL_USER au groupe docker" sudo usermod -aG docker "$REAL_USER" || true
+run_action "activerait et démarrerait le service docker" sudo systemctl enable --now docker >/dev/null 2>&1 || true
 
 # Virtualisation KVM/QEMU
 echo -e "    ${GRAY}├─ Installation de QEMU/KVM & Virt-Manager...${NC}"
-sudo apt-get install -y qemu-kvm qemu-system qemu-utils python3 python3-pip libvirt-clients libvirt-daemon-system bridge-utils virtinst libvirt-daemon virt-manager || true
+run_action "installerait qemu-kvm, qemu-system, libvirt, virt-manager, ..." sudo apt-get install -y qemu-kvm qemu-system qemu-utils python3 python3-pip libvirt-clients libvirt-daemon-system bridge-utils virtinst libvirt-daemon virt-manager || true
 
 # Enable libvirtd and add user group
-sudo systemctl enable --now libvirtd >/dev/null 2>&1 || true
-sudo usermod -aG libvirt "$REAL_USER" || true
-sudo usermod -aG kvm "$REAL_USER" || true
+run_action "activerait et démarrerait le service libvirtd" sudo systemctl enable --now libvirtd >/dev/null 2>&1 || true
+run_action "ajouterait $REAL_USER au groupe libvirt" sudo usermod -aG libvirt "$REAL_USER" || true
+run_action "ajouterait $REAL_USER au groupe kvm" sudo usermod -aG kvm "$REAL_USER" || true
 
 # VSCodium (ou VSCode)
 echo -e "    ${GRAY}├─ Installation de VSCodium (Éditeur Code Open Source)...${NC}"
-wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
-    | gpg --dearmor --yes \
-    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg >/dev/null 2>&1 || true
+if is_dry_run; then
+    log_simu "importerait la clé GPG VSCodium dans /usr/share/keyrings/vscodium-archive-keyring.gpg et ajouterait le dépôt APT vscodium.list"
+else
+    wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+        | gpg --dearmor --yes \
+        | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg >/dev/null 2>&1 || true
 
-echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
-    | sudo tee /etc/apt/sources.list.d/vscodium.list >/dev/null
+    echo 'deb [ signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg ] https://download.vscodium.com/debs vscodium main' \
+        | sudo tee /etc/apt/sources.list.d/vscodium.list >/dev/null
+fi
 
-sudo apt-get update -q || true
-sudo apt-get install -y codium || true
+run_action "rafraîchirait les index APT (apt-get update)" sudo apt-get update -q || true
+run_action "installerait codium" sudo apt-get install -y codium || true
 
 # Google Antigravity AI n'est pas disponible publiquement comme paquet Linux.
 # Si vous avez accès à une version interne, placez le .deb dans le répertoire assets/

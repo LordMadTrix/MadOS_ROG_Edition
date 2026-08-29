@@ -1,10 +1,12 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.0 - 04_arsenal_logiciel.sh
+# MadOS ROG Edition 3.5 - 04_arsenal_logiciel.sh
 # ==============================================================================
 # Phase: 4 - Arsenal Logiciel & IA (OpenClaw)
 # Installe Chrome, Steam, Lutris, et les outils Gaming.
 # ==============================================================================
+
+[ -f "$PROJECT_ROOT/lib/common.sh" ] && source "$PROJECT_ROOT/lib/common.sh"
 
 # ==============================================================================
 # Variables de Couleurs pour UI Terminal
@@ -27,7 +29,7 @@ echo -e "${RED}╚════════════════════�
 install_pkg() {
     for pkg in "$@"; do
         if apt-cache show "$pkg" &>/dev/null 2>&1; then
-            sudo apt install -y "$pkg" || true
+            run_action "installer le paquet $pkg" sudo apt install -y "$pkg" || true
         fi
     done
 }
@@ -42,20 +44,24 @@ echo -e "    ${WHITE}├─ [GAMING] Installation Steam & Lutris...${NC}"
 install_pkg steam-installer steam-devices lutris
 
 echo -e "    ${WHITE}├─ [Outils] Injection Utilitaires (VLC, OBS...)...${NC}"
-echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
+if is_dry_run; then
+    log_simu "configurerait debconf pour accepter l'EULA ttf-mscorefonts-installer"
+else
+    echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
+fi
 install_pkg vlc obs-studio stacer mangohud goverlay ttf-mscorefonts-installer pipx
 
 echo -e "    ${WHITE}├─ [PROTON] Déploiement Console ProtonUp-Qt...${NC}"
-sudo -u "$REAL_USER" pipx install protonup-qt 2>/dev/null || true
+run_action "installer protonup-qt via pipx" sudo -u "$REAL_USER" pipx install protonup-qt 2>/dev/null || true
 
 echo -e "    ${WHITE}├─ [EPIC/GOG] Configuration Flatpak & Flathub...${NC}"
 install_pkg flatpak 2>/dev/null || true
 if command -v flatpak &>/dev/null; then
-    sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
+    run_action "ajouter le dépôt Flathub" sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
     echo -e "    ${GRAY}├─ Injection de Heroic Games Launcher...${NC}"
-    sudo flatpak install -y flathub com.heroicgameslauncher.hgl --noninteractive >/dev/null 2>&1 || true
+    run_action "installer Heroic Games Launcher (flatpak)" sudo flatpak install -y flathub com.heroicgameslauncher.hgl --noninteractive >/dev/null 2>&1 || true
     echo -e "    ${GRAY}├─ Injection de SGDBoop (Steam Artwork)...${NC}"
-    sudo flatpak install -y flathub com.steamgriddb.SGDBoop --noninteractive >/dev/null 2>&1 || true
+    run_action "installer SGDBoop (flatpak)" sudo flatpak install -y flathub com.steamgriddb.SGDBoop --noninteractive >/dev/null 2>&1 || true
 fi
 
 # OpenClaw IA a été extrait vers son propre module (14_openclaw_ai.sh) pour l'automatisation.

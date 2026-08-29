@@ -268,8 +268,13 @@
         </div>
         <div class="terminal-body">
             <span class="prompt">$</span>
-            <code class="command" id="cmd">wget -qO- mados.sh | sudo bash</code>
-            <button class="copy-btn" onclick="copyText()">Infecter</button>
+            <code class="command" id="cmd">wget -qO install.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh &amp;&amp; sudo bash install.sh</code>
+            <button class="copy-btn" onclick="copyText('cmd')">Infecter</button>
+        </div>
+        <div class="terminal-body" style="border-top: 1px solid var(--border-red);">
+            <span class="prompt">$</span>
+            <code class="command" id="cmd-git">git clone https://github.com/LordMadTrix/MadOS_ROG_Edition.git &amp;&amp; cd MadOS_ROG_Edition &amp;&amp; sudo bash install.sh</code>
+            <button class="copy-btn" onclick="copyText('cmd-git')">Cloner</button>
         </div>
     </div>
 </section>
@@ -326,15 +331,20 @@
 </footer>
 
 <script>
-    function copyText() {
-        const text = "wget -qO install.sh https://raw.githubusercontent.com/LordMadTrix/MadOS_ROG_Edition/main/install.sh && sudo bash install.sh";
-        navigator.clipboard.writeText(text);
-        
-        const btn = document.querySelector('.copy-btn');
+    // Le bouton copie desormais EXACTEMENT ce qui est affiche a l'ecran.
+    // Avant, la page montrait "wget -qO- mados.sh | sudo bash" (commande
+    // invalide) et copiait autre chose : deux verites differentes.
+    function copyText(id) {
+        const el = document.getElementById(id || 'cmd');
+        if (!el) return;
+        navigator.clipboard.writeText(el.innerText.trim());
+
+        const btn = el.parentElement.querySelector('.copy-btn');
+        if (!btn) return;
         const original = btn.innerText;
         btn.innerText = "COPIÉ !";
         btn.style.background = "#00ff88";
-        
+
         setTimeout(() => {
             btn.innerText = original;
             btn.style.background = "#ff003c";
