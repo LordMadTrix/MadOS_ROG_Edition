@@ -323,6 +323,38 @@ EOF
         log_warning "${_libre_gb} Go libres : MadOS en recommande ${RECOMMENDED_DISK_SPACE:-40}. L'installation continue."
     fi
     unset _libre_gb
+
+    # ---- Version d'Ubuntu ----
+    # Ces bornes existaient dans config.conf sans que rien ne les lise : on
+    # pouvait lancer MadOS sur une version non testee sans le moindre mot.
+    # Averti, jamais bloquant : refuser une version recente rendrait le script
+    # inutilisable des la sortie de la LTS suivante.
+    if [ -r /etc/os-release ]; then
+        _ubu=$(. /etc/os-release 2>/dev/null; echo "${VERSION_ID:-}")
+        if [ -n "${_ubu:-}" ] && [ -n "${UBUNTU_MIN_VERSION:-}" ]; then
+            if [ "$(printf '%s
+%s
+' "$UBUNTU_MIN_VERSION" "$_ubu" | sort -V | head -1)" != "$UBUNTU_MIN_VERSION" ]; then
+                log_warning "Ubuntu $_ubu detecte : MadOS est teste a partir de ${UBUNTU_MIN_VERSION}. Des modules peuvent echouer."
+            elif [ -n "${UBUNTU_MAX_VERSION:-}" ] &&                  [ "$(printf '%s
+%s
+' "$_ubu" "$UBUNTU_MAX_VERSION" | sort -V | head -1)" != "$_ubu" ]; then
+                log_warning "Ubuntu $_ubu detecte : MadOS a ete teste jusqu'a ${UBUNTU_MAX_VERSION}. Certains depots tiers peuvent ne pas publier encore."
+            fi
+        fi
+        unset _ubu
+    fi
+
+    # ---- Memoire vive ----
+    # REQUIRED_RAM etait declare et jamais lu. Averti seulement : une machine
+    # sous le seuil peut installer MadOS, elle compilera juste plus lentement.
+    if [ -r /proc/meminfo ] && [ -n "${REQUIRED_RAM:-}" ]; then
+        _ram_gb=$(awk '/^MemTotal:/ {printf "%d", $2/1048576}' /proc/meminfo 2>/dev/null)
+        if [ -n "${_ram_gb:-}" ] && [ "$_ram_gb" -lt "$REQUIRED_RAM" ] 2>/dev/null; then
+            log_warning "${_ram_gb} Go de RAM : MadOS en recommande ${REQUIRED_RAM}. La compilation du noyau sera lente."
+        fi
+        unset _ram_gb
+    fi
     
     # ---- PROTECTION GOD-TIER : Auto-Clonage vers /opt (Safe Zone) ----
     if [[ "$SCRIPT_DIR" == *"/mnt/"* || "$SCRIPT_DIR" == *"/media/"* ]]; then
@@ -400,12 +432,15 @@ EOF
     if is_dry_run; then
         log_simu "écrirait /etc/apt/apt.conf.d/99mados-network (ForceIPv4, retries, timeouts)"
     else
-        cat <<'APTCONF' | sudo tee /etc/apt/apt.conf.d/99mados-network > /dev/null
+        # Heredoc NON quote : les valeurs viennent de config.conf, ou APT_RETRIES
+        # et APT_TIMEOUT etaient declares sans que rien ne les lise. Le contenu ne
+        # comporte aucun autre $ ni backtick, la substitution est donc sans risque.
+        cat <<APTCONF | sudo tee /etc/apt/apt.conf.d/99mados-network > /dev/null
 // MadOS - Fix DNS & stabilité réseau en VM
 Acquire::ForceIPv4 "true";
-Acquire::Retries "5";
-Acquire::http::Timeout "30";
-Acquire::https::Timeout "30";
+Acquire::Retries "${APT_RETRIES:-5}";
+Acquire::http::Timeout "${APT_TIMEOUT:-30}";
+Acquire::https::Timeout "${APT_TIMEOUT:-30}";
 APTCONF
     fi
 
@@ -418,13 +453,14 @@ APTCONF
     # d'interroger Google en clair. On ne touche donc plus a resolv.conf quand
     # resolved est actif : on passe par son drop-in, ce qui laisse le module 32
     # reprendre la main ensuite.
-    if ! ping -c 1 -W 3 archive.ubuntu.com >/dev/null 2>&1; then
+    if ! ping -c 1 -W "${PING_TIMEOUT:-3}" archive.ubuntu.com >/dev/null 2>&1; then
         if is_dry_run; then
             log_simu "injecterait des DNS de secours via systemd-resolved (drop-in), ou dans /etc/resolv.conf seulement si resolved est absent"
         elif systemctl is-active --quiet systemd-resolved 2>/dev/null; then
             echo -e "${GRAY}    Injecteur DNS de secours via systemd-resolved...${NC}"
             sudo mkdir -p /etc/systemd/resolved.conf.d/
-            printf '[Resolve]\nDNS=8.8.8.8 1.1.1.1\nFallbackDNS=8.8.4.4\n' \
+            printf '[Resolve]\nDNS=%s %s\nFallbackDNS=%s\n' \
+                "${DNS_PRIMARY:-8.8.8.8}" "${DNS_SECONDARY:-1.1.1.1}" "${DNS_TERTIARY:-8.8.4.4}" \
                 | sudo tee /etc/systemd/resolved.conf.d/mados-dns.conf > /dev/null
             # On retablit le lien symbolique attendu si une execution precedente
             # (ou un autre outil) l'avait remplace par un fichier statique.
@@ -436,10 +472,12 @@ APTCONF
             sudo systemctl restart systemd-resolved 2>/dev/null || true
             echo -e "${GRAY}    DNS de secours injectés (systemd-resolved conservé).${NC}"
         else
-            echo -e "${GRAY}    Injecteur DNS de secours (8.8.8.8 + 1.1.1.1)...${NC}"
+            echo -e "${GRAY}    Injecteur DNS de secours (${DNS_PRIMARY:-8.8.8.8} + ${DNS_SECONDARY:-1.1.1.1})...${NC}"
             backup_file "/etc/resolv.conf"
             sudo cp /etc/resolv.conf /etc/resolv.conf.bak 2>/dev/null || true
-            printf 'nameserver 8.8.8.8\nnameserver 1.1.1.1\nnameserver 8.8.4.4\n' | sudo tee /etc/resolv.conf > /dev/null
+            printf 'nameserver %s\nnameserver %s\nnameserver %s\n' \
+                "${DNS_PRIMARY:-8.8.8.8}" "${DNS_SECONDARY:-1.1.1.1}" "${DNS_TERTIARY:-8.8.4.4}" \
+                | sudo tee /etc/resolv.conf > /dev/null
             echo -e "${GRAY}    DNS de secours injectés.${NC}"
         fi
     else

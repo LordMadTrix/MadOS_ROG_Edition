@@ -33,7 +33,7 @@ ROOT_FSTYPE=$(df -T / | awk 'NR==2 {print $2}')
 
 if [ "$ROOT_FSTYPE" == "btrfs" ]; then
     echo -e "    ${WHITE}├─ [BTRFS] Mode snapshot ultra-rapide activé.${NC}"
-    run_action "créerait un snapshot Timeshift BTRFS initial" sudo timeshift --btrfs --create --comments "Sauvegarde MadOS Initiale" > /dev/null 2>&1 || true
+    run_action "créerait un snapshot Timeshift BTRFS initial" sudo timeshift --btrfs --create --comments "${SNAPSHOT_COMMENT:-Sauvegarde MadOS Initiale}" > /dev/null 2>&1 || true
 else
     echo -e "    ${GRAY}├─ [RSYNC] Mode standard RSYNC activé.${NC}"
     # On ne lance pas par défaut un rsync complet (trop long), on se contente de l'installer

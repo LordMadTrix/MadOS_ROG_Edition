@@ -20,7 +20,9 @@ export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
 INSTALL_DIR="/tmp/mados_update_$(date +%s)"
-REPO_URL="https://github.com/LordMadTrix/MadOS_ROG_Edition.git"
+# L'URL vient de config.conf (MADOS_REPO_URL), ou elle etait declaree sans
+# que rien ne la lise : un fork devait modifier ce module au lieu du config.
+REPO_URL="${MADOS_REPO_URL:-https://github.com/LordMadTrix/MadOS_ROG_Edition.git}"
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 24 Mise à jour de MadOS ROG Edition${NC}"
@@ -32,7 +34,7 @@ echo -e "    ${GRAY}├─ Vérification de la connexion internet...${NC}"
 # fonctionnait parfaitement. On teste donc aussi en HTTPS, ce qui est ce dont on
 # a reellement besoin pour cloner.
 RESEAU_OK=0
-ping -c 1 -W 3 github.com >/dev/null 2>&1 && RESEAU_OK=1
+ping -c 1 -W "${PING_TIMEOUT:-3}" github.com >/dev/null 2>&1 && RESEAU_OK=1
 if [ "$RESEAU_OK" -eq 0 ] && command -v curl >/dev/null 2>&1; then
     curl -fsS --max-time 10 -o /dev/null https://github.com && RESEAU_OK=1
 fi

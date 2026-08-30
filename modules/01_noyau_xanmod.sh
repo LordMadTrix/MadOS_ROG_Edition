@@ -36,8 +36,17 @@ detect_cpu_level() {
 CPU_LEVEL=$(detect_cpu_level)
 echo -e "    ${WHITE}├─ [HARDWARE] Architecture CPU identifiée : $CPU_LEVEL${NC}"
 
-XANMOD_PKG="linux-xanmod-edge-${CPU_LEVEL}"
-echo -e "    ${GRAY}├─ Injection du paquet : $XANMOD_PKG...${NC}"
+# La saveur vient de config.conf. Elle y etait declaree (XANMOD_FLAVOR) et
+# JAMAIS lue : changer "edge" en "lts" n'avait aucun effet, le module posait
+# edge quoi qu'il arrive. Repli sur edge, la valeur appliquee jusqu'ici.
+XANMOD_SAVEUR="${XANMOD_FLAVOR:-edge}"
+case "$XANMOD_SAVEUR" in
+    edge|lts|rt|tt) ;;
+    *)  echo -e "    ${YELLOW}├─ Saveur XanMod inconnue « $XANMOD_SAVEUR » : repli sur edge.${NC}"
+        XANMOD_SAVEUR="edge" ;;
+esac
+XANMOD_PKG="linux-xanmod-${XANMOD_SAVEUR}-${CPU_LEVEL}"
+echo -e "    ${GRAY}├─ Injection du paquet : $XANMOD_PKG (saveur : $XANMOD_SAVEUR)...${NC}"
 
 if is_dry_run; then
     log_simu "installerait le noyau $XANMOD_PKG (ou linux-xanmod-edge générique en repli)"
