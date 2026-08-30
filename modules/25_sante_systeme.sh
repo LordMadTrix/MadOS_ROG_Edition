@@ -15,7 +15,6 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 YELLOW='\033[0;33m'
 BOLD='\033[1m'
-BLUE='\033[0;34m'
 
 # Thème Whiptail MadOS
 export NEWT_COLORS='
@@ -37,7 +36,6 @@ export NEWT_COLORS='
 '
 
 REAL_USER=${SUDO_USER:-$USER}
-USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 25 Diagnostic Santé du Système MadOS${NC}"

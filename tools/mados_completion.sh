@@ -1,3 +1,6 @@
+# shellcheck shell=bash
+# Pas de shebang : ce fichier est SOURCE par bash-completion, jamais execute.
+# La directive ci-dessus indique le shell cible a ShellCheck.
 # Auto-complétion Bash pour l'utilitaire « mados ».
 # Installée vers /etc/bash_completion.d/mados par modules/28_mados_cli.sh.
 # Les listes ci-dessous doivent rester alignées sur le case final de tools/mados.sh.
