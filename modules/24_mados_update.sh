@@ -52,7 +52,6 @@ if ! sudo git clone --depth=1 "$REPO_URL" "$INSTALL_DIR" >/dev/null 2>&1; then
     exit 1
 fi
 
-CURRENT_SCRIPT="/tmp/mados_install_bootstrap"
 NEW_VERSION_FILE="$INSTALL_DIR/VERSION"
 CURRENT_VERSION_FILE="/opt/mados/VERSION"
 

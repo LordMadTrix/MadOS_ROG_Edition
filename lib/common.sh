@@ -26,13 +26,15 @@ export NC='\033[0m'
 # Fonction pour exécuter gsettings au nom de l'utilisateur réel
 user_gsettings() {
     local REAL_USER=${SUDO_USER:-$USER}
-    local USER_ID=$(id -u "$REAL_USER")
+    local USER_ID
+    USER_ID=$(id -u "$REAL_USER")
     
     # Tentative de détection du bus D-Bus
     local DBUS_ADDR="unix:path=/run/user/${USER_ID}/bus"
     if [ ! -S "/run/user/${USER_ID}/bus" ]; then
         # Fallback : chercher dans les processus
-        local DBUS_SESSION_PID=$(pgrep -u "$USER_ID" gnome-session | head -n 1)
+        local DBUS_SESSION_PID
+        DBUS_SESSION_PID=$(pgrep -u "$USER_ID" gnome-session | head -n 1)
         [ -n "$DBUS_SESSION_PID" ] && DBUS_ADDR=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$DBUS_SESSION_PID/environ | cut -d= -f2-)
     fi
 
@@ -46,7 +48,8 @@ user_gsettings() {
 # Fonction pour exécuter une commande simple au nom de l'utilisateur réel avec env complet
 user_run() {
     local REAL_USER=${SUDO_USER:-$USER}
-    local USER_ID=$(id -u "$REAL_USER")
+    local USER_ID
+    USER_ID=$(id -u "$REAL_USER")
     sudo -u "$REAL_USER" \
         XDG_RUNTIME_DIR="/run/user/${USER_ID}" \
         DISPLAY="${DISPLAY:-:0}" \
@@ -155,7 +158,8 @@ init_mados_logging() {
 
 log_info() {
     local msg="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     echo -e "${CYAN}[${timestamp}]${NC} ${GREEN}[INFO]${NC} ${msg}"
     echo "[${timestamp}] [INFO] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
@@ -163,7 +167,8 @@ log_info() {
 
 log_error() {
     local msg="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     echo -e "${RED}[${timestamp}]${NC} ${RED}[ERREUR]${NC} ${msg}"
     echo "[${timestamp}] [ERREUR] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" "$MADOS_ERRORS_FILE" >/dev/null 2>&1 || true
@@ -171,7 +176,8 @@ log_error() {
 
 log_warning() {
     local msg="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     echo -e "${YELLOW}[${timestamp}]${NC} ${YELLOW}[ATTENTION]${NC} ${msg}"
     echo "[${timestamp}] [ATTENTION] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
@@ -179,7 +185,8 @@ log_warning() {
 
 log_success() {
     local msg="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     echo -e "${GREEN}[${timestamp}]${NC} ${GREEN}[✓ SUCCÈS]${NC} ${msg}"
     echo "[${timestamp}] [SUCCÈS] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
@@ -261,7 +268,8 @@ STATE_FILE="/var/lib/mados/install_state"
 save_checkpoint() {
     local module="$1"
     local status="${2:-OK}"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     
     sudo mkdir -p "$(dirname "$STATE_FILE")"
     echo "$module:$status:$timestamp" | sudo tee -a "$STATE_FILE" > /dev/null
@@ -327,7 +335,8 @@ export MADOS_SIMU_COUNT=0
 
 log_simu() {
     local msg="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 
     echo -e "${CYAN}[${timestamp}]${NC} ${YELLOW}[SIMULATION]${NC} ${msg}"
     echo "[${timestamp}] [SIMULATION] ${msg}" | sudo tee -a "$MADOS_LOG_DIR/mados_install.log" >/dev/null 2>&1 || true
@@ -453,7 +462,8 @@ restore_file() {
 
 check_disk_space() {
     local required_gb="${1:-40}"
-    local available_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    local available_gb
+    available_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
     
     if [ "$available_gb" -lt "$required_gb" ]; then
         log_error "Espace disque insuffisant: ${available_gb}GB disponibles (${required_gb}GB requis)"

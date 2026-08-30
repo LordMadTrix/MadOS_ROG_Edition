@@ -351,7 +351,8 @@ EOF
     echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
     log_info "Détection de l'hyperviseur..."
-    local DETECTED_HYPERVISOR=$(detect_hypervisor)
+    local DETECTED_HYPERVISOR
+    DETECTED_HYPERVISOR=$(detect_hypervisor)
     
     if [ "$DETECTED_HYPERVISOR" != "none" ]; then
         log_success "Hyperviseur détecté: $DETECTED_HYPERVISOR"
@@ -366,7 +367,8 @@ EOF
     echo -e "${CYAN}  [2/4] Démarrage de l'Interface Interactive...${NC}"
     echo -e "${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-    export MODULES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/modules"
+    MODULES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/modules"
+    export MODULES_DIR
 
     echo -e "${YELLOW}[!] Optimisation du réseau et des miroirs Ubuntu...${NC}"
 
@@ -675,13 +677,15 @@ installation_totale() {
         if [ "$SILENT_MODE" = "true" ]; then
             export MADOS_TDP_PROFILE="EQUILIBRE"
         else
-            if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 3.5 - Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+            local _choix
+            if ! _choix=$(whiptail --title "MadOS 3.5 - Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
                 "SILENCE" "Bridage 25W - Calme Absolu" OFF \
                 "EQUILIBRE" "Stock 45W - Usine (Défaut)" ON \
                 "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
                 menu_principal
                 return
             fi
+            export MADOS_TDP_PROFILE="$_choix"
         fi
     else
         export MADOS_TDP_PROFILE="EQUILIBRE"
@@ -691,7 +695,8 @@ installation_totale() {
     # Detection via detecter_bureau() (lib/common.sh) : interroge logind puis les
     # processus de session. L'ancienne ligne developpait $XDG_CURRENT_DESKTOP
     # cote root, ou la variable n'existe pas -> toujours vide -> KDE force.
-    export MADOS_DE_DETECTED="$(detecter_bureau)"
+    MADOS_DE_DETECTED="$(detecter_bureau)"
+    export MADOS_DE_DETECTED
     if [ "$MADOS_DE_DETECTED" = "GNOME" ]; then
         export MADOS_DESKTOP="GNOME"
     else
@@ -704,13 +709,15 @@ installation_totale() {
     if [ "$SILENT_MODE" = "true" ]; then
         export MADOS_THEME="ROG"
     else
-        if ! export MADOS_THEME=$(whiptail --title "MadOS 3.5 - Charte Graphique" --radiolist "Quel style visuel appliquer ?" 12 60 3 \
+        local _choix
+        if ! _choix=$(whiptail --title "MadOS 3.5 - Charte Graphique" --radiolist "Quel style visuel appliquer ?" 12 60 3 \
             "ROG" "ROG Classic (Rouge & Noir)" ON \
             "CYBER" "Cyberpunk Neon (Bleu & Rose)" OFF \
             "CARBON" "Carbon Stealth (Gris & Noir)" OFF 3>&1 1>&2 2>&3); then
             menu_principal
             return
         fi
+        export MADOS_THEME="$_choix"
     fi
 
     clear
@@ -827,13 +834,15 @@ installation_custom() {
     fi
 
     if [[ "$CHOIX_ALL" == *"22_vlt"* ]]; then
-        if ! export MADOS_TDP_PROFILE=$(whiptail --title "MadOS 3.5 - Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 70 4 \
+        local _choix
+        if ! _choix=$(whiptail --title "MadOS 3.5 - Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 70 4 \
             "SILENCE" "Bridage 25W - Calme Absolu" OFF \
             "EQUILIBRE" "Stock 45W - Normal (Défaut)" ON \
             "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
             menu_principal
             return
         fi
+        export MADOS_TDP_PROFILE="$_choix"
     else
         export MADOS_TDP_PROFILE="EQUILIBRE"
     fi

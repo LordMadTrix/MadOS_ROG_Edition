@@ -25,7 +25,8 @@ main() {
 
     log_info "Détection de l'hyperviseur..."
     
-    local hypervisor=$(detect_hypervisor)
+    local hypervisor
+    hypervisor=$(detect_hypervisor)
     
     log_info "Hyperviseur détecté: $hypervisor"
     

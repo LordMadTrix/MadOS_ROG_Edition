@@ -37,7 +37,6 @@ export NEWT_COLORS='
 '
 
 REAL_USER=${SUDO_USER:-$USER}
-USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${BLUE}======================================================${NC}"
 echo -e "${CYAN}   19. Intégration VR (Meta Quest 3, ALVR, SideQuest)${NC}"

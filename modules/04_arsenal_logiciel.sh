@@ -20,7 +20,6 @@ BOLD='\033[1m'
 export DEBIAN_FRONTEND=noninteractive
 
 REAL_USER=${SUDO_USER:-$USER}
-USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
 
 echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 4 Installation de l'Arsenal Logiciel${NC}"
