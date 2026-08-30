@@ -23,13 +23,23 @@ echo -e "\n${RED}╔════════════════════
 echo -e "${RED}║${NC} 🚀 ${WHITE}${BOLD}Phase 2 Scan & Déploiement des Pilotes Graphiques${NC}"
 echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
-# Identifier le GPU dédié
-if command -v lspci >/dev/null; then
+# Identifier le GPU dédié.
+# L'ancienne version rappelait `lspci` juste apres avoir tente d'installer
+# pciutils, SANS revérifier qu'il existait desormais : en simulation (ou si
+# l'installation echoue faute de reseau) on obtenait "lspci: command not found"
+# puis un GPU_INFO vide, et le module concluait "puce non reconnue" sans le dire.
+GPU_INFO=""
+if ! command -v lspci >/dev/null 2>&1; then
+    echo -e "    ${YELLOW}⚠️  [ATTENTION] 'lspci' introuvable, installation de pciutils...${NC}"
+    run_action "installer pciutils" sudo apt-get install -y pciutils >/dev/null 2>&1 || true
+fi
+
+if command -v lspci >/dev/null 2>&1; then
     GPU_INFO=$(lspci | grep -i 'vga\|3d\|2d')
 else
-    echo -e "    ${RED}⚠️  [ATTENTION] 'lspci' introuvable, installation de bases recommandée...${NC}"
-    run_action "installer pciutils" sudo apt install pciutils -y >/dev/null 2>&1 || true
-    GPU_INFO=$(lspci | grep -i 'vga\|3d\|2d')
+    echo -e "    ${YELLOW}⚠️  'lspci' toujours indisponible : détection GPU impossible, module ignoré.${NC}"
+    echo -e "    ${WHITE}✅ [SUCCÈS] Phase 2 Terminée (aucune action).${NC}"
+    return 0 2>/dev/null || exit 0
 fi
 
 echo -e "    ${GRAY}├─ Matériel(s) détecté(s) :${NC}"
