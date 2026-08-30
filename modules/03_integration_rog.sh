@@ -90,19 +90,33 @@ else
             source "$HOME/.cargo/env"
         fi
 
-        BUILD_DIR="/tmp/mados-asus-build"
-        mkdir -p "$BUILD_DIR" && cd "$BUILD_DIR"
-
-        # asusctl compile
-        echo -e "    ${GRAY}├─ Compilation de asusctl...${NC}"
-        git clone --depth 1 https://gitlab.com/asus-linux/asusctl.git && cd asusctl
-        cargo build --release --locked && sudo make install PREFIX=/usr || true
-        cd ..
-
-        # supergfxctl compile
-        echo -e "    ${GRAY}├─ Compilation de supergfxctl...${NC}"
-        git clone --depth 1 https://gitlab.com/asus-linux/supergfxctl.git && cd supergfxctl
-        cargo build --release --locked && sudo make install || true
+        # Compilation de secours. Reecrite : l ancienne version enchainait
+        #   git clone ... && cd asusctl
+        #   cargo build ... && sudo make install
+        #   cd ..
+        # Si le clone echouait, le `cd` n avait pas lieu et `cargo build`
+        # s executait dans le dossier COURANT (celui des modules MadOS), puis
+        # `cd ..` remontait encore d un cran : le repertoire de travail du module
+        # restait decale pour tout ce qui suivait.
+        # Desormais chaque projet se compile dans un SOUS-SHELL, depuis un dossier
+        # temporaire neuf (mktemp) : le cd ne fuit jamais hors du sous-shell, et
+        # un echec a n importe quelle etape arrete ce projet-la sans toucher au
+        # suivant ni au reste du module.
+        for projet in asusctl supergfxctl; do
+            echo -e "    ${GRAY}├─ Compilation de ${projet}...${NC}"
+            (
+                build=$(mktemp -d) || exit 1
+                git clone --depth 1 "https://gitlab.com/asus-linux/${projet}.git" "$build/$projet" >/dev/null 2>&1 || exit 1
+                cd "$build/$projet" || exit 1
+                cargo build --release --locked >/dev/null 2>&1 || exit 1
+                if [ "$projet" = "asusctl" ]; then
+                    sudo make install PREFIX=/usr >/dev/null 2>&1
+                else
+                    sudo make install >/dev/null 2>&1
+                fi
+            ) && echo -e "    ${GREEN}│  ✓ ${projet} installé.${NC}" \
+              || echo -e "    ${YELLOW}│  ⚠ Échec de la compilation de ${projet} (ignoré).${NC}"
+        done
     }
 fi
 run_action "rechargerait la configuration systemd (daemon-reload)" sudo systemctl daemon-reload || true

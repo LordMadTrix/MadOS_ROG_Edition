@@ -36,8 +36,25 @@ echo -e "    ${WHITE}├─ [RESCUE] Création de l'entrée de Secours ROG dans 
 RESCUE_FILE="/etc/grub.d/41_mados_rescue"
 ROOT_SRC=$(findmnt -no SOURCE / 2>/dev/null)
 ROOT_UUID=$(blkid -s UUID -o value "$ROOT_SRC" 2>/dev/null)
-KERNEL_IMG=$(ls -1 /boot/vmlinuz-* 2>/dev/null | grep -i xanmod | sort -V | tail -1)
-[ -z "$KERNEL_IMG" ] && KERNEL_IMG=$(ls -1 /boot/vmlinuz-* 2>/dev/null | sort -V | tail -1)
+# Parcours par glob plutot que `ls | grep` (SC2010) : robuste aux noms de
+# fichiers inhabituels, tout en gardant le tri par VERSION (sort -V), sans
+# lequel 6.9 passerait pour plus recent que 6.10.
+_dernier_noyau() {
+    local k kl motif="${1:-}"
+    local candidats=()
+    for k in /boot/vmlinuz-*; do
+        [ -f "$k" ] || continue
+        if [ -n "$motif" ]; then
+            kl="${k,,}"
+            case "$kl" in *"$motif"*) ;; *) continue ;; esac
+        fi
+        candidats+=("$k")
+    done
+    [ "${#candidats[@]}" -eq 0 ] && return 1
+    printf '%s
+' "${candidats[@]}" | sort -V | tail -1
+}
+KERNEL_IMG=$(_dernier_noyau xanmod) || KERNEL_IMG=$(_dernier_noyau) || KERNEL_IMG=""
 INITRD_IMG=""
 if [ -n "$KERNEL_IMG" ]; then
     INITRD_IMG="/boot/initrd.img-$(basename "$KERNEL_IMG" | sed 's/^vmlinuz-//')"
@@ -126,8 +143,11 @@ echo -e "    ${GRAY}├─ Reconstruction brutale de l'initramfs et du grub (${C
 if is_dry_run; then
     log_simu "reconstruirait l'initramfs (ZSTD avec repli GZIP) et relancerait update-grub"
 else
-sudo update-initramfs -u -k all >/tmp/initramfs_update.log 2>&1
-if [ $? -ne 0 ]; then
+# La redirection etait executee par l utilisateur, pas par sudo (SC2024), et le
+# code teste juste apres etait celui de la redirection. On passe par tee et on
+# lit le statut de la VRAIE commande.
+sudo update-initramfs -u -k all 2>&1 | sudo tee /tmp/initramfs_update.log >/dev/null
+if [ "${PIPESTATUS[0]}" -ne 0 ]; then
     echo -e "    ${RED}⚠ Échec du ZSTD. Tentative de repli vers GZIP (Standard)...${NC}"
     sudo sed -i 's/^COMPRESS=zstd/COMPRESS=gzip/' "$INITRAMFS_CONF"
     sudo update-initramfs -u -k all >/dev/null 2>&1

@@ -325,9 +325,14 @@ EOF
                 if [ ! -f "$TMP_RUN/lib/common.sh" ] || [ ! -d "$TMP_RUN/assets" ]; then
                      echo -e "${RED}[!] Échec critique du clonage vers /opt. Repli sur source originale...${NC}"
                 else
-                     cd "$TMP_RUN"
-                     sudo bash ./install.sh "$@"
-                     exit $?
+                     # Sans garde, un cd qui echoue relancait l installeur depuis
+                     # le dossier courant au lieu du clone : on repartait sur la
+                     # source d origine en croyant utiliser le proxy local.
+                     if cd "$TMP_RUN"; then
+                         sudo bash ./install.sh "$@"
+                         exit $?
+                     fi
+                     echo -e "${RED}[!] Accès impossible à $TMP_RUN. Repli sur source originale...${NC}"
                 fi
             fi
         fi

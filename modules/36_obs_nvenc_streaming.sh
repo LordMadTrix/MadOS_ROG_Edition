@@ -24,7 +24,7 @@ else
     sudo add-apt-repository ppa:obsproject/obs-studio -y 2>/dev/null || true
     sudo apt update -q || true
     # Installation des headers requis pour la compilation du module v4l2loopback (Virtual Cam)
-    sudo apt install -y linux-headers-$(uname -r) 2>/dev/null || true
+    sudo apt install -y "linux-headers-$(uname -r)" 2>/dev/null || true
     sudo apt install -y obs-studio ffmpeg v4l2loopback-dkms || true
 fi
 
