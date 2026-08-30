@@ -11,8 +11,10 @@ YELLOW='\033[0;33m'
 NC='\033[0m'
 
 ISO_PATH="/mnt/d/DEV/MadOS_ROG_Edition/MadOS_ROG_Edition_v4.iso"
-VNC_PORT=5900
 VNC_DISPLAY=0
+# Le port reel depend du numero d'affichage : 5900 + N. Il etait fige a 5900,
+# ce qui aurait affiche une adresse fausse des que VNC_DISPLAY changeait.
+VNC_PORT=$((5900 + VNC_DISPLAY))
 
 # 1. Vérification de l'ISO
 if [ ! -f "$ISO_PATH" ]; then
@@ -62,7 +64,10 @@ echo ""
 echo -e "${YELLOW}⏳ Démarrage de la VM en arrière-plan... (Ctrl+C pour arrêter)${NC}"
 echo ""
 
-# 5. Lancement QEMU en mode VNC (accessible Windows localhost:5900)
+echo -e "${CYAN}   Adresse de connexion : localhost:${VNC_PORT}${NC}"
+echo ""
+
+# 5. Lancement QEMU en mode VNC
 qemu-system-x86_64 \
     $QEMU_ACCEL \
     -m 4096 \

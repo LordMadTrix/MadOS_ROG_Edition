@@ -81,7 +81,9 @@ echo "CONFIG_LOCALVERSION=\"-mados-xanmod\"" >> .config
 echo -e "${CYAN}🚀 [4/4] Lancement de la compilation du noyau (bzImage)...${NC}"
 echo -e "${YELLOW}Cette etape peut prendre entre 10 et 30 minutes selon votre processeur...${NC}"
 
-make -j$(nproc) WERROR=0 bzImage
+# Guillemets : sans eux, une sortie inattendue de nproc serait decoupee en
+# plusieurs arguments et make recevrait n'importe quoi (SC2046).
+make -j"$(nproc)" WERROR=0 bzImage
 
 if [ -f "arch/x86/boot/bzImage" ]; then
     echo -e "${GREEN}✅ Noyau XanMod compile avec succes !${NC}"

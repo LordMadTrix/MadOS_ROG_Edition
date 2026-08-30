@@ -6,7 +6,7 @@
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; CYAN='\033[0;36m'
 YELLOW='\033[0;33m'; WHITE='\033[1;37m'; GRAY='\033[0;37m'
-BOLD='\033[1m'; NC='\033[0m'
+NC='\033[0m'
 
 # Version lue depuis le dépôt embarqué dans l'ISO, jamais recopiée à la main.
 MADOS_VERSION="$(cat /opt/mados-rog/VERSION 2>/dev/null | tr -d ' 
