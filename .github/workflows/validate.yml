@@ -55,10 +55,6 @@ jobs:
             exit 1
           fi
 
-      # lib/config.conf declarait 58 reglages dont 48 que personne ne lisait :
-      # changer DNS_PRIMARY ou XANMOD_FLAVOR n'avait aucun effet, et rien ne le
-      # disait. Meme defaut que la sauvegarde qui ne sauvegardait rien. Ce
-      # controle refuse tout reglage qui ne pilote rien.
       # install.sh --dry-run promet de ne rien ecrire. La promesse reposait sur
       # une discipline que rien ne verifiait. Meme faute que celle qui, dans
       # MadTweak, effacait Windows.old pendant une simulation.
@@ -69,6 +65,10 @@ jobs:
             exit 1
           fi
 
+      # lib/config.conf declarait 58 reglages dont 48 que personne ne lisait :
+      # changer DNS_PRIMARY ou XANMOD_FLAVOR n'avait aucun effet, et rien ne le
+      # disait. Meme defaut que la sauvegarde qui ne sauvegardait rien. Ce
+      # controle refuse tout reglage qui ne pilote rien.
       - name: Chaque reglage de config.conf pilote-t-il quelque chose ?
         run: |
           if ! bash tools/test_config.sh; then
