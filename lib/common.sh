@@ -262,13 +262,38 @@ restore_file() {
 
 check_disk_space() {
     local required_gb="${1:-40}"
-    local available_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
-    
-    if [ "$available_gb" -lt "$required_gb" ]; then
+
+    # Détection mode LIVE (casper/ISO) : ne pas vérifier / (ramdisk 2GB)
+    if grep -q 'boot=casper\|live\|squashfs' /proc/cmdline 2>/dev/null || \
+       [ -d /cdrom ] || [ -f /etc/casper.conf ]; then
+        log_info "Mode Live détecté — vérification disque cible (pas /)"
+        # Chercher le plus grand disque disponible (ex: /dev/vdb, /dev/sdb)
+        local target_disk
+        target_disk=$(lsblk -bnd -o NAME,SIZE 2>/dev/null | \
+                      awk '{if($2+0 > max+0) {max=$2; dev=$1}} END{print dev}')
+        if [ -n "$target_disk" ]; then
+            local disk_gb=$(lsblk -bnd -o SIZE /dev/"$target_disk" 2>/dev/null | \
+                           awk '{printf "%d", $1/1024/1024/1024}')
+            if [ "${disk_gb:-0}" -ge "$required_gb" ]; then
+                log_success "Disque cible /dev/$target_disk : ${disk_gb}GB disponibles"
+                return 0
+            else
+                log_error "Disque cible trop petit: ${disk_gb:-0}GB (/dev/$target_disk) — ${required_gb}GB requis"
+                return 1
+            fi
+        else
+            log_warning "Aucun disque cible détecté — installation live continue"
+            return 0
+        fi
+    fi
+
+    # Mode normal : vérifier l'espace libre sur /
+    local available_gb
+    available_gb=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    if [ "${available_gb:-0}" -lt "$required_gb" ]; then
         log_error "Espace disque insuffisant: ${available_gb}GB disponibles (${required_gb}GB requis)"
         return 1
     fi
-    
     log_success "Espace disque OK: ${available_gb}GB disponibles"
     return 0
 }

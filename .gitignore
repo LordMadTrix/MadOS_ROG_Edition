@@ -85,3 +85,18 @@ connect_mados_ssh.bat
 !modules/*.py
 !*.py
 !*.sh
+
+# ==========================================
+# EXCLUSIONS - Ajoutees le 2026-08-30
+# ==========================================
+# Sauvegarde locale des scripts d'avant corrections : elle contient l'ANCIENNE
+# version avec un mot de passe sudo en clair. Ne doit JAMAIS etre publiee.
+_sauvegarde_avant_corrections_iso/
+
+# Objets compiles du noyau ecrit de zero : regenerables, sans interet en depot.
+*.o
+src/*.bin
+
+# Le motif « test_*.sh » plus haut excluait aussi les tests du projet.
+# tools/test_*.sh sont de vrais outils de verification, pas des brouillons.
+!tools/test_*.sh
