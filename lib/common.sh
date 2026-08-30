@@ -391,7 +391,27 @@ run_action() {
         log_simu "$description"
         return 0
     fi
+
+    # 114 des 149 appels a run_action sont suivis de « || true », qui avale le
+    # code de retour. Sans la ligne ci-dessous, leur echec ne laissait AUCUNE
+    # trace : ni dans la sortie, ni dans le journal. Un paquet non installe, un
+    # service non active, un reglage non applique -- et l'utilisateur repartait
+    # en croyant que tout avait fonctionne.
+    #
+    # On journalise, et on rend quand meme le code : le « || true » en aval
+    # continue de ne pas interrompre l'installation, ce qui reste souhaitable
+    # pour une action facultative. Mais l'echec est desormais VISIBLE.
+    #
+    # « local code » est declare AVANT l'appel : ecrire « local code=$? » juste
+    # apres marche, mais depend d'un detail d'evaluation de bash qu'il vaut
+    # mieux ne pas avoir a expliquer a la relecture.
+    local code
     "$@"
+    code=$?
+    [ "$code" -eq 0 ] && return 0
+
+    log_warning "ÉCHEC (code $code) : $description"
+    return "$code"
 }
 
 refuser_reglage() {
