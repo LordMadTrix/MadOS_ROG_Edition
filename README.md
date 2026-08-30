@@ -1,7 +1,7 @@
 <div align="center" markdown="1">
   <img src="assets/logo.png" alt="MadOS ROG Logo" width="300" />
 
-  # 🔴 MadOS ROG Edition 3.5 Ultimate Stable
+  # 🔴 MadOS ROG Edition 3.6 Reliability Edition
 
   ### La branche Linux de [MadTweak](https://github.com/LordMadTrix/madtweak)
 
@@ -11,7 +11,7 @@
 
   [![Kubuntu](https://img.shields.io/badge/OS-Kubuntu_24.04_LTS-007ACC?style=for-the-badge&logo=kubuntu&logoColor=white)](https://kubuntu.org/)
   [![NVIDIA](https://img.shields.io/badge/GPU-NVIDIA_DKMS-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://www.nvidia.com/)
-  [![Version](https://img.shields.io/badge/Version-3.5_Ultimate-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
+  [![Version](https://img.shields.io/badge/Version-3.6_Reliability-ff003c?style=for-the-badge)](https://github.com/LordMadTrix/MadOS_ROG_Edition)
 </div>
 
 ---

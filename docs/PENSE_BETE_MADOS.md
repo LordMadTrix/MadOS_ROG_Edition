@@ -1,4 +1,4 @@
-# 📘 MAD-OS 3.5 — PENSE-BÊTE DES MAÎTRES (GOD-TIER CHEAT SHEET)
+# 📘 MAD-OS 3.6 — PENSE-BÊTE DES MAÎTRES (GOD-TIER CHEAT SHEET)
 
 Félicitations, vous utilisez l'un des OS Linux les plus optimisés au monde. Voici comment piloter votre bête.
 
