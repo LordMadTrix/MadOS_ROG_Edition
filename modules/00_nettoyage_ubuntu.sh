@@ -105,18 +105,56 @@ EOF
     sudo systemctl restart NetworkManager 2>/dev/null || true
     sleep 5
 
-    # Controle de survie : si plus rien ne repond, on remet l'ancienne config.
-    if ! ping -c 1 -W 3 8.8.8.8 >/dev/null 2>&1 \
-       && ! ping -c 1 -W 3 archive.ubuntu.com >/dev/null 2>&1; then
-        echo -e "    ${RED}⚠️  Réseau injoignable après la bascule : restauration de l'ancienne configuration...${NC}"
+    # Controle de survie. L'ancienne version testait `ping 8.8.8.8` puis
+    # `ping archive.ubuntu.com` avec un &&, donc il fallait que LES DEUX
+    # echouent pour restaurer. Or `ping 8.8.8.8` reussit PAR IP, sans DNS : la
+    # premiere condition etait fausse et la restauration ne partait jamais.
+    # Constate en VM QEMU : apt a produit 2897 lignes "Could not resolve
+    # 'archive.ubuntu.com'" pendant que le garde-fou affichait "Reseau
+    # operationnel". Ce qu'il faut verifier, c'est ce dont apt a besoin :
+    # la RESOLUTION DE NOMS, puis un acces HTTP reel au depot.
+    reseau_utilisable() {
+        local hote="archive.ubuntu.com"
+        # 1. Resolution DNS -- le point qui avait lache.
+        getent hosts "$hote" >/dev/null 2>&1 || return 1
+        # 2. Acces HTTP reel au depot (ce que fera apt juste apres).
+        if command -v curl >/dev/null 2>&1; then
+            curl -fsS --max-time 15 -o /dev/null "http://${hote}/ubuntu/" 2>/dev/null && return 0
+        elif command -v wget >/dev/null 2>&1; then
+            wget -q --timeout=15 --spider "http://${hote}/ubuntu/" 2>/dev/null && return 0
+        else
+            # Sans client HTTP, la resolution DNS reste le meilleur signal.
+            return 0
+        fi
+        return 1
+    }
+
+    # NetworkManager peut avoir ete empeche de demarrer par le policy-rc.d
+    # (exit 101) pose par install.sh : on le relance explicitement, ce que
+    # policy-rc.d ne bloque pas, puis on laisse le temps au DHCP.
+    sudo systemctl start NetworkManager 2>/dev/null || true
+    for _essai in 1 2 3 4 5 6; do
+        reseau_utilisable && break
+        sleep 5
+    done
+
+    if ! reseau_utilisable; then
+        echo -e "    ${RED}⚠️  DNS ou dépôt injoignable après la bascule : restauration de l'ancienne configuration...${NC}"
         sudo rm -f /etc/netplan/01-network-manager-all.yaml 2>/dev/null || true
         if [ "$NETPLAN_RESTAURE" -eq 1 ] && [ -f /etc/netplan/50-cloud-init.yaml.bak ]; then
             sudo cp /etc/netplan/50-cloud-init.yaml.bak /etc/netplan/50-cloud-init.yaml 2>/dev/null || true
         fi
         sudo netplan apply 2>/dev/null || true
+        sudo systemctl restart systemd-resolved 2>/dev/null || true
         sleep 5
+        if reseau_utilisable; then
+            echo -e "    ${GREEN}├─ Réseau restauré avec l'ancienne configuration.${NC}"
+        else
+            echo -e "    ${RED}❌ Réseau toujours inutilisable. Les modules suivants ne pourront rien télécharger.${NC}"
+            echo -e "    ${GRAY}    Vérifiez : ${GREEN}resolvectl status${NC}${GRAY} et ${GREEN}ip route${NC}"
+        fi
     else
-        echo -e "    ${GREEN}├─ Réseau opérationnel sous NetworkManager.${NC}"
+        echo -e "    ${GREEN}├─ Réseau opérationnel (DNS et dépôt joignables).${NC}"
     fi
 fi
 
