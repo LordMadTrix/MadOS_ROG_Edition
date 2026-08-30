@@ -269,8 +269,20 @@ save_checkpoint() {
     local module="$1"
     local status="${2:-OK}"
     local timestamp
+
+    # Une SIMULATION ne doit rien laisser derriere elle. Ecrire un checkpoint ici
+    # changeait le comportement des executions SUIVANTES : apres un --dry-run,
+    # une VRAIE installation sautait tous les modules en les croyant deja faits.
+    # Constate en lancant deux --dry-run de suite dans une Ubuntu 24.04 propre :
+    # le second ne faisait plus rien du tout.
+    # (Avant la correction de skip_if_completed, ce defaut etait masque : la
+    # reprise ne fonctionnait pas, donc les checkpoints n'etaient jamais relus.)
+    if is_dry_run; then
+        log_simu "enregistrerait le checkpoint ${module} (${status})"
+        return 0
+    fi
+
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    
     sudo mkdir -p "$(dirname "$STATE_FILE")"
     echo "$module:$status:$timestamp" | sudo tee -a "$STATE_FILE" > /dev/null
     log_info "Checkpoint sauvegardé: ${module} (${status})"
