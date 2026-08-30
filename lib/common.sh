@@ -355,6 +355,32 @@ log_simu() {
     MADOS_SIMU_COUNT=$((MADOS_SIMU_COUNT + 1))
 }
 
+# ------------------------------------------------------------------------------
+# Une PPA publie-t-elle pour la version d Ubuntu qui tourne ici ?
+#
+# Ajouter une PPA qui ne publie pas pour la suite courante ne provoque pas
+# d erreur visible : add-apt-repository accepte, et c est le apt update suivant
+# qui echoue sur un 404 -- noye parmi les autres depots. Constate : la PPA
+# Lutris publie pour noble mais pas pour resolute (26.04), ou Ubuntu fournit
+# deja la meme version.
+#
+# On interroge Launchpad. Sans reseau ou sans outil JSON, on repond NON : mieux
+# vaut se passer d une PPA que casser tous les apt update qui suivent.
+# ------------------------------------------------------------------------------
+ppa_publie_ici() {
+    local ppa="${1#ppa:}"
+    local proprio="${ppa%%/*}" nom="${ppa##*/}"
+    local suite
+    suite=$(. /etc/os-release 2>/dev/null; echo "${VERSION_CODENAME:-}")
+    [ -n "$suite" ] || return 1
+    command -v curl >/dev/null 2>&1 || return 1
+
+    local url="https://ppa.launchpadcontent.net/${proprio}/${nom}/ubuntu/dists/${suite}/Release"
+    local code
+    code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null)
+    [ "$code" = "200" ]
+}
+
 run_action() {
     # Usage : run_action "ce que ça ferait, en clair" commande arg1 arg2...
     # En simulation, rien n'est exécuté : seule la description est affichée.

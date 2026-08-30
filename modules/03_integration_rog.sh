@@ -73,8 +73,12 @@ fi
 # 3. ASUSCTL & SUPERGFXCTL
 echo -e "\n    ${WHITE}├─ [ASUSCTL] Configuration des Dépôts Spécialisés ASUS-Linux...${NC}"
 
-# Ajout du PPA Officiel
-run_action "ajouterait le PPA lukas-moeller/asus-linux" sudo add-apt-repository ppa:lukas-moeller/asus-linux -y --no-update 2>/dev/null || true
+# La PPA « lukas-moeller/asus-linux » N EXISTE PAS : Launchpad rend 404 sur le
+# compte lui-meme, verifie sur l API et sur la page web. Elle etait ajoutee
+# depuis toujours, echouait en silence (|| true), et l installation de asusctl
+# basculait donc SYSTEMATIQUEMENT sur la compilation de secours plus bas.
+# asusctl, supergfxctl et rog-control-center sont dans les depots Ubuntu
+# officiels, en 24.04 comme en 26.04 : aucune PPA n est necessaire.
 run_action "rafraîchirait les index APT (apt update)" sudo apt update -q || true
 
 # Installation des outils officiels
@@ -123,7 +127,8 @@ run_action "rechargerait la configuration systemd (daemon-reload)" sudo systemct
 
 # 4. OpenRGB Integration
 echo -e "\n    ${WHITE}├─ [OPENRGB] Installation du contrôleur LED universel...${NC}"
-run_action "ajouterait le PPA th337/openrgb" sudo add-apt-repository ppa:th337/openrgb -y --no-update 2>/dev/null || true
+# La PPA « th337/openrgb » n existe pas non plus (404 sur le compte).
+# openrgb est dans les depots Ubuntu officiels.
 run_action "rafraîchirait les index APT (apt update)" sudo apt update -q || true
 run_action "installerait openrgb" sudo apt install -y openrgb 2>/dev/null || echo -e "    ${YELLOW}⚠ Échec installation OpenRGB.${NC}"
 

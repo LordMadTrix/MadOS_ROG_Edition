@@ -128,9 +128,18 @@ else
     echo "deb [signed-by=/etc/apt/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/ubuntu/ ${XANMOD_DIST} main" | sudo tee /etc/apt/sources.list.d/winehq.list > /dev/null
 fi
 
-# Lutris & Divers
+# Lutris : la PPA n est ajoutee que si elle publie POUR CETTE version d Ubuntu.
+# Elle publie pour noble (24.04) mais pas pour resolute (26.04) -- verifie :
+# 404 sur son index, 0 paquet publie selon l API Launchpad. L ajouter quand
+# meme faisait echouer tous les apt update suivants sur un depot introuvable.
+# Et sur 26.04 c est sans interet : Ubuntu fournit deja lutris 0.5.22, la
+# meme version que la PPA.
 if ! ls /etc/apt/sources.list.d/lutris-team-ubuntu-lutris-*.list &>/dev/null; then
-    run_action "ajouterait le PPA lutris-team/lutris" sudo add-apt-repository ppa:lutris-team/lutris -y --no-update
+    if ppa_publie_ici ppa:lutris-team/lutris; then
+        run_action "ajouterait le PPA lutris-team/lutris" sudo add-apt-repository ppa:lutris-team/lutris -y --no-update
+    else
+        echo -e "    ${GRAY}├─ PPA Lutris indisponible pour cette version : on garde celle des depots Ubuntu.${NC}"
+    fi
 fi
 run_action "activerait le dépôt universe" sudo add-apt-repository universe -y --no-update
 run_action "activerait le dépôt multiverse" sudo add-apt-repository multiverse -y --no-update
