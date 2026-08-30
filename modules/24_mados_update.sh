@@ -48,6 +48,17 @@ fi
 echo -e "    ${GREEN}✓ Connexion OK.${NC}"
 
 echo -e "    ${GRAY}├─ Clonage de la dernière version depuis GitHub...${NC}"
+
+# Le mode simulation se verifie ICI, pas trente lignes plus bas.
+# Avant, le module clonait le depot dans /tmp et y posait des droits AVANT
+# d'atteindre son premier « if is_dry_run » (ligne 92) : --dry-run telechargeait
+# donc pour de vrai. Sans danger (le dossier est un /tmp horodate cree par ce
+# module), mais la promesse « rien n'est ecrit » n'etait pas tenue.
+if is_dry_run; then
+    log_simu "clonerait $REPO_URL dans $INSTALL_DIR, comparerait les versions, puis relancerait install.sh si une mise a jour existe"
+    exit 0
+fi
+
 sudo rm -rf "$INSTALL_DIR" 2>/dev/null || true
 if ! sudo git clone --depth=1 "$REPO_URL" "$INSTALL_DIR" >/dev/null 2>&1; then
     echo -e "    ${RED}✗ Impossible de récupérer la mise à jour depuis GitHub.${NC}"
