@@ -112,8 +112,20 @@ if is_dry_run; then
 else
     echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
     echo "deb [signed-by=/etc/apt/keyrings/spotify-new.gpg,/etc/apt/keyrings/spotify-old.gpg arch=amd64] https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list > /dev/null
-    echo 'deb [signed-by=/etc/apt/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org releases main' | sudo tee /etc/apt/sources.list.d/xanmod-release.list > /dev/null
-    echo "deb [signed-by=/etc/apt/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/winehq.list > /dev/null
+    # XanMod a change la structure de son depot : la distribution "releases"
+    # renvoie 404 (verifie : https://deb.xanmod.org/dists/releases/Release -> 404,
+    # https://deb.xanmod.org/dists/noble/Release -> 200). Il faut le nom de code
+    # de la distribution. Consequence de l'ancienne URL, mesuree en VM :
+    #   E: The repository 'http://deb.xanmod.org releases Release' does not have a Release file.
+    #   E: Unable to locate package linux-xanmod-edge-x64v3
+    # ... et le module 01 annoncait quand meme un succes.
+    # lsb_release peut renvoyer "n/a" (notamment si /etc/os-release a ete
+    # rebrande sans VERSION_CODENAME) : on lit os-release en priorite.
+    XANMOD_DIST="$(. /etc/os-release 2>/dev/null; echo "${VERSION_CODENAME:-}")"
+    [ -z "$XANMOD_DIST" ] && XANMOD_DIST="$(lsb_release -sc 2>/dev/null)"
+    case "$XANMOD_DIST" in ""|"n/a") XANMOD_DIST="noble" ;; esac
+    echo "deb [signed-by=/etc/apt/keyrings/xanmod-archive-keyring.gpg] http://deb.xanmod.org ${XANMOD_DIST} main" | sudo tee /etc/apt/sources.list.d/xanmod-release.list > /dev/null
+    echo "deb [signed-by=/etc/apt/keyrings/winehq-archive-keyring.gpg] https://dl.winehq.org/wine-builds/ubuntu/ ${XANMOD_DIST} main" | sudo tee /etc/apt/sources.list.d/winehq.list > /dev/null
 fi
 
 # Lutris & Divers

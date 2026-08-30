@@ -42,11 +42,24 @@ echo -e "    ${GRAY}├─ Injection du paquet : $XANMOD_PKG...${NC}"
 if is_dry_run; then
     log_simu "installerait le noyau $XANMOD_PKG (ou linux-xanmod-edge générique en repli)"
 else
-if sudo apt install -y "$XANMOD_PKG"; then
-    echo -e "    ${GRAY}✅ [SUCCÈS] Noyau $XANMOD_PKG installé.${NC}"
-else
-    echo -e "    ${RED}⚠️  [ATTENTION] Moteur introuvable, tentative version générique...${NC}"
-    sudo apt install -y linux-xanmod-edge || true
+# Repli par NIVEAU D'ARCHITECTURE decroissant. L'ancien repli visait
+# "linux-xanmod-edge" sans suffixe : ce paquet N'EXISTE PAS dans le depot
+# (verifie en VM : les paquets sont linux-xanmod-edge-x64v2/v3,
+# linux-xanmod-lts-x64v1/v2/v3, linux-xanmod-x64v2/v3). Le repli echouait donc
+# toujours, et le module annoncait un succes malgre tout.
+XANMOD_POSE=0
+for _pkg in "$XANMOD_PKG" "linux-xanmod-edge-x64v2" "linux-xanmod-lts-${CPU_LEVEL}" "linux-xanmod-lts-x64v1"; do
+    if sudo apt install -y "$_pkg" 2>/dev/null; then
+        echo -e "    ${GRAY}✅ [SUCCÈS] Noyau $_pkg installé.${NC}"
+        XANMOD_PKG="$_pkg"
+        XANMOD_POSE=1
+        break
+    fi
+done
+if [ "$XANMOD_POSE" -eq 0 ]; then
+    echo -e "    ${RED}❌ [ERREUR] Aucun noyau XanMod n'a pu être installé.${NC}"
+    echo -e "    ${YELLOW}    Le système restera sur son noyau actuel : $(uname -r)${NC}"
+    echo -e "    ${GRAY}    Vérifiez le dépôt : ${GREEN}apt-cache search '^linux-xanmod'${NC}"
 fi
 fi
 

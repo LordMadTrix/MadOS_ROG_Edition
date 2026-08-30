@@ -73,8 +73,21 @@ echo -e "${THEME_COLOR}║${NC}   ${GRAY}Interface détectée : ${BOLD}$MADOS_DE
 echo -e "${THEME_COLOR}╚══════════════════════════════════════════════════════╝${NC}\n"
 
 # 1. OS Identity
+# On PRESERVE les champs techniques d'origine avant de rebrander. L'ancienne
+# version ecrasait /etc/os-release avec 6 lignes seulement et faisait
+# disparaitre VERSION_CODENAME : `lsb_release -sc` renvoyait ensuite "n/a" pour
+# toujours. Mesure en VM apres une installation complete :
+#     VERSION_CODENAME present ? NON -> disparu
+#     lsb_release -sc : n/a
+# Consequence bien au-dela de MadOS : add-apt-repository, les depots tiers et
+# tout installeur qui detecte la version d'Ubuntu cessent de fonctionner.
+MADOS_CODENAME="$(. /etc/os-release 2>/dev/null; echo "${VERSION_CODENAME:-}")"
+MADOS_VERSION_ID="$(. /etc/os-release 2>/dev/null; echo "${VERSION_ID:-24.04}")"
+[ -z "$MADOS_CODENAME" ] && MADOS_CODENAME="$(lsb_release -sc 2>/dev/null)"
+case "$MADOS_CODENAME" in ""|"n/a") MADOS_CODENAME="noble" ;; esac
+
 if is_dry_run; then
-    log_simu "écrirait /etc/os-release, /etc/hostname et le MOTD MadOS ROG"
+    log_simu "écrirait /etc/os-release (en conservant VERSION_CODENAME=$MADOS_CODENAME), /etc/hostname et le MOTD MadOS ROG"
 else
 cat > /etc/os-release <<OSRELEASE
 NAME="MadOS ROG Edition"
@@ -82,7 +95,11 @@ VERSION="3.5 (Ultimate Stable)"
 ID=ubuntu
 ID_LIKE=debian
 PRETTY_NAME="MadOS ROG Edition 3.5 ($THEME_DESC)"
-VERSION_ID="24.04"
+VERSION_ID="$MADOS_VERSION_ID"
+VERSION_CODENAME=$MADOS_CODENAME
+UBUNTU_CODENAME=$MADOS_CODENAME
+HOME_URL="https://lordmadtrix.github.io/MadOS_ROG_Edition/"
+SUPPORT_URL="https://github.com/LordMadTrix/MadOS_ROG_Edition"
 OSRELEASE
 
 echo "mados-rog" > /etc/hostname
@@ -220,7 +237,15 @@ if [ -d "$GRUB_THEME_DIR" ]; then
         sed -i 's/GRUB_TIMEOUT=.*/GRUB_TIMEOUT=3/' "$GRUB_CONF" 2>/dev/null || true
         
         if grep -q 'GRUB_CMDLINE_LINUX_DEFAULT' "$GRUB_CONF"; then
-            sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 quiet splash\"/' "$GRUB_CONF" 2>/dev/null || true
+            # Ajout IDEMPOTENT. L'ancien sed collait " quiet splash" a chaque
+            # execution sans jamais verifier. Mesure en VM apres UNE SEULE
+            # installation :
+            #   GRUB_CMDLINE_LINUX_DEFAULT="quiet splash quiet splash loglevel=3 ..."
+            for _p in quiet splash; do
+                if ! grep -q "GRUB_CMDLINE_LINUX_DEFAULT=.*[\" ]${_p}[ \"]" "$GRUB_CONF" 2>/dev/null; then
+                    sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 ${_p}\"|" "$GRUB_CONF" 2>/dev/null || true
+                fi
+            done
         fi
     fi
     update-grub > /dev/null 2>&1 || true
