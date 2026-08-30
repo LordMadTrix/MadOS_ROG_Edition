@@ -41,7 +41,7 @@ set -uo pipefail
 RACINE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DOSSIER="${1:-$RACINE/modules}"
 
-MODIFIE='(apt|apt-get|dpkg|snap|systemctl|rm|cp|mv|mkdir|tee|ln|chmod|chown|update-initramfs|update-grub|grub-install|make|install|usermod|useradd|modprobe|swapon|mkswap|mkfs|parted|wipefs|timeshift|add-apt-repository|dracut|sysctl|nmcli|ufw|gsettings|killall|pkill|convert|magick)'
+MODIFIE='(apt|apt-get|dpkg|snap|systemctl|rm|cp|mv|mkdir|tee|ln|chmod|chown|update-initramfs|update-grub|grub-install|make|install|usermod|useradd|modprobe|swapon|mkswap|mkfs|parted|wipefs|timeshift|add-apt-repository|dracut|sysctl|nmcli|ufw|gsettings|killall|pkill|convert|magick|bash|sh|dd|truncate)'
 
 analyser() {
     awk -v modifie="$MODIFIE" '
@@ -95,27 +95,32 @@ printf 'echo hop\nsudo systemctl enable a\n' > "$T/nu.sh"
 printf 'if is_dry_run; then\n    log_simu "x"\nelse\n    if command -v a; then\n        sudo rm /tmp/x\n    fi\nfi\n' > "$T/imbrique.sh"
 printf 'if [ -z "$X" ]; then\n    echo vide\nelif is_dry_run; then\n    log_simu "x"\nelse\n    sudo cp a b\nfi\n' > "$T/garde_elif.sh"
 printf 'if is_dry_run; then\n    log_simu "x"\n    exit 0\nfi\nsudo rm -rf /tmp/truc\nsudo chmod +x /tmp/machin\n' > "$T/sortie.sh"
+printf 'echo hop
+sudo bash -c "echo x >> /etc/default/grub"
+' > "$T/shell.sh"
 
 v_protege=$(analyser "$T/protege.sh"    | wc -l)
 v_nu=$(analyser      "$T/nu.sh"         | wc -l)
 v_imbrique=$(analyser "$T/imbrique.sh"  | wc -l)
 v_elif=$(analyser    "$T/garde_elif.sh" | wc -l)
 v_sortie=$(analyser  "$T/sortie.sh"     | wc -l)
+v_shell=$(analyser   "$T/shell.sh"      | wc -l)
 rm -rf "$T"
 
 if [ "$v_protege" -ne 0 ] || [ "$v_nu" -ne 1 ] || [ "$v_imbrique" -ne 0 ] || \
-   [ "$v_elif" -ne 0 ] || [ "$v_sortie" -ne 0 ]; then
+   [ "$v_elif" -ne 0 ] || [ "$v_sortie" -ne 0 ] || [ "$v_shell" -ne 1 ]; then
     echo "ECHEC : l'analyseur ne distingue plus protege et nu."
     echo "  temoin protege  : $v_protege (attendu 0)"
     echo "  temoin nu       : $v_nu (attendu 1)"
     echo "  temoin imbrique : $v_imbrique (attendu 0)"
     echo "  garde sur elif  : $v_elif (attendu 0)"
     echo "  sortie anticipee: $v_sortie (attendu 0)"
+    echo "  sudo bash -c    : $v_shell (attendu 1)"
     echo ""
     echo "Aucun verdict n'est rendu : un analyseur faux vaut moins que pas d'analyse."
     exit 2
 fi
-echo "Analyseur valide sur 5 cas temoins."
+echo "Analyseur valide sur 6 cas temoins."
 echo ""
 
 # ---- Verdict ---------------------------------------------------------------

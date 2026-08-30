@@ -65,6 +65,31 @@ jobs:
             exit 1
           fi
 
+      # L'analyse statique ci-dessus ne voit que les motifs qu'on lui a appris.
+      # Elle a longtemps annonce « 0 module fautif » alors que
+      # hyperviseur_drivers.sh ecrivait POUR DE VRAI dans /etc/default/grub en
+      # mode --dry-run, via « sudo bash -c », une forme qu'elle ne surveillait
+      # pas. Ce controle-ci n'analyse pas : il EXECUTE les 40 modules dans un
+      # espace de noms isole et mesure ce qu'ils ecrivent. Il ne peut donc pas
+      # avoir le meme angle mort.
+      #
+      # Les deux se completent, aucun ne remplace l'autre : celui-ci ne mesure
+      # ni /sys ni /proc, que seule l'analyse statique peut couvrir.
+      - name: Les modules ecrivent-ils quelque chose malgre la simulation ?
+        run: |
+          sortie=$(sudo bash tools/test_simulation_reelle.sh 2>&1) || {
+            echo "$sortie"
+            echo "::error::Un module modifie le systeme malgre --dry-run, ou echoue a l'execution."
+            exit 1
+          }
+          echo "$sortie"
+          # Une abstention ne doit jamais passer pour une reussite silencieuse :
+          # sans cette ligne, un environnement sans overlayfs rendrait « vert »
+          # un controle qui n'a rien controle du tout.
+          if echo "$sortie" | grep -q "^IGNORE"; then
+            echo "::warning::Test d'execution reelle non execute ici (environnement sans overlayfs ou sans unshare). Aucune mesure n'a ete faite."
+          fi
+
       # lib/config.conf declarait 58 reglages dont 48 que personne ne lisait :
       # changer DNS_PRIMARY ou XANMOD_FLAVOR n'avait aucun effet, et rien ne le
       # disait. Meme defaut que la sauvegarde qui ne sauvegardait rien. Ce

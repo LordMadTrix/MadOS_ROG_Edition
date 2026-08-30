@@ -89,13 +89,26 @@ main() {
     # ==============================================================================
     log_info "Optimisation système pour l'environnement virtualisé..."
     
-    # Désactiver le watchdog s'il existe (peut causer des ralentissements)
-    sudo bash -c 'echo "GRUB_CMDLINE_LINUX_DEFAULT=\"\$GRUB_CMDLINE_LINUX_DEFAULT nowatchdog\"" >> /etc/default/grub' 2>/dev/null || true
-    
-    # Configuration de l'I/O scheduler pour les VMs
-    if [ -f "/sys/block/sda/queue/scheduler" ]; then
-        sudo bash -c 'echo "noop" > /sys/block/sda/queue/scheduler' 2>/dev/null || \
-        sudo bash -c 'echo "deadline" > /sys/block/sda/queue/scheduler' 2>/dev/null || true
+    # Désactiver le watchdog s'il existe (peut causer des ralentissements),
+    # puis régler l'ordonnanceur d'E/S. Les deux modifient la machine : en
+    # simulation on annonce, on n'applique pas.
+    #
+    # Sans cette garde, --dry-run écrivait POUR DE VRAI dans /etc/default/grub,
+    # le fichier qui pilote le démarrage. Constaté en exécutant les 40 modules
+    # dans un espace de noms isolé, pas en relisant le code : l'analyseur
+    # statique ne surveillait pas « sudo bash -c », porte dérobée par laquelle
+    # n'importe quelle action passait sans être vue.
+    if is_dry_run; then
+        log_simu "ajouterait « nowatchdog » à GRUB_CMDLINE_LINUX_DEFAULT (/etc/default/grub)"
+        log_simu "réglerait l'ordonnanceur d'E/S de sda sur « noop », à défaut « deadline »"
+    else
+        sudo bash -c 'echo "GRUB_CMDLINE_LINUX_DEFAULT=\"\$GRUB_CMDLINE_LINUX_DEFAULT nowatchdog\"" >> /etc/default/grub' 2>/dev/null || true
+
+        # Configuration de l'I/O scheduler pour les VMs
+        if [ -f "/sys/block/sda/queue/scheduler" ]; then
+            sudo bash -c 'echo "noop" > /sys/block/sda/queue/scheduler' 2>/dev/null || \
+            sudo bash -c 'echo "deadline" > /sys/block/sda/queue/scheduler' 2>/dev/null || true
+        fi
     fi
     
     # ==============================================================================

@@ -1056,7 +1056,7 @@ cloture_installation() {
         clear
         echo -e "${RED}🚀 REBOOT ENGAGÉ. Rendez-vous dans la matrice...${NC}"
         sleep 2
-        sudo reboot
+        run_action "redémarrerait immédiatement le système" sudo reboot
     else
         clear
         echo -e "${GREEN}Séquence terminée. Votre station MadOS est prête.${NC}"
