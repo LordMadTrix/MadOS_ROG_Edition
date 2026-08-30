@@ -140,6 +140,36 @@ for m in "$RACINE"/modules/*.sh; do
 done
 
 echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# install.sh lui-meme, lance SEUL et en simulation.
+#
+# Les modules ci-dessus ne couvrent pas install.sh, et l'analyse statique ne
+# peut pas le couvrir non plus : elle modelise des scripts lineaires, pas un
+# gros script a fonctions ou un « exit 0 » dans une garde serait pris pour une
+# sortie de fichier et masquerait tout le reste.
+#
+# Ce cas-ci comble le trou. Lance sans lib/ ni modules/, install.sh declenche
+# son amorcage : avant correction, il effacait recursivement /opt/mados_src,
+# installait git et clonait le depot -- POUR DE VRAI, malgre --dry-run.
+# ─────────────────────────────────────────────────────────────────────────────
+avant_install=$(ecritures | wc -l)
+mkdir -p "$BASE/seul"
+cp "$RACINE/install.sh" "$BASE/seul/" 2>/dev/null
+if [ -f "$BASE/seul/install.sh" ]; then
+    ( cd "$BASE/seul" && timeout 60 bash install.sh --dry-run </dev/null )         > "$BASE/logs/install_seul.out" 2>&1
+    code_install=$?
+    delta_install=$(( $(ecritures | wc -l) - avant_install ))
+    printf '  %-36s %-9s %-7s %s
+' "install.sh (lance seul)"            "$([ "$code_install" -eq 0 ] && echo ok || echo "code $code_install")"            "-" "$([ "$delta_install" -gt 0 ] && echo "$delta_install" || echo "-")"
+    if [ "$delta_install" -gt 0 ]; then
+        ECHEC=$((ECHEC + 1))
+    fi
+else
+    echo "  install.sh introuvable, cas non execute"
+fi
+echo ""
+
 echo "  modules reussis  : $OK"
 echo "  modules en echec : $ECHEC"
 echo "  modules expires  : $EXPIRE"

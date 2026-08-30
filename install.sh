@@ -58,6 +58,35 @@ mados_amorcage() {
     local cible="/opt/mados_src"
     local archive="/tmp/mados_src.tar.gz"
 
+    # ─────────────────────────────────────────────────────────────────────────
+    # SIMULATION : cet amorçage écrit POUR DE VRAI. Il efface /opt/mados_src
+    # (rm -rf), installe git, clone le dépôt, télécharge et extrait une archive,
+    # puis relance l'installateur. Six écritures, dont une suppression
+    # récursive — alors que --dry-run vient d'annoncer que rien ne serait écrit.
+    #
+    # is_dry_run() n'est pas utilisable ici : elle vit dans lib/common.sh,
+    # précisément le fichier manquant qu'on venait chercher. On lit donc DRY_RUN
+    # directement, tel que la lecture des arguments (plus haut) l'a exporté.
+    #
+    # Et on s'arrête là : sans les modules, il n'y a rien à simuler ensuite.
+    # Continuer donnerait une simulation vide qui aurait l'air d'avoir marché.
+    # ─────────────────────────────────────────────────────────────────────────
+    if [ "${DRY_RUN:-no}" = "yes" ]; then
+        echo -e "${YELLOW}[SIMULATION]${NC} install.sh a été lancé sans ses modules."
+        echo -e "${GRAY}    Sans --dry-run, il aurait :${NC}"
+        echo -e "${GRAY}      • effacé puis recréé ${cible}${NC}"
+        echo -e "${GRAY}      • installé git s'il manquait${NC}"
+        echo -e "${GRAY}      • cloné ${depot} (ou téléchargé main.tar.gz en repli)${NC}"
+        echo -e "${GRAY}      • relancé l'installation depuis ${cible}${NC}"
+        echo -e ""
+        echo -e "${YELLOW}    Rien n'a été écrit. Pour simuler l'installation complète,${NC}"
+        echo -e "${YELLOW}    récupérez d'abord le dépôt :${NC}"
+        echo -e "      ${GREEN}git clone ${depot}.git${NC}"
+        echo -e "      ${GREEN}cd MadOS_ROG_Edition && sudo bash install.sh --dry-run${NC}"
+        exit 0
+    fi
+
+
     # Filet anti-récursion : si la relance retombe ici, on s'arrête net.
     if [ -n "${MADOS_AMORCAGE_FAIT:-}" ]; then
         echo -e "${RED}[ERREUR] L'amorçage a déjà eu lieu et lib/common.sh reste introuvable.${NC}"
