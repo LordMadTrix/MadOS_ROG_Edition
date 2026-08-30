@@ -56,12 +56,12 @@ jobs:
           fi
 
   shellcheck:
-    name: ShellCheck (informatif)
+    name: ShellCheck (bloquant)
     runs-on: ubuntu-latest
-    # Non bloquant DE FACON EXPLICITE : le job apparait en echec dans l'UI mais
-    # ne bloque pas la fusion. C'est different d'un "|| true", qui faisait
-    # passer le job au vert quoi qu'il arrive et masquait tout.
-    continue-on-error: true
+    # Bloquant. Le code est propre : toute nouvelle alerte doit etre traitee,
+    # pas accumulee. SC1091 reste exclu car ShellCheck ne peut pas suivre un
+    # `source` dont le chemin est une variable ($PROJECT_ROOT/lib/common.sh) :
+    # c'est un faux positif structurel, pas un defaut.
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -69,8 +69,8 @@ jobs:
       - name: Install ShellCheck
         run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
 
-      - name: Lint install.sh, lib/ et modules/
-        run: shellcheck -S warning -e SC2034,SC2155,SC1091 install.sh lib/*.sh modules/*.sh
+      - name: Lint install.sh, lib/, modules/ et tools/
+        run: shellcheck -S warning -e SC1091 install.sh lib/*.sh modules/*.sh tools/*.sh
 
   pages:
     name: GitHub Pages — Verify index.html
