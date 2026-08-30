@@ -146,12 +146,28 @@ echo "  modules expires  : $EXPIRE"
 echo ""
 
 # ---- Verdict ----------------------------------------------------------------
-reels=0; recopies=0; journaux=0
+reels=0; recopies=0; journaux=0; caches=0
 echo "  Fichiers captes, contenu compare a l'original :"
 while IFS= read -r f; do
     [ -n "$f" ] || continue
     case "$f" in
         */log/*|*.log|*/logs/*) journaux=$((journaux+1)); printf '    [journal] %s\n' "$f"; continue ;;
+        /var/cache/apt/*)
+            # APT reconstruit pkgcache.bin et srcpkgcache.bin des qu une commande
+            # LIT les listes de paquets, sans rien installer. Ce n est pas une
+            # modification du systeme : c est un cache derive, reconstructible.
+            #
+            # Constate sur un serveur d integration continue, dont le cache etait
+            # perime. La machine de developpement, cache a jour, ne montrait rien :
+            # le test passait chez moi et echouait ailleurs, pour du bruit.
+            #
+            # L exclusion s arrete la. /var/lib/apt/lists/ n est PAS exclu : ces
+            # fichiers ne changent que sur « apt-get update », une vraie action
+            # reseau, qui doit rester bloquante.
+            caches=$((caches+1))
+            printf '    [cache  ] %s (regenere par apt en lecture)
+' "$f"
+            continue ;;
     esac
     if [ -f "$ORIG$f" ] && cmp -s "$f" "$ORIG$f"; then
         recopies=$((recopies+1)); printf '    [recopie] %s (contenu inchange)\n' "$f"
@@ -159,10 +175,11 @@ while IFS= read -r f; do
         reels=$((reels+1));       printf '    [MODIFIE] %s\n' "$f"
     fi
 done <<< "$(ecritures)"
-[ "$journaux" -eq 0 ] && [ "$recopies" -eq 0 ] && [ "$reels" -eq 0 ] && echo "    (aucun)"
+[ "$journaux" -eq 0 ] && [ "$recopies" -eq 0 ] && [ "$reels" -eq 0 ] && [ "$caches" -eq 0 ] && echo "    (aucun)"
 
 echo ""
 echo "  journaux (attendus)   : $journaux"
+echo "  caches apt regeneres  : $caches"
 echo "  recopies sans effet   : $recopies"
 echo "  MODIFICATIONS REELLES : $reels"
 echo ""
