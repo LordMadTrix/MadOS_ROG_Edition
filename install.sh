@@ -135,15 +135,38 @@ MadOS ROG Edition - options
   sudo bash install.sh --help          Cette aide
 AIDE
             exit 0 ;;
-        list)
-            source "$(dirname "$0")/lib/config.conf" 2>/dev/null || true
-            source "$(dirname "$0")/lib/common.sh" 2>/dev/null || true
-            list_backups
-            exit $? ;;
-        restore)
-            source "$(dirname "$0")/lib/config.conf" 2>/dev/null || true
-            source "$(dirname "$0")/lib/common.sh" 2>/dev/null || true
-            restore_all
+        list|restore)
+            # Les sauvegardes vivent sur le SYSTEME (manifeste + /var/lib), pas
+            # dans le depot : ces deux options doivent donc fonctionner meme
+            # depuis un install.sh telecharge seul. L'ancienne version ne
+            # cherchait common.sh qu'a cote du script, avalait l'echec avec
+            # `|| true`, puis appelait list_backups/restore_all -> "command not
+            # found". Constate en VM : `sudo bash install.sh --list-backups`
+            # plantait sur install.sh: line 141: list_backups: command not found
+            MADOS_LIB=""
+            for _base in "$(dirname "$0")" /opt/mados-rog /opt/mados_src; do
+                if [ -f "$_base/lib/common.sh" ]; then
+                    MADOS_LIB="$_base/lib"
+                    break
+                fi
+            done
+            if [ -z "$MADOS_LIB" ]; then
+                echo "MadOS : lib/common.sh introuvable." >&2
+                echo "  Cherché dans : $(dirname "$0")/lib, /opt/mados-rog/lib, /opt/mados_src/lib" >&2
+                echo "  Récupérez l'arborescence complète :" >&2
+                echo "    git clone https://github.com/LordMadTrix/MadOS_ROG_Edition.git" >&2
+                echo "    cd MadOS_ROG_Edition && sudo bash install.sh $1" >&2
+                exit 1
+            fi
+            # shellcheck source=/dev/null
+            [ -f "$MADOS_LIB/config.conf" ] && source "$MADOS_LIB/config.conf" 2>/dev/null
+            # shellcheck source=/dev/null
+            source "$MADOS_LIB/common.sh"
+            if [ "$MADOS_ACTION" = "list" ]; then
+                list_backups
+            else
+                restore_all
+            fi
             exit $? ;;
     esac
 
