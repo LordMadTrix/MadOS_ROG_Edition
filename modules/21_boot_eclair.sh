@@ -87,7 +87,7 @@ if is_dry_run; then
 else
 backup_file "/etc/default/grub"
 sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=3/' /etc/default/grub || true
-sudo update-grub 2>/dev/null || true
+regenerer_amorcage "régénération du menu GRUB (démarrage rapide)" sudo update-grub
 if [ -f "$INITRAMFS_CONF" ]; then
     # Sur une Ubuntu par defaut la ligne est COMMENTEE (#COMPRESS=gzip) : le
     # motif ancre ^COMPRESS= ne matchait donc jamais et ZSTD n'etait jamais
@@ -152,7 +152,7 @@ if [ "${PIPESTATUS[0]}" -ne 0 ]; then
     sudo sed -i 's/^COMPRESS=zstd/COMPRESS=gzip/' "$INITRAMFS_CONF"
     sudo update-initramfs -u -k all >/dev/null 2>&1
 fi
-sudo update-grub >/dev/null 2>&1 || true
+regenerer_amorcage "régénération du menu GRUB (paramètres du noyau)" sudo update-grub
 fi
 
 echo -e "    ${CYAN}✅ [SUCCÈS] Boot sublimé. Au redémarrage, la seule chose que vous verrez sera le Splash Plymouth ROG instantané.${NC}"

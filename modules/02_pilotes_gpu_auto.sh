@@ -96,7 +96,7 @@ if echo "$GPU_INFO" | grep -iq "nvidia"; then
             # Activation DRM Modeset
             echo -e "    ${GRAY}├─ Activation de NVIDIA DRM Modeset...${NC}"
             echo "options nvidia-drm modeset=1" | sudo tee /etc/modprobe.d/nvidia-modeset.conf >/dev/null
-            sudo update-initramfs -u >/dev/null 2>&1 || true
+            regenerer_amorcage "reconstruction de l'initramfs (pilotes graphiques)" sudo update-initramfs -u
         else
             echo -e "    ${RED}❌ [ERREUR] Échec installation $RECOMMENDED_DRIVER.${NC}"
             echo -e "    ${YELLOW}    ATTENTION : le système peut démarrer sans pilote graphique propriétaire.${NC}"

@@ -102,7 +102,7 @@ run_action "activerait le thème Plymouth mados-pulsar" sudo plymouth-set-defaul
 
 # Mise à jour de l'initramfs pour inclure le splash
 echo -e "    ${WHITE}├─ [BOOT] Reconstruction de l'image de démarrage (Initramfs)...${NC}"
-run_action "reconstruirait l'initramfs (update-initramfs -u)" sudo update-initramfs -u 2>/dev/null || true
+regenerer_amorcage "reconstruction de l'initramfs (écran de démarrage Plymouth)" sudo update-initramfs -u
 
 echo -e "    ${CYAN}✅ [SUCCÈS] Séquence de démarrage animée activée. Votre logo va pulser de lumière au prochain boot !${NC}"
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 35 Terminée.${NC}"

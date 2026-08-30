@@ -77,7 +77,16 @@ analyser() {
         if (d ~ /^#/) next
         if (d ~ /^alias[ \t]/) next
         if (d ~ /echo[ \t]+-?e?[ \t]*"[^"]*sudo/) next
-        if (d ~ /run_action|run_command_retry/) next
+        # Les enveloppes qui portent elles-memes un « is_dry_run » : ce qu elles
+        # recoivent n est pas execute en simulation. regenerer_amorcage a ete
+        # ajoutee ici pour update-grub / update-initramfs, dont les echecs
+        # etaient avales par « || true ».
+        #
+        # Cette exclusion est un acte de CONFIANCE envers la fonction : elle ne
+        # prouve pas que la garde y est correcte. C est tools/test_simulation_reelle.sh
+        # qui le verifie, en executant et en mesurant. Ne jamais ajouter un nom
+        # ici sans que le test dynamique passe.
+        if (d ~ /run_action|run_command_retry|regenerer_amorcage/) next
 
         protege = 0
         for (k = 1; k <= prof; k++) if (garde[k] && reelle[k]) protege = 1
@@ -98,6 +107,8 @@ printf 'if is_dry_run; then\n    log_simu "x"\n    exit 0\nfi\nsudo rm -rf /tmp/
 printf 'echo hop
 sudo bash -c "echo x >> /etc/default/grub"
 ' > "$T/shell.sh"
+printf 'regenerer_amorcage "x" sudo update-grub
+' > "$T/enveloppe.sh"
 
 v_protege=$(analyser "$T/protege.sh"    | wc -l)
 v_nu=$(analyser      "$T/nu.sh"         | wc -l)
@@ -105,10 +116,11 @@ v_imbrique=$(analyser "$T/imbrique.sh"  | wc -l)
 v_elif=$(analyser    "$T/garde_elif.sh" | wc -l)
 v_sortie=$(analyser  "$T/sortie.sh"     | wc -l)
 v_shell=$(analyser   "$T/shell.sh"      | wc -l)
+v_env=$(analyser     "$T/enveloppe.sh"   | wc -l)
 rm -rf "$T"
 
 if [ "$v_protege" -ne 0 ] || [ "$v_nu" -ne 1 ] || [ "$v_imbrique" -ne 0 ] || \
-   [ "$v_elif" -ne 0 ] || [ "$v_sortie" -ne 0 ] || [ "$v_shell" -ne 1 ]; then
+   [ "$v_elif" -ne 0 ] || [ "$v_sortie" -ne 0 ] || [ "$v_shell" -ne 1 ] || [ "$v_env" -ne 0 ]; then
     echo "ECHEC : l'analyseur ne distingue plus protege et nu."
     echo "  temoin protege  : $v_protege (attendu 0)"
     echo "  temoin nu       : $v_nu (attendu 1)"
@@ -116,11 +128,12 @@ if [ "$v_protege" -ne 0 ] || [ "$v_nu" -ne 1 ] || [ "$v_imbrique" -ne 0 ] || \
     echo "  garde sur elif  : $v_elif (attendu 0)"
     echo "  sortie anticipee: $v_sortie (attendu 0)"
     echo "  sudo bash -c    : $v_shell (attendu 1)"
+    echo "  enveloppe amorcage: $v_env (attendu 0)"
     echo ""
     echo "Aucun verdict n'est rendu : un analyseur faux vaut moins que pas d'analyse."
     exit 2
 fi
-echo "Analyseur valide sur 6 cas temoins."
+echo "Analyseur valide sur 7 cas temoins."
 echo ""
 
 # ---- Verdict ---------------------------------------------------------------

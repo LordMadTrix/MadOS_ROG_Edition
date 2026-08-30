@@ -403,6 +403,43 @@ refuser_reglage() {
 }
 
 # ==============================================================================
+# Régénérer l'amorçage : un échec ici ne doit JAMAIS passer inaperçu.
+#
+# update-grub et update-initramfs reconstruisent ce qui permet à la machine de
+# démarrer. Les huit appels du projet étaient tous suivis de « || true » ET
+# redirigeaient stderr vers /dev/null : non seulement le code de retour était
+# avalé, mais le message expliquant pourquoi disparaissait aussi. Au redémarrage
+# suivant, la machine pouvait ne plus démarrer sans que rien, nulle part, ne
+# l'ait signalé.
+#
+# On n'interrompt pas l'installation pour autant : une régénération ratée se
+# rattrape à la main, et arrêter tout au milieu laisserait le système dans un
+# état pire. Mais l'échec est affiché, journalisé, et accompagné de la commande
+# qui le corrige.
+# ==============================================================================
+regenerer_amorcage() {
+    local description="$1"
+    shift
+
+    if is_dry_run; then
+        log_simu "$description"
+        return 0
+    fi
+
+    # stderr n'est PAS jete : sans le message de la commande, un echec est
+    # indiagnosticable.
+    if "$@"; then
+        log_success "$description"
+        return 0
+    fi
+
+    log_error "ÉCHEC : $description"
+    log_warning "  La machine pourrait ne pas démarrer correctement au prochain redémarrage."
+    log_warning "  À rattraper à la main : sudo update-grub && sudo update-initramfs -u"
+    return 0
+}
+
+# ==============================================================================
 # Sauvegarde & Restauration
 # ==============================================================================
 backup_file() {

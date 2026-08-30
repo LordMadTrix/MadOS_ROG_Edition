@@ -54,7 +54,7 @@ echo -e "    ${GRAY}├─ Régénération des accès HID (${CYAN}Ceci prendra 1
 if is_dry_run; then
     log_simu "régénèrerait l'initramfs (update-initramfs -u -k all)"
 else
-    sudo update-initramfs -u -k all >/dev/null 2>&1 || true
+    regenerer_amorcage "reconstruction de l'initramfs pour tous les noyaux (USB 1000 Hz)" sudo update-initramfs -u -k all
 fi
 
 echo -e "    ${CYAN}✅ [SUCCÈS] Autosuspend désactivé, vos périphériques ne seront jamais bridés électriquement.${NC}"

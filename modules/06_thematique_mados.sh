@@ -248,7 +248,7 @@ if [ -d "$GRUB_THEME_DIR" ]; then
             done
         fi
     fi
-    update-grub > /dev/null 2>&1 || true
+    regenerer_amorcage "régénération du menu GRUB (thème MadOS)" update-grub
     rm -rf "$GRUB_THEME_DIR"
 else
     echo -e "    ${GRAY}├─ Échec du téléchargement du thème GRUB. (Ignoré)${NC}"
@@ -381,7 +381,7 @@ SCRIPT_EOF
     sudo update-alternatives --set default.plymouth /usr/share/plymouth/themes/mados-rog/mados-rog.plymouth >/dev/null 2>&1
     
     echo -e "    ${GRAY}├─ Recompilation du Kernel et de l'initramfs (Patientez svp)...${NC}"
-    sudo update-initramfs -u >/dev/null 2>&1 || true
+    regenerer_amorcage "reconstruction de l'initramfs (thème MadOS)" sudo update-initramfs -u
     fi
 fi
 

@@ -84,7 +84,7 @@ fi
 fi
 
 echo -e "    ${WHITE}├─ [BOOT] Séquenceur GRUB mis à jour.${NC}"
-run_action "lancerait update-grub" sudo update-grub 2>/dev/null || true
+regenerer_amorcage "régénération du menu GRUB (update-grub)" sudo update-grub
 
 # 4. Activation NTSYNC (Révolution Gaming 2026)
 echo -e "    ${WHITE}├─ [NTSYNC] Activation de la synchronisation noyau...${NC}"
