@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 11_batterie_extreme.sh
+# MadOS ROG Edition 3.6 - 11_batterie_extreme.sh
 # ==============================================================================
 # Phase: 11 - Batterie Extrême (auto-cpufreq)
 # ==============================================================================
@@ -39,7 +39,10 @@ else
     # l'utilisateur veut faire marche arriere (systemctl enable --now tlp).
     if systemctl is-enabled --quiet tlp 2>/dev/null || systemctl is-active --quiet tlp 2>/dev/null; then
         echo -e "    ${YELLOW}├─ TLP détecté : désactivé au profit d'auto-cpufreq (incompatibles).${NC}"
-        echo -e "    ${GRAY}│  Pour revenir à TLP : ${GREEN}sudo systemctl disable --now auto-cpufreq && sudo systemctl enable --now tlp${NC}"
+        # L'installeur auto-cpufreq SUPPRIME tlp (constate en VM : "Suppression
+        # de tlp", "Suppression de tlp-rdw"), il ne se contente pas de le
+        # desactiver. Un simple `systemctl enable tlp` echouerait donc.
+        echo -e "    ${GRAY}│  Pour revenir à TLP : ${GREEN}sudo systemctl disable --now auto-cpufreq && sudo apt install --reinstall -y tlp tlp-rdw && sudo systemctl enable --now tlp${NC}"
         sudo systemctl disable --now tlp 2>/dev/null || true
         sudo systemctl mask tlp 2>/dev/null || true
     fi

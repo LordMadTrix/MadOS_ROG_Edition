@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 01_noyau_xanmod.sh
+# MadOS ROG Edition 3.6 - 01_noyau_xanmod.sh
 # ==============================================================================
 # Phase: 1 - Installation Kernel XanMod EDGE (7.0+)
 # Cible spécifiquement la variance x64v3 pour ROG (AVX2).

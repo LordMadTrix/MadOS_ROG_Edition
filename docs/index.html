@@ -252,12 +252,12 @@
 </nav>
 
 <section class="hero">
-    <div class="version-badge">GOD TIER VERSION 3.5 — QUESTING EDITION</div>
+    <div class="version-badge">GOD TIER VERSION 3.6 — RELIABILITY EDITION</div>
     <h1>MADOS<br><span>ROG EDITION</span></h1>
     <p style="color:#ff003c;font-weight:700;letter-spacing:1px;margin-bottom:.6rem">LA BRANCHE LINUX DE MADTWEAK</p>
     <p class="subtitle">
         Le framework Linux le plus agressif du monde. Forgé pour l'i9 et la RTX.
-        Basé sur <b>Ubuntu 25.10</b>, propulsé par <b>XanMod 6.19+</b> et <b>Plasma 6</b>.
+        Basé sur <b>Ubuntu 24.04 LTS</b> (jusqu'à 25.10), propulsé par <b>XanMod 7.2</b> et <b>Plasma 6</b>.
         Performances pures, IA locale et esthétique Cyber-ROG sans aucun compromis.
     </p>
 
@@ -315,6 +315,71 @@
     <div class="card">
         <h3><span>🎨</span> Pulsar Visuals</h3>
         <p>L'esthétique ROG à l'état pur. Boot animé Pulsar, thèmes Cyberpunk/Carbon dynamiques et interface Glassmorphism fluide.</p>
+    </div>
+</section>
+
+<section id="nouveautes" style="padding: 5rem 5%; border-top: 1px solid var(--border-red);">
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2.2rem; text-align: center; margin-bottom: .8rem;">⚙️ NOUVEAUTÉS 3.6</h2>
+    <p style="text-align:center; color: var(--text-dim); max-width: 780px; margin: 0 auto 3rem; line-height:1.7;">
+        Version de fiabilité. L'installateur a été audité script par script, puis vérifié par une
+        installation réelle de bout en bout dans une machine virtuelle Ubuntu&nbsp;24.04 propre.
+    </p>
+
+    <div style="max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+
+        <div class="card">
+            <h3><span>🚑</span> L'installation fonctionne</h3>
+            <p>La commande d'installation ne récupérait que <code>install.sh</code>, sans les modules :
+            elle s'arrêtait aussitôt sur une erreur. Le script va désormais chercher lui-même
+            l'arborescence complète et se relance.</p>
+        </div>
+
+        <div class="card">
+            <h3><span>🐧</span> Le noyau XanMod s'installe</h3>
+            <p>Le dépôt pointait vers une distribution qui n'existe plus (404). Corrigé :
+            <b>XanMod 7.2</b> se pose maintenant réellement, avec un repli par niveau
+            d'architecture si votre CPU ne supporte pas le x64v3.</p>
+        </div>
+
+        <div class="card">
+            <h3><span>🌐</span> Plus de coupure réseau</h3>
+            <p>La bascule vers NetworkManager avait lieu au début et cassait le DNS pendant que
+            les modules téléchargeaient. Elle a été déplacée en fin d'installation, là où plus
+            rien n'en dépend.</p>
+        </div>
+
+        <div class="card">
+            <h3><span>💾</span> Sauvegarde et restauration réelles</h3>
+            <p><code>--restore</code> n'avait rien à restaurer : aucun module n'appelait la fonction
+            de sauvegarde. Les fichiers système sensibles sont désormais réellement sauvegardés
+            avant modification.</p>
+        </div>
+
+        <div class="card">
+            <h3><span>🕵️</span> Rien n'est envoyé sans votre accord</h3>
+            <p>Le journal d'installation partait automatiquement sur un pastebin public.
+            L'envoi est maintenant refusé par défaut et vous est explicitement proposé.</p>
+        </div>
+
+        <div class="card">
+            <h3><span>🖥️</span> Utilitaire <code>mados</code></h3>
+            <p>Nouvelle commande unifiée : <code>mados shift game</code>, <code>status</code>,
+            <code>health</code>, <code>night on</code>, <code>backups</code>, <code>restore</code>.
+            Avec auto-complétion Bash.</p>
+        </div>
+
+    </div>
+
+    <div style="max-width: 900px; margin: 3rem auto 0; padding: 1.5rem 2rem; border: 1px solid var(--border-red); background: rgba(255,0,60,.04);">
+        <h3 style="font-family:'Orbitron',sans-serif; font-size:1rem; letter-spacing:1px; margin-bottom:1rem;">VÉRIFIÉ, PAS SEULEMENT ANNONCÉ</h3>
+        <p style="color: var(--text-dim); line-height:1.8; margin:0;">
+            Installation complète menée dans une VM Ubuntu&nbsp;24.04 vierge :
+            <b style="color:var(--text-main)">30 modules exécutés</b>,
+            <b style="color:var(--text-main)">1&nbsp;688 paquets installés</b>,
+            <b style="color:var(--text-main)">0 erreur de résolution DNS</b>.
+            Le mode <code>--dry-run</code> a été confirmé sans aucune écriture sur le système.
+            L'intégration continue bloque désormais sur toute erreur de syntaxe et toute alerte ShellCheck.
+        </p>
     </div>
 </section>
 

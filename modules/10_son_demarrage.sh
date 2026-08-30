@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 10_son_demarrage.sh
+# MadOS ROG Edition 3.6 - 10_son_demarrage.sh
 # ==============================================================================
 # Phase: 10 - Son d'ouverture de session ROG
 # ==============================================================================
@@ -55,7 +55,7 @@ fi
         cat <<EOF | sudo -u "$REAL_USER" tee "$USER_HOME/Documents/mados_welcome.sh" >/dev/null
 #!/bin/bash
 sleep 5
-spd-say -v fr-fr -r -20 "MadOS 3.5 Engagé. Puissance au maximum. Bienvenue Maître \$(whoami)."
+spd-say -v fr-fr -r -20 "MadOS 3.6 Engagé. Puissance au maximum. Bienvenue Maître \$(whoami)."
 EOF
         sudo chmod +x "$USER_HOME/Documents/mados_welcome.sh" || true
     fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 98_fix_graphic_boot.sh
+# MadOS ROG Edition 3.6 - 98_fix_graphic_boot.sh
 # ==============================================================================
 # Phase: 98 - Réparation du Boot Graphique (outil de dépannage manuel)
 #

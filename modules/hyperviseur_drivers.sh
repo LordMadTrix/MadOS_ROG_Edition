@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - hyperviseur_drivers.sh
+# MadOS ROG Edition 3.6 - hyperviseur_drivers.sh
 # ==============================================================================
 # Installation optimisée des drivers pour QEMU, VMware, VirtualBox et Hyper-V
 #

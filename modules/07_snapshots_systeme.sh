@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 07_snapshots_systeme.sh
+# MadOS ROG Edition 3.6 - 07_snapshots_systeme.sh
 # ==============================================================================
 # Phase: 7 - Instantanés (Timeshift)
 # Configure un point de sauvegarde système par sécurité

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 Ultimate - install.sh
+# MadOS ROG Edition 3.6 Ultimate - install.sh
 # ==============================================================================
 # Optimized for Ubuntu 24.04 LTS (Stable)
 # ==============================================================================
@@ -264,7 +264,7 @@ EOF
     echo -e "  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝ "
     echo -ne "${NC}"
     echo -e "${RED}     ╔══════════════════════════════╗${NC}"
-    echo -e "${RED}     ║   Ultimate MadOS 3.5 Stable  ║${NC}"
+    echo -e "${RED}     ║   Ultimate MadOS 3.6 Stable  ║${NC}"
     echo -e "${RED}     ║     Edition Kubuntu LTS      ║${NC}"
     echo -e "${RED}     ╚══════════════════════════════╝${NC}\n"
 
@@ -305,7 +305,7 @@ EOF
     echo -e "${WHITE}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝ ${NC}"
     echo ""
     echo -e "${RED}     ╔══════════════════════════════╗${NC}"
-    echo -e "${RED}     ║    INSTALLATEUR MadOS 3.5    ║${NC}"
+    echo -e "${RED}     ║    INSTALLATEUR MadOS 3.6    ║${NC}"
     echo -e "${RED}     ║     by LordMadTrix           ║${NC}"
     echo -e "${RED}     ╚══════════════════════════════╝${NC}"
     echo ""
@@ -514,7 +514,7 @@ actcheckbox=white,red
         installation_totale --silent
     else
         local WELCOME_CHOICE
-        WELCOME_CHOICE=$(whiptail --title "MadOS 3.5 - BIENVENUE" \
+        WELCOME_CHOICE=$(whiptail --title "MadOS 3.6 - BIENVENUE" \
             --menu "Choisissez votre mode d'entrée dans la matrice :" 15 65 2 \
             "1" "AUTO : Installation Totale (Recommandé ROG)" \
             "2" "MENU : Sélection Personnalisée (Expert)" 3>&1 1>&2 2>&3)
@@ -571,7 +571,7 @@ run_module() {
             else
                 # Max tentatives atteintes - demander à l'utilisateur
                 local CHOICE
-                CHOICE=$(whiptail --title "MadOS 3.5 - ERREUR MODULE" --menu "Le script $SCRIPT a échoué après $max_attempts tentatives.\n\nConsultez les logs: $MADOS_LOG_DIR/mados_install.log" 15 65 3 \
+                CHOICE=$(whiptail --title "MadOS 3.6 - ERREUR MODULE" --menu "Le script $SCRIPT a échoué après $max_attempts tentatives.\n\nConsultez les logs: $MADOS_LOG_DIR/mados_install.log" 15 65 3 \
                     "1" "Réessayer encore une fois" \
                     "2" "Ignorer l'erreur et continuer" \
                     "3" "Arrêter l'installation" 3>&1 1>&2 2>&3)
@@ -614,7 +614,7 @@ menu_principal() {
 
     # Détection d'une installation interrompue
     if [ -f "$STATE_FILE" ]; then
-        if (whiptail --title "MadOS 3.5 - REPRISE DÉTECTÉE" \
+        if (whiptail --title "MadOS 3.6 - REPRISE DÉTECTÉE" \
             --yesno "Une installation précédente semble avoir été interrompue.\n\nSouhaitez-vous REPRENDRE l'installation là où elle s'est arrêtée ?\n(Répondre 'Non' effacera l'ancien état)" 12 65); then
             log_info "Reprise de l'installation demandée par l'utilisateur."
         else
@@ -622,7 +622,7 @@ menu_principal() {
         fi
     fi
 
-    if CHOIX=$(whiptail --title "MadOS 3.5 - Menu Principal" \
+    if CHOIX=$(whiptail --title "MadOS 3.6 - Menu Principal" \
         --cancel-button "Quitter" \
         --ok-button "Sélectionner" \
         --menu "Choisissez le profil d'installation pour votre machine :" 16 75 3 \
@@ -657,7 +657,7 @@ installation_totale() {
         CHOIX_BONUS="SNAP PROT SOND BATT MANG OLAM NET ZRAM ADS SSD USB BOOT VOLT TUNE STLT DASH LINK PLMY OBSP GUI CLI SAN"
     else
         # Affichage des options facultatives auto-sélectionnées ou non
-        if ! CHOIX_BONUS=$(whiptail --title "MadOS 3.5 - Options Bonus (Déploiement Total)" \
+        if ! CHOIX_BONUS=$(whiptail --title "MadOS 3.6 - Options Bonus (Déploiement Total)" \
             --checklist "Espace pour (dés)activer, Entrée pour valider.\nLes fonctions vitales sont cochées par défaut." 20 65 12 \
             "SNAP" "Bouclier Système Timeshift" ON \
             "PROT" "Ultra Gaming (Proton-GE & GameScope)" ON \
@@ -701,7 +701,7 @@ installation_totale() {
             export MADOS_TDP_PROFILE="EQUILIBRE"
         else
             local _choix
-            if ! _choix=$(whiptail --title "MadOS 3.5 - Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
+            if ! _choix=$(whiptail --title "MadOS 3.6 - Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 65 4 \
                 "SILENCE" "Bridage 25W - Calme Absolu" OFF \
                 "EQUILIBRE" "Stock 45W - Usine (Défaut)" ON \
                 "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
@@ -733,7 +733,7 @@ installation_totale() {
         export MADOS_THEME="ROG"
     else
         local _choix
-        if ! _choix=$(whiptail --title "MadOS 3.5 - Charte Graphique" --radiolist "Quel style visuel appliquer ?" 12 60 3 \
+        if ! _choix=$(whiptail --title "MadOS 3.6 - Charte Graphique" --radiolist "Quel style visuel appliquer ?" 12 60 3 \
             "ROG" "ROG Classic (Rouge & Noir)" ON \
             "CYBER" "Cyberpunk Neon (Bleu & Rose)" OFF \
             "CARBON" "Carbon Stealth (Gris & Noir)" OFF 3>&1 1>&2 2>&3); then
@@ -812,7 +812,7 @@ installation_totale() {
 
 installation_custom() {
     local CHOIX_ALL
-    if ! CHOIX_ALL=$(whiptail --title "MadOS 3.5 - Déploiement Custom (Expert)" \
+    if ! CHOIX_ALL=$(whiptail --title "MadOS 3.6 - Déploiement Custom (Expert)" \
         --checklist "Espace pour sélectionner, Entrée pour valider :" 20 65 12 \
         "00_clean" "Nettoyer système (Bloatwares)" OFF \
         "01_kern" "Noyau Gaming XanMod EDGE" OFF \
@@ -858,7 +858,7 @@ installation_custom() {
 
     if [[ "$CHOIX_ALL" == *"22_vlt"* ]]; then
         local _choix
-        if ! _choix=$(whiptail --title "MadOS 3.5 - Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 70 4 \
+        if ! _choix=$(whiptail --title "MadOS 3.6 - Surcadençage & Profils Thermiques" --radiolist "Comportement énergétique du processeur (TDP) :" 18 70 4 \
             "SILENCE" "Bridage 25W - Calme Absolu" OFF \
             "EQUILIBRE" "Stock 45W - Normal (Défaut)" ON \
             "EXTREME" "Débridage 65W - E-Sport Max" OFF 3>&1 1>&2 2>&3); then
@@ -924,7 +924,7 @@ installation_custom() {
 }
 
 mode_destruction() {
-    if whiptail --title "MadOS 3.5 - MODE DESTRUCTION" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 70; then
+    if whiptail --title "MadOS 3.6 - MODE DESTRUCTION" --yesno "Ceci va PURGER Canonical de tous ses bloatwares (snapd, cloud-init) de manière agressive.\n\nÊtes-vous absolument sûr de vouloir détruire la trace d'Ubuntu ?" 12 70; then
         clear
         run_module "00_nettoyage_ubuntu.sh" "Purification Extrême de l'Hôte"
         sleep 2
@@ -935,7 +935,7 @@ mode_destruction() {
 cloture_installation() {
     clear
     echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${RED}║${NC} 🏁 ${WHITE}${BOLD}Séquence de Clôture MadOS 3.5 Ultimate${NC}"
+    echo -e "${RED}║${NC} 🏁 ${WHITE}${BOLD}Séquence de Clôture MadOS 3.6 Ultimate${NC}"
     echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
 
     # Ni REAL_USER ni USER_HOME n'etaient definis dans install.sh : le chown
@@ -1004,7 +1004,7 @@ cloture_installation() {
     fi
 
     # UI Finale Premium
-    whiptail --title "MadOS 3.5 — DÉPLOIEMENT TERMINÉ 🚀" --msgbox \
+    whiptail --title "MadOS 3.6 — DÉPLOIEMENT TERMINÉ 🚀" --msgbox \
     "MAD-OS EST MAINTENANT ACTIF SUR VOTRE SYSTÈME !\n\n\
     [STATUT] : OPÉRATIONNEL\n\
     [LOG DIAG] : $LOG_URL\n\n\

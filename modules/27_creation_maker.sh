@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 27_creation_maker.sh
+# MadOS ROG Edition 3.6 - 27_creation_maker.sh
 # ==============================================================================
 # Phase: 27 - Station Maker & IA
 # Intègre OrcaSlicer (Creality K1), LaserWeb (TwoTrees TTS) et optimise l'IA OpenClaw

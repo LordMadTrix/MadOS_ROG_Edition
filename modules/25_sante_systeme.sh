@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 25_sante_systeme.sh
+# MadOS ROG Edition 3.6 - 25_sante_systeme.sh
 # ==============================================================================
 # Phase: 25 - Diagnostic Santé Système MadOS
 # ==============================================================================
@@ -197,9 +197,9 @@ echo -e "    ${WHITE}${BOLD}╚════════════════�
 
 # Proposer d'afficher le rapport complet — jamais en automatique ni en simulation.
 if ! is_dry_run && [ -z "${MADOS_SILENT:-}" ]; then
-    whiptail --title "MadOS 3.5 - 🏥 Diagnostic & Benchmark" \
+    whiptail --title "MadOS 3.6 - 🏥 Diagnostic & Benchmark" \
         --yesno "Score Global : $TOTAL_SCORE/100 (Santé: $PERCENT%)\n\nVoulez-vous consulter le rapport détaillé ?" 12 55 && \
-        whiptail --title "MadOS 3.5 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
+        whiptail --title "MadOS 3.6 - Rapport complet" --scrolltext --textbox "$REPORT_FILE" 30 80 2>/dev/null || true
 fi
 
 echo -e "    ${WHITE}✅ [SUCCÈS] Phase 25 Terminée.${NC}"

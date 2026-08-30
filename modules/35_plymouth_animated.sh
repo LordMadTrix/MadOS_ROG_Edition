@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 35_plymouth_animated.sh
+# MadOS ROG Edition 3.6 - 35_plymouth_animated.sh
 # ==============================================================================
 # Phase: 35 - Plymouth Animated (Boot Splash ROG Eye Pulse)
 # ==============================================================================
@@ -51,7 +51,7 @@ EOF
     cat <<'EOF' | sudo tee /usr/share/plymouth/themes/mados-pulsar/mados-pulsar.plymouth >/dev/null
 [Plymouth Theme]
 Name=MadOS ROG Pulse
-Description=Animated pulsing ROG logo for MadOS 3.5
+Description=Animated pulsing ROG logo for MadOS 3.6
 ModuleName=script
 
 [script]

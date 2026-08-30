@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 24_mados_update.sh
+# MadOS ROG Edition 3.6 - 24_mados_update.sh
 # ==============================================================================
 # Phase: 24 - Mise à jour automatique MadOS
 # ==============================================================================
@@ -74,7 +74,7 @@ echo -e "    ${GRAY}├─ Application des permissions...${NC}"
 sudo chmod +x "$INSTALL_DIR/install.sh" "$INSTALL_DIR/modules/"*.sh || true
 
 # Demander quels modules relancer
-CHOICE=$(whiptail --title "MadOS 3.5 - 🔄 Update Launcher" --menu \
+CHOICE=$(whiptail --title "MadOS 3.6 - 🔄 Update Launcher" --menu \
     "Quelle mise à jour souhaitez-vous appliquer ?" 18 65 5 \
     "1" "Mise à jour Totale (tous les modules)" \
     "2" "Mise à jour Sélective (choisir les modules)" \

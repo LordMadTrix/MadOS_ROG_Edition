@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 02_pilotes_gpu_auto.sh
+# MadOS ROG Edition 3.6 - 02_pilotes_gpu_auto.sh
 # ==============================================================================
 # Phase: 2 - Détection et Installation GPU
 # Cherche la carte dédiée et installe les pilotes appropriés.

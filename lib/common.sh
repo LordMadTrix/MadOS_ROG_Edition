@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - lib/common.sh
+# MadOS ROG Edition 3.6 - lib/common.sh
 # ==============================================================================
 # Fonctions communes, logging, gestion d'erreurs et rollback
 # ==============================================================================
@@ -136,7 +136,7 @@ init_mados_logging() {
     touch "$MADOS_CHECKPOINT_FILE" "$MADOS_STATUS_FILE" 2>/dev/null || true
     
     log_info "═══════════════════════════════════════════════════════════"
-    log_info "MadOS ROG Edition 3.5 - Démarrage Installation"
+    log_info "MadOS ROG Edition 3.6 - Démarrage Installation"
     log_info "Date: $(date '+%Y-%m-%d %H:%M:%S')"
     log_info "Utilisateur: $USER"
     log_info "═══════════════════════════════════════════════════════════"
@@ -545,7 +545,7 @@ print_installation_report() {
     
     clear
     echo -e "${RED}╔══════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${RED}║${NC} ${GREEN}✓${NC} ${WHITE}${BOLD}Installation MadOS 3.5 Terminée${NC}"
+    echo -e "${RED}║${NC} ${GREEN}✓${NC} ${WHITE}${BOLD}Installation MadOS 3.6 Terminée${NC}"
     echo -e "${RED}╚══════════════════════════════════════════════════════════════════════════╝${NC}\n"
     
     echo -e "${CYAN}📊 Rapport de l'Installation:${NC}"

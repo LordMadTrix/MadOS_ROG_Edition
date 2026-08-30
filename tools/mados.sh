@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - mados
+# MadOS ROG Edition 3.6 - mados
 # ==============================================================================
 # Utilitaire en ligne de commande unifié.
 # Installé vers /usr/local/bin/mados par modules/28_mados_cli.sh.

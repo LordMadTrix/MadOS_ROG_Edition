@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 99_integration_systeme.sh
+# MadOS ROG Edition 3.6 - 99_integration_systeme.sh
 # ==============================================================================
 # Phase: 99 - Finalisation & Intégration Permanente
 # Rend l'installateur disponible via commande globale et nettoie l'OOBE.

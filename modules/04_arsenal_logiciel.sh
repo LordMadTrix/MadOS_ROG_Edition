@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 04_arsenal_logiciel.sh
+# MadOS ROG Edition 3.6 - 04_arsenal_logiciel.sh
 # ==============================================================================
 # Phase: 4 - Arsenal Logiciel & IA (OpenClaw)
 # Installe Chrome, Steam, Lutris, et les outils Gaming.

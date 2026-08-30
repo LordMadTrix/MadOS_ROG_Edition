@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 14_openclaw_ai.sh
+# MadOS ROG Edition 3.6 - 14_openclaw_ai.sh
 # ==============================================================================
 # Phase: 14 - Assistant IA OpenClaw
 # ==============================================================================
@@ -154,7 +154,7 @@ else
 #!/bin/bash
 export NEWT_COLORS="root=black,black window=white,black border=red,black shadow=black,black title=white,red button=white,black actbutton=white,red compactbutton=white,black textbox=white,black listbox=white,black actlistbox=white,red sellistbox=white,black actsellistbox=white,red checkbox=white,black actcheckbox=white,red"
 while true; do
-  if ! CHOICE=$(whiptail --title "MadOS 3.5 - 🤖 Cœur Neuronal OpenClaw" --menu "Interface de Gestion de l'IA Locale" 19 68 7 \
+  if ! CHOICE=$(whiptail --title "MadOS 3.6 - 🤖 Cœur Neuronal OpenClaw" --menu "Interface de Gestion de l'IA Locale" 19 68 7 \
     "1" "Accéder au Terminal Neuronal (Web UI)" \
     "2" "Ouvrir le Canal de Communication Brut (TUI)" \
     "3" "Engager le Noyau IA (Démarrer Gateway)" \
@@ -191,7 +191,7 @@ while true; do
           google-chrome --app=http://localhost:18789 2>/dev/null || xdg-open http://localhost:18789
         fi
       else
-        whiptail --title "MadOS 3.5 - OpenClaw" --msgbox "⚠️  [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.6 - OpenClaw" --msgbox "⚠️  [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     2)
@@ -199,20 +199,20 @@ while true; do
         clear
         cd "$HOME/OpenClaw" && node scripts/run-node.mjs tui
       else
-        whiptail --title "MadOS 3.5 - OpenClaw" --msgbox "⚠️  [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
+        whiptail --title "MadOS 3.6 - OpenClaw" --msgbox "⚠️  [ATTENTION] Le moteur OpenClaw est éteint ! Veuillez le démarrer (Option 3) d'abord." 8 70
       fi
       ;;
     3)
       systemctl --user start openclaw.service
-      whiptail --title "MadOS 3.5 - OpenClaw" --msgbox "✅ [SUCCÈS] Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 18789." 9 75
+      whiptail --title "MadOS 3.6 - OpenClaw" --msgbox "✅ [SUCCÈS] Moteur OpenClaw démarré en tâche de fond !\nL'interface Web est désormais accessible sur le port 18789." 9 75
       ;;
     4)
       systemctl --user stop openclaw.service
-      whiptail --title "MadOS 3.5 - OpenClaw" --msgbox "🛑 Moteur OpenClaw arrêté avec succès." 8 60
+      whiptail --title "MadOS 3.6 - OpenClaw" --msgbox "🛑 Moteur OpenClaw arrêté avec succès." 8 60
       ;;
     5)
       systemctl --user restart openclaw.service
-      whiptail --title "MadOS 3.5 - OpenClaw" --msgbox "🔄 Moteur OpenClaw redémarré à neuf !" 8 60
+      whiptail --title "MadOS 3.6 - OpenClaw" --msgbox "🔄 Moteur OpenClaw redémarré à neuf !" 8 60
       ;;
     6)
       echo "=== DIAGNOSTIC OPENCLAW (DOCTOR) ===" > /tmp/oc_doctor.txt
@@ -220,7 +220,7 @@ while true; do
       systemctl --user status openclaw.service --no-pager | head -n 12 >> /tmp/oc_doctor.txt
       echo -e "\n--- DERNIERES ERREURS (LOGS) ---" >> /tmp/oc_doctor.txt
       journalctl --user -u openclaw.service -n 15 --no-pager >> /tmp/oc_doctor.txt
-      whiptail --title "MadOS 3.5 - OpenClaw Doctor 🩺" --scrolltext --textbox /tmp/oc_doctor.txt 22 80
+      whiptail --title "MadOS 3.6 - OpenClaw Doctor 🩺" --scrolltext --textbox /tmp/oc_doctor.txt 22 80
       ;;
   esac
 done

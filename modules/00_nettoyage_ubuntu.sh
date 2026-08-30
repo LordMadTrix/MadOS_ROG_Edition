@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 00_nettoyage_ubuntu.sh
+# MadOS ROG Edition 3.6 - 00_nettoyage_ubuntu.sh
 # ==============================================================================
 # Phase: 0 - Purification & Dépôts
 # Nettoie les composants serveur et prépare l'environnement.

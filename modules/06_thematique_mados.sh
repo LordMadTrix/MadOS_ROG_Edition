@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# MadOS ROG Edition 3.5 - 06_thematique_mados.sh
+# MadOS ROG Edition 3.6 - 06_thematique_mados.sh
 # ==============================================================================
 # Phase: 6 - Identité OS complète + Visuals
 # Transforme le rendu pour correspondre au style ROG
@@ -68,7 +68,7 @@ fi
 export CURRENT_DE="$MADOS_DE"
 
 echo -e "\n${THEME_COLOR}╔══════════════════════════════════════════════════════╗${NC}"
-echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 3.5 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
+echo -e "${THEME_COLOR}║${NC}   ${WHITE}${BOLD}MadOS 3.6 — APPLICATION DU THÈME : ${THEME_DESC}${NC}  ${THEME_COLOR}║${NC}"
 echo -e "${THEME_COLOR}║${NC}   ${GRAY}Interface détectée : ${BOLD}$MADOS_DE${NC}                 ${THEME_COLOR}║${NC}"
 echo -e "${THEME_COLOR}╚══════════════════════════════════════════════════════╝${NC}\n"
 
@@ -91,10 +91,10 @@ if is_dry_run; then
 else
 cat > /etc/os-release <<OSRELEASE
 NAME="MadOS ROG Edition"
-VERSION="3.5 (Ultimate Stable)"
+VERSION="3.6 (Ultimate Stable)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="MadOS ROG Edition 3.5 ($THEME_DESC)"
+PRETTY_NAME="MadOS ROG Edition 3.6 ($THEME_DESC)"
 VERSION_ID="$MADOS_VERSION_ID"
 VERSION_CODENAME=$MADOS_CODENAME
 UBUNTU_CODENAME=$MADOS_CODENAME
@@ -121,7 +121,7 @@ echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██╔████╔██║████
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║\033[0m"
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║\033[0m"
 echo -e "${ZSH_LOGO_COLOR}${BOLD}  ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝\033[0m"
-echo -e "  \033[0;36m\033[1mMadOS 3.5 ($THEME_DESC)\033[0m  |  Kernel: \$(uname -r)"
+echo -e "  \033[0;36m\033[1mMadOS 3.6 ($THEME_DESC)\033[0m  |  Kernel: \$(uname -r)"
 MOTD
 chmod +x /etc/update-motd.d/00-mados-header 2>/dev/null || true
 fi
