@@ -474,6 +474,11 @@ chown mados:mados /home/mados/.Xresources
 mkdir -p /home/mados/.config/lxqt
 cat > /home/mados/.config/lxqt/lxqt.conf <<LXQTCONF
 
+[General]
+icon_theme=Papirus-Dark
+single_click_activate=false
+theme=graphite
+LXQTCONF
 # ─────────────────────────────────────────────────────────────────────────────
 # LA BARRE DES TACHES
 #
@@ -529,11 +534,6 @@ timeFormat=HH:mm
 dateFormat=ddd d MMM
 showSeconds=false
 PANELCONF
-[General]
-icon_theme=Papirus-Dark
-single_click_activate=false
-theme=graphite
-LXQTCONF
 
 # Configuration de la session LXQt (Labwc comme WM)
 cat > /home/mados/.config/lxqt/session.conf <<SESSIONCONF
@@ -743,9 +743,9 @@ if loadfont /boot/grub/fonts/unicode.pf2 ; then
 fi
 
 set color_normal=light-gray/black
-set color_highlight=black/red
+set color_highlight=white/red
 set menu_color_normal=light-gray/black
-set menu_color_highlight=black/red
+set menu_color_highlight=white/red
 
 set timeout=10
 set default=0
