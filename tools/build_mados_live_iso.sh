@@ -195,7 +195,7 @@ locale-gen fr_FR.UTF-8
 update-locale LANG=fr_FR.UTF-8
 
 # Installation du noyau officiel XanMod, de systemd, network-manager, casper et initramfs
-apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv network-manager dbus-user-session sudo initramfs-tools casper --no-install-recommends -y
+apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper --no-install-recommends -y
 
 # Générer l'initramfs pour le noyau XanMod
 # On prend le noyau XANMOD explicitement, pas « le premier par ordre
@@ -273,7 +273,25 @@ passwd -l ubuntu 2>/dev/null || true
 # Création de l'utilisateur live "mados"
 useradd -m -s /bin/bash mados
 echo "mados:mados" | chpasswd
+# ─────────────────────────────────────────────────────────────────────────────
+# ACCES AUX PERIPHERIQUES D'ENTREE
+#
+# Sans gestionnaire de siege, un compositeur Wayland affiche l'ecran mais
+# n'ouvre AUCUN peripherique d'entree : le bureau apparait, le clavier et la
+# souris sont morts. Constate en lancant l'ISO -- le terminal et l'installateur
+# s'affichaient parfaitement, et aucune touche n'arrivait.
+#
+# L'image n'avait ni seatd, ni libpam-systemd. Sans le second, l'autologin par
+# agetty n'ouvre pas de session logind, et libseat n'a donc rien a interroger.
+# D'ou le contournement « LIBSEAT_BACKEND=noop » : le seul moyen de faire
+# demarrer labwc, mais precisement celui qui ne fournit aucune entree.
+#
+# On installe les deux, et le contournement disparait.
+# ─────────────────────────────────────────────────────────────────────────────
 usermod -aG sudo,video,audio,render,input,tty mados
+# Groupe cree par le paquet seatd ; sans lui, l'acces au siege est refuse.
+getent group _seatd >/dev/null 2>&1 && usermod -aG _seatd mados
+systemctl enable seatd 2>/dev/null || true
 echo "mados ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/mados
 
 # ═══════════════════════════════════════════════════
@@ -374,7 +392,6 @@ if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ];
     if [ "$reponse" = "o" ] || [ "$reponse" = "O" ] || [ "$reponse" = "y" ] || [ "$reponse" = "Y" ]; then
         export WLR_BACKENDS=drm
         export WLR_RENDERER=pixman
-        export LIBSEAT_BACKEND=noop
         export XDG_RUNTIME_DIR=/run/user/$(id -u)
         export XDG_SESSION_TYPE=wayland
         # Rendu logiciel : indispensable en machine virtuelle, penalisant sur
@@ -436,7 +453,6 @@ __userfile__=true
 
 [Environment]
 WLR_NO_HARDWARE_CURSORS=1
-LIBSEAT_BACKEND=noop
 LIBGL_ALWAYS_SOFTWARE=1
 
 [LockScreenSettings]
@@ -454,7 +470,6 @@ SESSIONCONF
 
 # Lancement du panel LXQt (Razor-Qt) et de l'installateur MadOS au boot de Labwc (Wayland)
 cat <<LABWC > /home/mados/.config/labwc/autostart
-export LIBSEAT_BACKEND=noop
 # Rendu logiciel : indispensable en machine virtuelle (aucune acceleration
 # disponible), penalisant sur du vrai materiel. systemd-detect-virt tranche
 # au demarrage ; la meme image sert donc aux deux usages.

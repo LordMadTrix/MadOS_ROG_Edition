@@ -277,9 +277,14 @@ rm -f /mnt/mados/home/mados/.config/labwc/autostart 2>/dev/null || true
 # Créer un autostart propre (sans l'installateur live)
 mkdir -p /mnt/mados/home/mados/.config/labwc/
 cat > /mnt/mados/home/mados/.config/labwc/autostart <<AUTOSTART
-export WLR_NO_HARDWARE_CURSORS=1
-export LIBSEAT_BACKEND=noop
-export LIBGL_ALWAYS_SOFTWARE=1
+# Le systeme installe tourne sur du VRAI materiel : ni contournement de siege
+# (seatd et logind y sont presents), ni rendu logiciel force. Ces trois lignes
+# etaient recopiees telles quelles depuis le live, ou elles n'avaient de sens
+# que faute des paquets adequats.
+if systemd-detect-virt --quiet; then
+    export LIBGL_ALWAYS_SOFTWARE=1
+    export WLR_NO_HARDWARE_CURSORS=1
+fi
 xsetroot -solid '#0a0a0a' 2>/dev/null &
 lxqt-notificationd &
 lxqt-policykit-agent &
