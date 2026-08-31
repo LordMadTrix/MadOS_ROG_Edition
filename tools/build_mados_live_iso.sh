@@ -436,18 +436,14 @@ if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ];
         fi
         mkdir -p "$XDG_RUNTIME_DIR"
         chmod 700 "$XDG_RUNTIME_DIR"
-        # lxqt-session, et non labwc directement : c'est la session qui
-        # applique le style Qt, charge le theme et fournit aux greffons du
-        # panneau leur contexte D-Bus. Lance seul, lxqt-panel affichait son
-        # apparence d'usine -- fond clair -- et ni le menu ni l'horloge ne se
-        # dessinaient. Constate sur trois reconstructions successives.
+        # « exec labwc » et non lxqt-session : cette derniere est concue pour
+        # X11 et echoue ici. Comme « exec » remplace le shell, son echec fait
+        # tomber la session entiere, et l'installateur se relance depuis zero.
+        # Constate a l'ecran, apres avoir cru bien faire.
         #
-        # labwc reste le gestionnaire de fenetres : session.conf le designe.
-        if command -v lxqt-session >/dev/null 2>&1; then
-            exec lxqt-session
-        else
-            exec labwc
-        fi
+        # Le theme du panneau se regle autrement : QT_QPA_PLATFORMTHEME, plus
+        # bas, indique a Qt d'utiliser le style LXQt sans exiger sa session.
+        exec labwc
     fi
 fi
 PROFILE
@@ -587,6 +583,15 @@ else
     xsetroot -solid '#0a0a0a' 2>/dev/null &
 fi
 # Ressources X11 pour xterm, seul rescape graphique de cet autostart.
+# Le style Qt : sans cette variable, lxqt-panel lance hors de sa session
+# affiche son apparence d'usine -- fond clair -- quel que soit le theme choisi
+# dans lxqt.conf. C'est lxqt-session qui la pose d'ordinaire.
+export QT_QPA_PLATFORMTHEME=lxqt
+export XDG_CURRENT_DESKTOP=LXQt
+lxqt-notificationd &
+lxqt-policykit-agent &
+lxqt-panel &
+lxqt-runner --no-show &
 xrdb -merge /home/mados/.Xresources 2>/dev/null &
 # L'installateur ne se lance plus ici : il tourne sur la console, avant labwc.
 # Le faire passer par Xwayland puis xterm ajoutait deux couches entre le
