@@ -612,8 +612,22 @@ run_sudo bash -c "echo '$KERNEL_VERSION' > \"$CHROOT_DIR/opt/mados-rog/noyau/ver
 # 5. Configuration de GRUB pour l'ISO
 echo -e "${CYAN}[5/7] Configuration du chargeur de démarrage GRUB...${NC}"
 cat <<EOF > "$WORKDIR/grub.cfg"
+# Le menu doit rester assez longtemps a l'ecran pour qu'on puisse choisir
+# l'entree de diagnostic quand le demarrage normal se fige.
+set timeout=10
+set default=0
+
 menuentry "Demarrer MadOS ROG Edition v$MADOS_VERSION (Live & Install)" {
     linux /boot/vmlinuz boot=casper quiet splash ---
+    initrd /boot/initrd.img
+}
+
+menuentry "MadOS ROG Edition v$MADOS_VERSION - messages detailles (diagnostic)" {
+    # Sans « quiet splash », tous les messages du noyau s'affichent a l'ecran.
+    # console=ttyS0 les envoie EN PLUS sur le port serie, que l'hyperviseur sait
+    # ecrire dans un fichier : seule facon de lire ce qui s'est passe quand
+    # l'ecran se fige. Sans cette entree, on diagnostique un systeme muet.
+    linux /boot/vmlinuz boot=casper console=tty0 console=ttyS0,115200n8 ---
     initrd /boot/initrd.img
 }
 EOF

@@ -103,6 +103,8 @@ if [ -n "$DISQUE_TEST" ] && [ -f "$DISQUE_TEST" ]; then
 fi
 
 echo -e "${GREEN}🚀 Lancement de MadOS ROG Edition (ISO) sous QEMU...${NC}"
+echo -e "${GRAY}Messages du noyau captures dans : mados_serial.log${NC}"
+echo -e "${GRAY}(choisir « messages detailles » au menu GRUB pour les remplir)${NC}"
 # shellcheck disable=SC2086
 qemu-system-x86_64 \
     $QEMU_ARGS \
@@ -111,6 +113,7 @@ qemu-system-x86_64 \
     -cdrom "$ISO_PATH" \
     $QEMU_DISQUE \
     -boot d \
+    -serial file:mados_serial.log \
     -vga std \
     -display gtk \
     -device intel-hda \
