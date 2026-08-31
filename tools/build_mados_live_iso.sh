@@ -436,7 +436,18 @@ if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ];
         fi
         mkdir -p "$XDG_RUNTIME_DIR"
         chmod 700 "$XDG_RUNTIME_DIR"
-        exec labwc
+        # lxqt-session, et non labwc directement : c'est la session qui
+        # applique le style Qt, charge le theme et fournit aux greffons du
+        # panneau leur contexte D-Bus. Lance seul, lxqt-panel affichait son
+        # apparence d'usine -- fond clair -- et ni le menu ni l'horloge ne se
+        # dessinaient. Constate sur trois reconstructions successives.
+        #
+        # labwc reste le gestionnaire de fenetres : session.conf le designe.
+        if command -v lxqt-session >/dev/null 2>&1; then
+            exec lxqt-session
+        else
+            exec labwc
+        fi
     fi
 fi
 PROFILE
@@ -555,6 +566,9 @@ SESSIONCONF
 
 # Lancement du panel LXQt (Razor-Qt) et de l'installateur MadOS au boot de Labwc (Wayland)
 cat <<LABWC > /home/mados/.config/labwc/autostart
+# Les composants LXQt (panneau, notifications, agent PolicyKit, lanceur) ne
+# sont plus lances ici : lxqt-session s'en charge, avec le theme applique.
+# Les lancer aussi depuis labwc produirait des doublons.
 # Rendu logiciel : indispensable en machine virtuelle (aucune acceleration
 # disponible), penalisant sur du vrai materiel. systemd-detect-virt tranche
 # au demarrage ; la meme image sert donc aux deux usages.
@@ -562,7 +576,7 @@ if systemd-detect-virt --quiet; then
     export LIBGL_ALWAYS_SOFTWARE=1
     export WLR_NO_HARDWARE_CURSORS=1
 fi
-# Fond noir ROG pour le bureau
+
 # Fond d'ecran : le bureau affichait un noir uni, alors que le depot embarque
 # dix fonds ROG. MadCarbon est le plus leger (54 Ko), ce qui compte dans une
 # image live. swaybg le pose nativement sous Wayland ; xsetroot, qui servait
@@ -572,11 +586,7 @@ if command -v swaybg >/dev/null 2>&1 && [ -f /usr/share/backgrounds/mados.png ];
 else
     xsetroot -solid '#0a0a0a' 2>/dev/null &
 fi
-# Suite LXQt = Razor-Qt complet
-lxqt-notificationd &
-lxqt-policykit-agent &
-lxqt-panel &
-lxqt-runner --no-show &
+# Ressources X11 pour xterm, seul rescape graphique de cet autostart.
 xrdb -merge /home/mados/.Xresources 2>/dev/null &
 # L'installateur ne se lance plus ici : il tourne sur la console, avant labwc.
 # Le faire passer par Xwayland puis xterm ajoutait deux couches entre le
