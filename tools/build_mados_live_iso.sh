@@ -708,10 +708,8 @@ font=JetBrains Mono:size=11
 pad=10x10
 dpi-aware=no
 
-[cursor]
-color=0a0a0a ff003c
-
 [colors]
+cursor=0a0a0a ff003c
 alpha=0.95
 background=0a0a0a
 foreground=e0e0e0
