@@ -41,7 +41,7 @@ extraire() {
 # ──────────────────────────────────────────────────────────────────────────────
 titre "I-04 : le disque n'est jamais preselectionne"
 
-BLOC=$(extraire 'mapfile -t DISQUES' 'Disque choisi')
+BLOC=$(extraire 'MIN_OCTETS=' 'Disque choisi')
 if [ -z "$BLOC" ]; then
   rouge "bloc de choix du disque introuvable dans le fichier"
 else
@@ -49,7 +49,14 @@ else
   cat > "$T/bin/lsblk" <<'STUB'
 #!/bin/bash
 case "$*" in
-  *"-dn -o NAME,TYPE"*)   printf 'sda disk\nsdb disk\nnvme0n1 disk\n' ;;
+  *"-dn -o NAME,TYPE"*)   printf 'sda disk\nsdb disk\nnvme0n1 disk\nfd0 disk\nsdc disk\n' ;;
+  *"-dnb -o SIZE"*)
+      # Taille en octets, par peripherique : c'est ce que lit le filtre.
+      case "$*" in
+        */dev/fd0*) echo "4096" ;;             # une disquette
+        */dev/sdc*) echo "1073741824" ;;       # 1 Go, sous le minimum de 3 Go
+        *)          echo "536870912000" ;;     # 500 Go
+      esac ;;
   *"-dn -o SIZE,MODEL"*)  echo "  500G  DISQUE_FACTICE" ;;
   *"-n -o MOUNTPOINT"*)   echo "" ;;
   *)                      echo "" ;;
@@ -76,6 +83,26 @@ STUB
   echo "$SORTIE2" | grep -q 'CHOISI=sdb' \
     && vert "le disque retenu est bien le n°2 choisi, pas le plus gros" \
     || rouge "mauvais disque : $(echo "$SORTIE2" | grep CHOISI= | head -1)"
+
+  # Le lecteur de disquette de QEMU etait propose comme cible d'installation :
+  # « fd0  4K disk ». Constate en lancant l'ISO pour de vrai, pas en relisant.
+  if echo "$SORTIE" | grep -qE '^ +[0-9]+\) /dev/fd0'; then
+    rouge "une disquette est proposee comme cible"
+  else
+    vert "les disquettes sont ecartees"
+  fi
+  if echo "$SORTIE" | grep -qE '^ +[0-9]+\) /dev/sdc'; then
+    rouge "un disque de 1 Go est propose alors que 3 Go sont requis"
+  else
+    vert "les disques trop petits sont ecartes"
+  fi
+  # Un filtrage muet vaut a peine mieux qu'aucun filtrage : l'utilisateur qui
+  # ne voit pas son disque doit savoir pourquoi.
+  if echo "$SORTIE" | grep -qi 'cart'; then
+    vert "les supports ecartes sont annonces, pas escamotes"
+  else
+    rouge "le filtrage est silencieux"
+  fi
 fi
 
 # ──────────────────────────────────────────────────────────────────────────────

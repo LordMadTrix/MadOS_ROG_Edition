@@ -48,10 +48,55 @@ echo ""
 # par wipefs + parted mklabel. La taille est précisément le critère qui désigne
 # le plus souvent le mauvais disque.
 # ─────────────────────────────────────────────────────────────────────────────
-mapfile -t DISQUES < <(lsblk -dn -o NAME,TYPE 2>/dev/null | awk '$2=="disk"{print $1}')
+# ─────────────────────────────────────────────────────────────────────────────
+# Tous les « disk » de lsblk ne sont pas des cibles valides.
+#
+# Constaté en lançant l'ISO sous QEMU : la machine n'avait aucun disque dur, et
+# le lecteur de disquette que QEMU crée par défaut était proposé comme cible —
+# « fd0  4K disk ». lsblk le classe bien comme « disk », et rien ne l'écartait.
+# Sur du vrai matériel, un lecteur de cartes vide produit le même effet.
+#
+# Le seuil n'est pas arbitraire : le partitionnement réclame 512 Mo d'ESP et
+# 2 Go de swap avant la moindre donnée. En dessous de 3 Go, parted échouerait
+# de toute façon — autant le dire avant plutôt que de planter au milieu.
+# ─────────────────────────────────────────────────────────────────────────────
+MIN_OCTETS=$((3 * 1024 * 1024 * 1024))
+CONFORT_OCTETS=$((16 * 1024 * 1024 * 1024))
+
+mapfile -t TOUS < <(lsblk -dn -o NAME,TYPE 2>/dev/null | awk '$2=="disk"{print $1}')
+
+DISQUES=()
+ECARTES=()
+for d in "${TOUS[@]}"; do
+    case "$d" in
+        fd*|sr*|loop*|ram*|zram*)
+            ECARTES+=("$d|support non installable"); continue ;;
+    esac
+    OCTETS=$(lsblk -dnb -o SIZE "/dev/$d" 2>/dev/null | head -1)
+    [ -z "$OCTETS" ] && OCTETS=0
+    if [ "$OCTETS" -lt "$MIN_OCTETS" ]; then
+        ECARTES+=("$d|trop petit pour accueillir le système")
+        continue
+    fi
+    DISQUES+=("$d")
+done
+
+if [ ${#ECARTES[@]} -gt 0 ]; then
+    LISTE=""
+    for e in "${ECARTES[@]}"; do LISTE="$LISTE /dev/${e%%|*} (${e#*|})"; done
+    echo -e "${GRAY}Écartés :$LISTE${NC}"
+    echo ""
+fi
 
 if [ ${#DISQUES[@]} -eq 0 ]; then
-    echo -e "${RED}[ERREUR] Aucun disque détecté sur cette machine.${NC}"
+    echo -e "${RED}[ERREUR] Aucun disque utilisable sur cette machine.${NC}"
+    if [ ${#ECARTES[@]} -gt 0 ]; then
+        echo -e "${GRAY}  Écartés :${NC}"
+        for e in "${ECARTES[@]}"; do
+            echo -e "${GRAY}    /dev/${e%%|*} — ${e#*|}${NC}"
+        done
+    fi
+    echo -e "${YELLOW}  Il faut un disque d'au moins 3 Go (ESP 512 Mo + swap 2 Go + racine).${NC}"
     exit 1
 fi
 
@@ -60,10 +105,15 @@ echo ""
 i=1
 for d in "${DISQUES[@]}"; do
     INFO=$(lsblk -dn -o SIZE,MODEL "/dev/$d" 2>/dev/null | head -1)
+    OCTETS=$(lsblk -dnb -o SIZE "/dev/$d" 2>/dev/null | head -1)
+    JUSTE=""
+    if [ -n "$OCTETS" ] && [ "$OCTETS" -lt "$CONFORT_OCTETS" ]; then
+        JUSTE=" ${YELLOW}(très juste pour un système complet)${NC}"
+    fi
     MONTE=$(lsblk -n -o MOUNTPOINT "/dev/$d" 2>/dev/null | grep -c '/' || true)
     MARQUE=""
     [ "$MONTE" -gt 0 ] && MARQUE=" ${YELLOW}(contient des partitions montées)${NC}"
-    echo -e "  ${WHITE}$i)${NC} /dev/$d   $INFO$MARQUE"
+    echo -e "  ${WHITE}$i)${NC} /dev/$d   $INFO$MARQUE$JUSTE"
     i=$((i+1))
 done
 echo -e "  ${WHITE}q)${NC} Annuler"
