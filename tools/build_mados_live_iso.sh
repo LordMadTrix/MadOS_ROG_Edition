@@ -254,6 +254,7 @@ echo "Paquets noyau conserves pour l'installation : $NB_DEB"
 # Suite complète : panel, runner, fm, notif, settings
 # ═══════════════════════════════════════════════════
 apt-get install -y \
+    lxqt-menu-data \
     lxqt-panel \
     lxqt-runner \
     lxqt-session \
@@ -473,7 +474,6 @@ chown mados:mados /home/mados/.Xresources
 # Configuration th\u00e8me LXQt ROG sombre
 mkdir -p /home/mados/.config/lxqt
 cat > /home/mados/.config/lxqt/lxqt.conf <<LXQTCONF
-
 [General]
 icon_theme=Papirus-Dark
 single_click_activate=false
@@ -505,7 +505,7 @@ lineCount=1
 lockPanel=true
 opacity=100
 panelSize=34
-plugins=mainmenu, desktopswitch, taskbar, tray, clock
+plugins=mainmenu, desktopswitch, taskbar, clock
 position=Bottom
 reserveSpace=true
 width=100
@@ -522,10 +522,6 @@ type=desktopswitch
 [taskbar]
 alignment=Left
 type=taskbar
-
-[tray]
-alignment=Right
-type=tray
 
 [clock]
 alignment=Right
