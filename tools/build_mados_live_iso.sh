@@ -209,7 +209,7 @@ update-locale LANG=fr_FR.UTF-8
 # installer plus tard depuis le chroot supposerait un reseau, qu'une
 # installation hors ligne n'a pas.
 # ─────────────────────────────────────────────────────────────────────────────
-apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper parted dosfstools rsync grub2-common grub-pc-bin grub-efi-amd64-bin efibootmgr swaybg --no-install-recommends -y
+apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper parted dosfstools rsync grub2-common grub-pc-bin grub-efi-amd64-bin efibootmgr swaybg waybar fonts-jetbrains-mono --no-install-recommends -y
 
 # Générer l'initramfs pour le noyau XanMod
 # On prend le noyau XANMOD explicitement, pas « le premier par ordre
@@ -538,6 +538,163 @@ dateFormat=ddd d MMM
 showSeconds=false
 PANELCONF
 
+# ─────────────────────────────────────────────────────────────────────────────
+# WAYBAR — la barre des taches
+#
+# lxqt-panel etait lance hors de sa session : sans le style Qt ni le contexte
+# D-Bus que lxqt-session pose d'ordinaire, il affichait son apparence d'usine et
+# ses greffons menu et horloge ne se dessinaient pas. Six reconstructions n'en
+# sont pas venues a bout.
+#
+# waybar est concue POUR Wayland, se configure en JSON et CSS, et ne depend
+# d'aucune session : tout ce qui s'affiche est ecrit ici, donc verifiable.
+#
+# Choix assume : pas d'icones Font Awesome. Une icone dont la police manque
+# devient un carre vide ; du texte court reste lisible en toute circonstance.
+# Les symboles retenus (▲ ▼ ♪ ⏱) existent dans les polices courantes.
+#
+# Modules ecartes : les espaces de travail (labwc n'implemente pas le protocole
+# wlr-workspaces, le module serait inerte) et la zone de notification (sans
+# agent, elle reste vide).
+# ─────────────────────────────────────────────────────────────────────────────
+mkdir -p /home/mados/.config/waybar
+
+cat > /home/mados/.config/waybar/config <<WAYBARCFG
+{
+    "layer": "top",
+    "position": "bottom",
+    "height": 34,
+    "spacing": 4,
+
+    "modules-left":  ["custom/logo", "wlr/taskbar"],
+    "modules-right": ["cpu", "memory", "network", "pulseaudio", "clock"],
+
+    "custom/logo": {
+        "format": "MADOS",
+        "tooltip": false
+    },
+
+    "wlr/taskbar": {
+        "format": "{title:.28}",
+        "icon-size": 16,
+        "on-click": "activate",
+        "tooltip-format": "{title}"
+    },
+
+    "cpu": {
+        "interval": 3,
+        "format": "CPU {usage}%",
+        "tooltip": false
+    },
+
+    "memory": {
+        "interval": 5,
+        "format": "RAM {percentage}%",
+        "tooltip-format": "{used:0.1f} Go utilises sur {total:0.1f} Go"
+    },
+
+    "network": {
+        "interval": 5,
+        "format-wifi": "▲ {essid}",
+        "format-ethernet": "▲ {ifname}",
+        "format-disconnected": "▼ hors ligne",
+        "tooltip-format": "{ipaddr}"
+    },
+
+    "pulseaudio": {
+        "format": "♪ {volume}%",
+        "format-muted": "♪ coupe",
+        "on-click": "pavucontrol"
+    },
+
+    "clock": {
+        "interval": 30,
+        "format": "⏱ {:%H:%M}",
+        "format-alt": "{:%A %d %B}",
+        "tooltip-format": "<tt>{calendar}</tt>"
+    }
+}
+WAYBARCFG
+
+cat > /home/mados/.config/waybar/style.css <<WAYBARCSS
+/* Palette reprise du site MadOS : rouge ROG, noir profond, cyan. */
+
+* {
+    font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace;
+    font-size: 12px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(10, 10, 10, 0.94);
+    border-top: 2px solid #ff003c;
+    color: #e0e0e0;
+}
+
+/* Le logo, ancre a gauche, seul element en rouge plein. */
+#custom-logo {
+    color: #ff003c;
+    font-weight: bold;
+    letter-spacing: 2px;
+    padding: 0 16px;
+    margin-right: 6px;
+    background: rgba(255, 0, 60, 0.10);
+    border-right: 1px solid rgba(255, 0, 60, 0.35);
+}
+
+/* Les fenetres ouvertes : discretes au repos, soulignees de rouge quand actives. */
+#taskbar button {
+    padding: 0 12px;
+    margin: 4px 2px;
+    color: #909090;
+    background: transparent;
+    border-radius: 4px;
+    border-bottom: 2px solid transparent;
+}
+#taskbar button.active {
+    color: #ffffff;
+    background: rgba(255, 0, 60, 0.20);
+    border-bottom: 2px solid #ff003c;
+}
+#taskbar button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+/* Les indicateurs, en pastilles sombres. */
+#cpu, #memory, #network, #pulseaudio {
+    padding: 0 12px;
+    margin: 5px 2px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#cpu, #memory { color: #00e5ff; }
+#network      { color: #b0b0b0; }
+#pulseaudio   { color: #b0b0b0; }
+
+/* Ce qui ne va pas se voit en rouge, comme partout ailleurs dans MadOS. */
+#network.disconnected,
+#pulseaudio.muted {
+    color: #ff003c;
+    background: rgba(255, 0, 60, 0.12);
+}
+
+/* L'heure ferme la barre, en miroir du logo. */
+#clock {
+    color: #ffffff;
+    font-weight: bold;
+    padding: 0 14px;
+    margin: 5px 8px 5px 2px;
+    border-radius: 4px;
+    background: rgba(255, 0, 60, 0.18);
+    border: 1px solid rgba(255, 0, 60, 0.40);
+}
+WAYBARCSS
+
+
 # Configuration de la session LXQt (Labwc comme WM)
 cat > /home/mados/.config/lxqt/session.conf <<SESSIONCONF
 [General]
@@ -590,7 +747,7 @@ export QT_QPA_PLATFORMTHEME=lxqt
 export XDG_CURRENT_DESKTOP=LXQt
 lxqt-notificationd &
 lxqt-policykit-agent &
-lxqt-panel &
+waybar &
 lxqt-runner --no-show &
 xrdb -merge /home/mados/.Xresources 2>/dev/null &
 # L'installateur ne se lance plus ici : il tourne sur la console, avant labwc.
