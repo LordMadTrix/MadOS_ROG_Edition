@@ -345,7 +345,15 @@ if systemd-detect-virt --quiet; then
     export LIBGL_ALWAYS_SOFTWARE=1
     export WLR_NO_HARDWARE_CURSORS=1
 fi
-xsetroot -solid '#0a0a0a' 2>/dev/null &
+# Fond d'ecran : le bureau affichait un noir uni, alors que le depot embarque
+# dix fonds ROG. MadCarbon est le plus leger (54 Ko), ce qui compte dans une
+# image live. swaybg le pose nativement sous Wayland ; xsetroot, qui servait
+# jusqu'ici, est un outil X11 qui ne sait afficher qu'une couleur.
+if command -v swaybg >/dev/null 2>&1 && [ -f /usr/share/backgrounds/mados.png ]; then
+    swaybg -i /usr/share/backgrounds/mados.png -m fill &
+else
+    xsetroot -solid '#0a0a0a' 2>/dev/null &
+fi
 lxqt-notificationd &
 lxqt-policykit-agent &
 lxqt-panel &

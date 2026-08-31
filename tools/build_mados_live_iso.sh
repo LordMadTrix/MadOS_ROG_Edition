@@ -209,7 +209,7 @@ update-locale LANG=fr_FR.UTF-8
 # installer plus tard depuis le chroot supposerait un reseau, qu'une
 # installation hors ligne n'a pas.
 # ─────────────────────────────────────────────────────────────────────────────
-apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper parted dosfstools rsync grub2-common grub-pc-bin grub-efi-amd64-bin efibootmgr --no-install-recommends -y
+apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper parted dosfstools rsync grub2-common grub-pc-bin grub-efi-amd64-bin efibootmgr swaybg --no-install-recommends -y
 
 # Générer l'initramfs pour le noyau XanMod
 # On prend le noyau XANMOD explicitement, pas « le premier par ordre
@@ -265,6 +265,11 @@ apt-get install -y \
     pcmanfm-qt \
     labwc xwayland xterm \
     --no-install-recommends -y
+
+# Le fond d'ecran, a un emplacement standard : /opt/mados-rog n'existe plus
+# apres l'installation sur disque, l'autostart y chercherait dans le vide.
+mkdir -p /usr/share/backgrounds
+cp /opt/mados-rog/assets/wallpapers/MadCarbon.png /usr/share/backgrounds/mados.png 2>/dev/null || true
 
 # Enregistrement de la session Labwc pour LightDM (fallback GUI)
 mkdir -p /usr/share/wayland-sessions/
@@ -341,12 +346,26 @@ DISTRIB_DESCRIPTION="MadOS ROG Edition $MADOS_VERSION"
 LSBREL
 
 # Banner de connexion (efface "Ubuntu 25.04" du prompt getty)
+# ─────────────────────────────────────────────────────────────────────────────
+# La banniere de connexion : premiere chose que voit l'utilisateur apres une
+# installation. L'ancienne dessinait une boite a largeur FIXE autour d'un
+# numero de version VARIABLE : les barres de droite ne tombaient jamais au bon
+# endroit, et la boite apparaissait tronquee. Verifie sur une capture d'ecran.
+#
+# On abandonne la boite. Une banniere ASCII et deux lignes de texte n'ont
+# aucune largeur a respecter, donc rien a casser.
+# ─────────────────────────────────────────────────────────────────────────────
 cat > /etc/issue <<ISSUE
 
-  ┌─────────────────────────────────┐
-  │   MadOS ROG Edition $MADOS_VERSION          │
-  │   XanMod 7 | Wayland | LXQt    │
-  └─────────────────────────────────┘
+  [1;31m███╗   ███╗ █████╗ ██████╗  ██████╗ ███████╗[0m
+  [1;31m████╗ ████║██╔══██╗██╔══██╗██╔═══██╗██╔════╝[0m
+  [1;31m██╔████╔██║███████║██║  ██║██║   ██║███████╗[0m
+  [1;31m██║╚██╔╝██║██╔══██║██║  ██║██║   ██║╚════██║[0m
+  [1;31m██║ ╚═╝ ██║██║  ██║██████╔╝╚██████╔╝███████║[0m
+  [1;31m╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝[0m
+
+  [0;36mROG Edition $MADOS_VERSION[0m  ·  XanMod 7  ·  Wayland  ·  LXQt
+  [0;37m\n \l[0m
 
 ISSUE
 
@@ -492,7 +511,15 @@ if systemd-detect-virt --quiet; then
     export WLR_NO_HARDWARE_CURSORS=1
 fi
 # Fond noir ROG pour le bureau
-xsetroot -solid '#0a0a0a' 2>/dev/null &
+# Fond d'ecran : le bureau affichait un noir uni, alors que le depot embarque
+# dix fonds ROG. MadCarbon est le plus leger (54 Ko), ce qui compte dans une
+# image live. swaybg le pose nativement sous Wayland ; xsetroot, qui servait
+# jusqu'ici, est un outil X11 qui ne sait afficher qu'une couleur.
+if command -v swaybg >/dev/null 2>&1 && [ -f /usr/share/backgrounds/mados.png ]; then
+    swaybg -i /usr/share/backgrounds/mados.png -m fill &
+else
+    xsetroot -solid '#0a0a0a' 2>/dev/null &
+fi
 # Suite LXQt = Razor-Qt complet
 lxqt-notificationd &
 lxqt-policykit-agent &
@@ -643,6 +670,18 @@ echo -e "${CYAN}[5/7] Configuration du chargeur de démarrage GRUB...${NC}"
 cat <<EOF > "$WORKDIR/grub.cfg"
 # Le menu doit rester assez longtemps a l'ecran pour qu'on puisse choisir
 # l'entree de diagnostic quand le demarrage normal se fige.
+# Identite visuelle du menu : sans ces lignes, GRUB affiche du texte blanc sur
+# noir en 640x480, identique a n'importe quelle distribution.
+insmod all_video
+insmod gfxterm
+set gfxmode=auto
+terminal_output gfxterm
+
+set color_normal=light-gray/black
+set color_highlight=black/red
+set menu_color_normal=light-gray/black
+set menu_color_highlight=black/red
+
 set timeout=10
 set default=0
 
