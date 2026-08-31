@@ -195,7 +195,21 @@ locale-gen fr_FR.UTF-8
 update-locale LANG=fr_FR.UTF-8
 
 # Installation du noyau officiel XanMod, de systemd, network-manager, casper et initramfs
-apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper --no-install-recommends -y
+# ─────────────────────────────────────────────────────────────────────────────
+# LES OUTILS DE L'INSTALLATEUR
+#
+# Constate en installant pour de vrai dans une machine virtuelle : parted,
+# rsync, mkfs.fat, partprobe, grub-install et update-grub etaient ABSENTS de
+# l'image. L'installateur ne pouvait ni partitionner, ni formater, ni copier
+# quoi que ce soit -- et annoncait pourtant « v Partitions formatees »,
+# « v Systeme copie » a chaque etape ratee.
+#
+# Les paquets GRUB sont installes ICI, dans le live, et non seulement dans le
+# chroot : le systeme cible est une COPIE du live, il en herite donc. Les
+# installer plus tard depuis le chroot supposerait un reseau, qu'une
+# installation hors ligne n'a pas.
+# ─────────────────────────────────────────────────────────────────────────────
+apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper parted dosfstools rsync grub2-common grub-pc-bin grub-efi-amd64-bin efibootmgr --no-install-recommends -y
 
 # Générer l'initramfs pour le noyau XanMod
 # On prend le noyau XANMOD explicitement, pas « le premier par ordre

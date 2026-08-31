@@ -150,6 +150,7 @@ fi
 
 DISK="/dev/$TARGET_DISK"
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # MODE D'AMORÇAGE RÉEL — on installe comme la machine a démarré.
 #
@@ -165,6 +166,42 @@ else
     MODE_BOOT="BIOS"
 fi
 echo -e "${CYAN}Mode d'amorçage détecté : ${WHITE}$MODE_BOOT${NC}"
+# ─────────────────────────────────────────────────────────────────────────────
+# ARRETER AVANT D'EFFACER, PAS APRES
+#
+# Constate en installant pour de vrai dans une machine virtuelle : parted,
+# rsync, mkfs.fat et partprobe etaient ABSENTS de l'image live. Le disque a
+# ete efface (wipefs), puis chaque etape a echoue en annoncant sa reussite :
+# « v Partitions formatees », « v Systeme copie »... sur un disque vide.
+#
+# Un outil manquant se constate en une seconde. Le constater APRES avoir
+# efface le disque de quelqu'un est indefendable.
+# ─────────────────────────────────────────────────────────────────────────────
+echouer() {
+    echo ""
+    echo -e "${RED}✗ ÉCHEC : $1${NC}"
+    echo -e "${YELLOW}  L'installation s'arrête ici plutôt que de continuer sur une base fausse.${NC}"
+    umount /mnt/mados/boot/efi 2>/dev/null || true
+    umount /mnt/mados 2>/dev/null || true
+    exit 1
+}
+
+MANQUANTS=""
+for outil in parted partprobe rsync mkfs.ext4 mkswap wipefs blkid mountpoint; do
+    command -v "$outil" >/dev/null 2>&1 || MANQUANTS="$MANQUANTS $outil"
+done
+if [ "$MODE_BOOT" = "UEFI" ]; then
+    command -v mkfs.fat >/dev/null 2>&1 || MANQUANTS="$MANQUANTS mkfs.fat"
+fi
+if [ -n "$MANQUANTS" ]; then
+    echo ""
+    echo -e "${RED}✗ Outils indispensables absents de ce système :$MANQUANTS${NC}"
+    echo -e "${YELLOW}  Rien n'a été touché sur $DISK. Vos données sont intactes.${NC}"
+    echo -e "${GRAY}  À installer :  sudo apt-get install -y parted dosfstools rsync${NC}"
+    exit 1
+fi
+echo -e "${GREEN}  ✓ Outils d'installation présents${NC}"
+
 
 # ── Détection type de disque (nvme ou sata) ────────────────────────────────────
 if echo "$TARGET_DISK" | grep -q "nvme"; then
@@ -195,6 +232,16 @@ sleep 1
 partprobe "$DISK" 2>/dev/null || true
 sleep 2
 
+# Sans parted, les commandes ci-dessus n'ont RIEN fait -- et le script
+# annoncait quand meme « GPT/BIOS : bios_grub 2 Mo... ». On verifie que les
+# partitions existent vraiment avant d'aller les formater.
+for part in "$SWAP_PART" "$ROOT_PART"; do
+    [ -b "$part" ] || echouer "le partitionnement n'a pas cree $part"
+done
+if [ "$MODE_BOOT" = "UEFI" ]; then
+    [ -b "$EFI_PART" ] || echouer "le partitionnement n'a pas cree la partition EFI $EFI_PART"
+fi
+
 # ── Formatage ─────────────────────────────────────────────────────────────────
 echo -e "${CYAN}[2/6] Formatage des partitions...${NC}"
 if [ "$MODE_BOOT" = "UEFI" ]; then
@@ -202,6 +249,11 @@ if [ "$MODE_BOOT" = "UEFI" ]; then
 fi
 mkswap -L "mados-swap" "$SWAP_PART"
 mkfs.ext4 -L "MadOS_ROOT" -F "$ROOT_PART"
+# blkid dit ce qui est REELLEMENT sur la partition, la ou mkfs peut avoir
+# echoue sans que personne ne lise son code de retour.
+if ! blkid "$ROOT_PART" 2>/dev/null | grep -q 'TYPE="ext4"'; then
+    echouer "la partition racine $ROOT_PART ne porte aucun systeme de fichiers ext4"
+fi
 echo -e "${GREEN}  ✓ Partitions formatées${NC}"
 
 # ── Montage ───────────────────────────────────────────────────────────────────
@@ -213,6 +265,9 @@ if [ "$MODE_BOOT" = "UEFI" ]; then
     mount "$EFI_PART" /mnt/mados/boot/efi
 fi
 swapon "$SWAP_PART" 2>/dev/null || true
+if ! mountpoint -q /mnt/mados; then
+    echouer "/mnt/mados n'est pas monte : la suite ecrirait dans le systeme live"
+fi
 echo -e "${GREEN}  ✓ Partitions montées dans /mnt/mados${NC}"
 
 # ── Copie du système depuis le squashfs live ───────────────────────────────────
@@ -232,7 +287,12 @@ rsync -aAX \
     --exclude=/casper \
     / /mnt/mados/
 
-echo -e "${GREEN}  ✓ Système copié${NC}"
+# Un rsync absent ou interrompu laisse une racine vide. Sans ce controle, le
+# script annoncait « Systeme copie » sur un disque ou il n'y avait rien.
+if [ ! -s /mnt/mados/etc/passwd ] || [ ! -d /mnt/mados/usr/bin ]; then
+    echouer "la copie du systeme n'a rien produit sur $ROOT_PART"
+fi
+echo -e "${GREEN}  ✓ Système copié ($(du -sh /mnt/mados 2>/dev/null | cut -f1))${NC}"
 
 # ── Reconfiguration du système installé ───────────────────────────────────────
 echo -e "${CYAN}[5/6] Configuration du système installé...${NC}"
