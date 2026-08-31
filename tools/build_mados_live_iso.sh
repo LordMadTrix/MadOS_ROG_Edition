@@ -473,10 +473,66 @@ chown mados:mados /home/mados/.Xresources
 # Configuration th\u00e8me LXQt ROG sombre
 mkdir -p /home/mados/.config/lxqt
 cat > /home/mados/.config/lxqt/lxqt.conf <<LXQTCONF
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LA BARRE DES TACHES
+#
+# Aucun panel.conf n'existait : le panneau tournait sur ses valeurs d'usine.
+# D'ou l'aspect generique constate sur capture -- fond clair, elements tronques
+# a gauche et a droite, sans rapport avec le theme rouge et noir du reste.
+#
+# On fixe la taille, la position et surtout l'ORDRE des elements : menu a
+# gauche, fenetres au centre, indicateurs et horloge a droite. Les couleurs
+# viennent du theme (graphite) plutot que d'etre ecrites ici : LXQt les stocke
+# au format binaire de Qt, illisible et fragile a generer a la main.
+# ─────────────────────────────────────────────────────────────────────────────
+cat > /home/mados/.config/lxqt/panel.conf <<PANELCONF
+[General]
+__userfile__=true
+
+[panel1]
+alignment=-1
+animation-duration=0
+desktop=0
+hidable=false
+iconSize=22
+lineCount=1
+lockPanel=true
+opacity=100
+panelSize=34
+plugins=mainmenu, desktopswitch, taskbar, tray, clock
+position=Bottom
+reserveSpace=true
+width=100
+widthPercent=true
+
+[mainmenu]
+alignment=Left
+type=mainmenu
+
+[desktopswitch]
+alignment=Left
+type=desktopswitch
+
+[taskbar]
+alignment=Left
+type=taskbar
+
+[tray]
+alignment=Right
+type=tray
+
+[clock]
+alignment=Right
+type=clock
+timeFormat=HH:mm
+dateFormat=ddd d MMM
+showSeconds=false
+PANELCONF
 [General]
 icon_theme=Papirus-Dark
 single_click_activate=false
-theme=dark
+theme=graphite
 LXQTCONF
 
 # Configuration de la session LXQt (Labwc comme WM)
@@ -672,10 +728,19 @@ cat <<EOF > "$WORKDIR/grub.cfg"
 # l'entree de diagnostic quand le demarrage normal se fige.
 # Identite visuelle du menu : sans ces lignes, GRUB affiche du texte blanc sur
 # noir en 640x480, identique a n'importe quelle distribution.
-insmod all_video
-insmod gfxterm
-set gfxmode=auto
-terminal_output gfxterm
+# Le mode graphique exige une POLICE : sans loadfont, gfxterm n'a aucun glyphe
+# pour les traits de cadre et affiche des blocs vides a la place. Constate sur
+# une capture d'ecran -- le cadre du menu etait illisible.
+#
+# Le « if » n'est pas une precaution de style : si la police manque, GRUB reste
+# en mode texte, qui dessine ces memes traits nativement. Mieux vaut un menu
+# sobre qu'un menu casse.
+if loadfont /boot/grub/fonts/unicode.pf2 ; then
+    insmod all_video
+    insmod gfxterm
+    set gfxmode=auto
+    terminal_output gfxterm
+fi
 
 set color_normal=light-gray/black
 set color_highlight=black/red
