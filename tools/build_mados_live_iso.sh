@@ -352,18 +352,41 @@ GETTY
 
 # Script de démarrage Wayland automatique depuis le TTY1
 cat <<'PROFILE' > /home/mados/.bash_profile
-# Lancement automatique de Labwc sur TTY1
+# ─────────────────────────────────────────────────────────────────────────────
+# L'installateur d'abord, sur la console. Le bureau ensuite, si on le demande.
+#
+# Avant, TTY1 lancait labwc, qui lancait Xwayland, qui lancait un xterm, qui
+# lancait l'installateur. Trois couches entre le clavier et un programme en
+# mode TEXTE qui n'en reclame aucune. Constate en lancant l'ISO : la liste des
+# disques s'affichait parfaitement, et aucune touche n'atteignait le terminal.
+#
+# Un installateur texte se contente d'une console. On supprime les couches
+# plutot que de chercher laquelle avale les touches.
+# ─────────────────────────────────────────────────────────────────────────────
 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-    export WLR_BACKENDS=drm
-    export WLR_RENDERER=pixman
-    export WLR_NO_HARDWARE_CURSORS=1
-    export LIBGL_ALWAYS_SOFTWARE=1
-    export LIBSEAT_BACKEND=noop
-    export XDG_RUNTIME_DIR=/run/user/$(id -u)
-    export XDG_SESSION_TYPE=wayland
-    mkdir -p "$XDG_RUNTIME_DIR"
-    chmod 700 "$XDG_RUNTIME_DIR"
-    exec labwc
+
+    if [ -x /opt/mados-rog/tools/live_installer.sh ] || [ -f /opt/mados-rog/tools/live_installer.sh ]; then
+        sudo bash /opt/mados-rog/tools/live_installer.sh
+    fi
+
+    echo ""
+    read -r -p "Ouvrir le bureau graphique ? (o/N) : " reponse
+    if [ "$reponse" = "o" ] || [ "$reponse" = "O" ] || [ "$reponse" = "y" ] || [ "$reponse" = "Y" ]; then
+        export WLR_BACKENDS=drm
+        export WLR_RENDERER=pixman
+        export LIBSEAT_BACKEND=noop
+        export XDG_RUNTIME_DIR=/run/user/$(id -u)
+        export XDG_SESSION_TYPE=wayland
+        # Rendu logiciel : indispensable en machine virtuelle, penalisant sur
+        # du vrai materiel. La decision se prend ici, pas a la construction.
+        if systemd-detect-virt --quiet; then
+            export LIBGL_ALWAYS_SOFTWARE=1
+            export WLR_NO_HARDWARE_CURSORS=1
+        fi
+        mkdir -p "$XDG_RUNTIME_DIR"
+        chmod 700 "$XDG_RUNTIME_DIR"
+        exec labwc
+    fi
 fi
 PROFILE
 chown mados:mados /home/mados/.bash_profile
@@ -447,11 +470,10 @@ lxqt-policykit-agent &
 lxqt-panel &
 lxqt-runner --no-show &
 xrdb -merge /home/mados/.Xresources 2>/dev/null &
-xterm -fullscreen -hold \
-    -bg '#0a0a0a' -fg '#e0e0e0' \
-    -fa 'DejaVu Sans Mono' -fs 11 \
-    -title 'MadOS ROG Installer' \
-    -e "sudo bash /opt/mados-rog/tools/live_installer.sh" &
+# L'installateur ne se lance plus ici : il tourne sur la console, avant labwc.
+# Le faire passer par Xwayland puis xterm ajoutait deux couches entre le
+# clavier et lui, et les touches n'y arrivaient pas.
+xterm -bg '#0a0a0a' -fg '#e0e0e0' -fa 'DejaVu Sans Mono' -fs 11 &
 LABWC
 chown -R mados:mados /home/mados/.config
 
