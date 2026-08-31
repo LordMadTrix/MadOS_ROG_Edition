@@ -73,7 +73,7 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target sleep.target
 EOF
-            sudo systemctl daemon-reload || true
+            run_action "rechargerait la configuration de systemd" sudo systemctl daemon-reload
             sudo systemctl enable --now mados-amd-thermal.service >/dev/null 2>&1
         fi
     fi
@@ -120,7 +120,7 @@ elif [ "$CPU_VENDOR" = "GenuineIntel" ]; then
             fi
 
             sudo intel-undervolt apply >/dev/null 2>&1 || true
-            sudo systemctl enable --now intel-undervolt.service >/dev/null 2>&1 || true
+            activer_service "sous-voltage du processeur" enable-now intel-undervolt.service
         fi
     fi
 else

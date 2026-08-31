@@ -498,7 +498,7 @@ APTCONF
                 sudo cp /etc/resolv.conf /etc/resolv.conf.bak 2>/dev/null || true
                 sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
             fi
-            sudo systemctl restart systemd-resolved 2>/dev/null || true
+            activer_service "résolution DNS" restart systemd-resolved
             echo -e "${GRAY}    DNS de secours injectés (systemd-resolved conservé).${NC}"
         else
             echo -e "${GRAY}    Injecteur DNS de secours (${DNS_PRIMARY:-8.8.8.8} + ${DNS_SECONDARY:-1.1.1.1})...${NC}"

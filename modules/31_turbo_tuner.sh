@@ -114,11 +114,11 @@ RestartSec=30
 WantedBy=multi-user.target
 SVC_EOF
 
-    sudo systemctl daemon-reload || true
+    run_action "rechargerait la configuration de systemd" sudo systemctl daemon-reload
     # N'activer le service que si l'utilitaire qu'il pilote existe reellement.
     if [ -x /usr/local/bin/mados ]; then
-        sudo systemctl enable mados-auto-boost.service 2>/dev/null || true
-        sudo systemctl start mados-auto-boost.service 2>/dev/null || true
+        activer_service "Turbo-Tuner" enable mados-auto-boost.service
+        activer_service "Turbo-Tuner" start mados-auto-boost.service
     else
         echo -e "    ${GRAY}├─ Utilitaire 'mados' absent : Auto-Boost installé mais non activé.${NC}"
     fi

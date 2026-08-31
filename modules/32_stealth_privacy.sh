@@ -56,7 +56,7 @@ EOF
         sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
     fi
 
-    sudo systemctl restart systemd-resolved 2>/dev/null || true
+    activer_service "résolution DNS" restart systemd-resolved
 
     # Verification : on annonce du DoT, on verifie que c'est bien actif.
     if command -v resolvectl >/dev/null 2>&1; then

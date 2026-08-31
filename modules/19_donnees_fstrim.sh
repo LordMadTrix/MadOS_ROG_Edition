@@ -33,7 +33,7 @@ if [ -f /etc/systemd/journald.conf ]; then
         backup_file "/etc/systemd/journald.conf"
         sudo sed -i 's/^#SystemMaxUse=.*/SystemMaxUse=500M/' /etc/systemd/journald.conf || true
         sudo sed -i 's/^#SystemMaxFileSize=.*/SystemMaxFileSize=100M/' /etc/systemd/journald.conf || true
-        sudo systemctl restart systemd-journald >/dev/null 2>&1 || true
+        activer_service "journal système" restart systemd-journald
     fi
 fi
 

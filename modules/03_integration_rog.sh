@@ -67,7 +67,7 @@ CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power
 WIFI_PWR_ON_AC=off
 WIFI_PWR_ON_BAT=on
 EOF
-    sudo systemctl enable tlp thermald 2>/dev/null || true
+    activer_service "gestion thermique et batterie" enable tlp thermald
 fi
 
 # 3. ASUSCTL & SUPERGFXCTL
@@ -173,8 +173,8 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 SVC_EOF
-    sudo systemctl enable mados-rgb.service >/dev/null 2>&1 || true
-    sudo systemctl start mados-rgb.service >/dev/null 2>&1 || true
+    activer_service "éclairage clavier ROG" enable mados-rgb.service
+    activer_service "éclairage clavier ROG" start mados-rgb.service
     fi
 
 run_action "activerait le service supergfxd et asusd" sudo systemctl enable supergfxd asusd 2>/dev/null || true

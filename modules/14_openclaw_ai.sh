@@ -43,7 +43,7 @@ if ! command -v ollama >/dev/null 2>&1; then
         log_simu "installerait Ollama (script officiel) et activerait le service systemd ollama"
     else
         curl -fsSL https://ollama.com/install.sh | sudo -E bash - >/dev/null 2>&1
-        sudo systemctl enable --now ollama >/dev/null 2>&1 || true
+        activer_service "serveur Ollama" enable-now ollama
     fi
 fi
 

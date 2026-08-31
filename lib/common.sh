@@ -438,6 +438,71 @@ refuser_reglage() {
 # qui le corrige.
 # ==============================================================================
 # ==============================================================================
+# Activer un service, et VERIFIER qu'il l'est reellement.
+#
+# « sudo systemctl enable X || true » : si l'activation echouait, le service ne
+# demarrait jamais au boot et rien ne le disait. La fonction concernee ne
+# marchait pas, sans explication -- le pire des diagnostics pour l'utilisateur.
+#
+# Ici encore, le controle porte sur le RESULTAT : systemctl peut rendre 0 dans
+# des cas ou l'unite n'est pas pour autant active (unite masquee, dependance
+# non satisfaite, unite generee mais refusee au demarrage). is-enabled et
+# is-active disent l'etat reel.
+#
+# Usage :
+#   activer_service "gestion thermique" enable      tlp thermald
+#   activer_service "eclairage clavier" enable-now  mados-rgb.service
+#   activer_service "reseau"            restart     NetworkManager
+# ==============================================================================
+activer_service() {
+    local description="$1"
+    local mode="$2"
+    shift 2
+
+    if [ "$#" -eq 0 ]; then
+        log_warning "activer_service appelée sans service : « $description »"
+        return 0
+    fi
+
+    if is_dry_run; then
+        log_simu "$mode du service ($description) : $*"
+        return 0
+    fi
+
+    local s
+    case "$mode" in
+        enable)     sudo systemctl enable "$@"      >/dev/null 2>&1 ;;
+        enable-now) sudo systemctl enable --now "$@" >/dev/null 2>&1 ;;
+        start)      sudo systemctl start "$@"       >/dev/null 2>&1 ;;
+        restart)    sudo systemctl restart "$@"     >/dev/null 2>&1 ;;
+        *)          log_warning "activer_service : mode inconnu « $mode »"; return 0 ;;
+    esac
+
+    # Ce qu'on verifie depend de ce qu'on a demande : « enable » promet un
+    # demarrage au boot, « start » promet un service qui tourne maintenant.
+    local rates=""
+    for s in "$@"; do
+        case "$mode" in
+            enable)
+                systemctl is-enabled "$s" >/dev/null 2>&1 || rates="$rates $s" ;;
+            enable-now)
+                { systemctl is-enabled "$s" >/dev/null 2>&1 &&                   systemctl is-active  "$s" >/dev/null 2>&1; } || rates="$rates $s" ;;
+            start|restart)
+                systemctl is-active "$s" >/dev/null 2>&1 || rates="$rates $s" ;;
+        esac
+    done
+
+    if [ -z "$rates" ]; then
+        return 0
+    fi
+
+    log_warning "SERVICE NON ACTIVÉ ($description) :$rates"
+    log_warning "  La fonction correspondante ne démarrera pas."
+    log_warning "  À vérifier :  systemctl status$rates"
+    return 0
+}
+
+# ==============================================================================
 # Installer des paquets, et VERIFIER qu'ils sont bien la.
 #
 # Les appels du projet s'ecrivaient « sudo apt install -y X || true » : le code
@@ -955,6 +1020,6 @@ export -f user_gsettings user_run detecter_bureau
 # aussi un "source common.sh" par fichier (plus robuste que compter sur l'export),
 # mais cette ligne reste le filet pour tout code qui n'aurait pas encore ce source.
 export -f run_action is_dry_run refuser_reglage log_simu
-export -f installer_paquets regenerer_amorcage
+export -f installer_paquets regenerer_amorcage activer_service
 
 

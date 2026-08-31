@@ -111,8 +111,8 @@ EOF
     sudo chmod 600 /etc/netplan/01-network-manager-all.yaml
     sudo netplan generate 2>/dev/null || true
     sudo netplan apply 2>/dev/null || true
-    sudo systemctl enable NetworkManager 2>/dev/null || true
-    sudo systemctl restart NetworkManager 2>/dev/null || true
+    activer_service "gestionnaire réseau" enable NetworkManager
+    activer_service "gestionnaire réseau" restart NetworkManager
     sleep 5
 
     # Controle de survie. L'ancienne version testait `ping 8.8.8.8` puis
@@ -142,7 +142,7 @@ EOF
     # NetworkManager peut avoir ete empeche de demarrer par le policy-rc.d
     # (exit 101) pose par install.sh : on le relance explicitement, ce que
     # policy-rc.d ne bloque pas, puis on laisse le temps au DHCP.
-    sudo systemctl start NetworkManager 2>/dev/null || true
+    activer_service "gestionnaire réseau" start NetworkManager
     for _essai in 1 2 3 4 5 6; do
         reseau_utilisable && break
         sleep 5
@@ -155,7 +155,7 @@ EOF
             sudo cp /etc/netplan/50-cloud-init.yaml.bak /etc/netplan/50-cloud-init.yaml 2>/dev/null || true
         fi
         sudo netplan apply 2>/dev/null || true
-        sudo systemctl restart systemd-resolved 2>/dev/null || true
+        activer_service "résolution DNS" restart systemd-resolved
         sleep 5
         if reseau_utilisable; then
             echo -e "    ${GREEN}├─ Réseau restauré avec l'ancienne configuration.${NC}"
