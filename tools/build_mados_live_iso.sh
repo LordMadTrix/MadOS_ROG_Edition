@@ -133,7 +133,7 @@ echo -e "${CYAN}[2/7] Telechargement et bootstrapping du systeme de base Ubuntu 
 run_sudo debootstrap --arch=amd64 "$SUITE_UBUNTU" "$CHROOT_DIR" http://archive.ubuntu.com/ubuntu/
 
 # 3. Personnalisation du système via Chroot
-echo -e "${CYAN}[3/7] Configuration et installation des composants dans le chroot (XanMod, X11, KDE)...${NC}"
+echo -e "${CYAN}[3/7] Configuration du chroot (noyau XanMod, Wayland/labwc, bureau LXQt)...${NC}"
 
 # Copie des scripts MadOS dans le système cible (sans les ISOs/fichiers volumineux)
 run_sudo mkdir -p "$CHROOT_DIR/opt/mados-rog"
@@ -431,9 +431,14 @@ SESSIONCONF
 
 # Lancement du panel LXQt (Razor-Qt) et de l'installateur MadOS au boot de Labwc (Wayland)
 cat <<LABWC > /home/mados/.config/labwc/autostart
-export WLR_NO_HARDWARE_CURSORS=1
 export LIBSEAT_BACKEND=noop
-export LIBGL_ALWAYS_SOFTWARE=1
+# Rendu logiciel : indispensable en machine virtuelle (aucune acceleration
+# disponible), penalisant sur du vrai materiel. systemd-detect-virt tranche
+# au demarrage ; la meme image sert donc aux deux usages.
+if systemd-detect-virt --quiet; then
+    export LIBGL_ALWAYS_SOFTWARE=1
+    export WLR_NO_HARDWARE_CURSORS=1
+fi
 # Fond noir ROG pour le bureau
 xsetroot -solid '#0a0a0a' 2>/dev/null &
 # Suite LXQt = Razor-Qt complet
