@@ -209,7 +209,7 @@ update-locale LANG=fr_FR.UTF-8
 # installer plus tard depuis le chroot supposerait un reseau, qu'une
 # installation hors ligne n'a pas.
 # ─────────────────────────────────────────────────────────────────────────────
-apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper parted dosfstools rsync grub2-common grub-pc-bin grub-efi-amd64-bin efibootmgr swaybg waybar fonts-jetbrains-mono --no-install-recommends -y
+apt-get install -y linux-xanmod-x64v3 systemd systemd-sysv libpam-systemd seatd network-manager dbus-user-session sudo initramfs-tools casper parted dosfstools rsync grub2-common grub-pc-bin grub-efi-amd64-bin efibootmgr swaybg waybar foot fonts-jetbrains-mono --no-install-recommends -y
 
 # Générer l'initramfs pour le noyau XanMod
 # On prend le noyau XANMOD explicitement, pas « le premier par ordre
@@ -694,6 +694,124 @@ window#waybar {
 }
 WAYBARCSS
 
+# ─────────────────────────────────────────────────────────────────────────────
+# LE TERMINAL — foot
+#
+# xterm affichait une barre de titre grise et des bordures epaisses qui juraient
+# avec le reste. foot est natif Wayland, tres leger, et se configure en texte.
+# Sa palette reprend celle de MadOS : rouge #ff003c, cyan #00e5ff, fond #0a0a0a.
+# ─────────────────────────────────────────────────────────────────────────────
+mkdir -p /home/mados/.config/foot
+
+cat > /home/mados/.config/foot/foot.ini <<FOOTINI
+font=JetBrains Mono:size=11
+pad=10x10
+dpi-aware=no
+
+[cursor]
+color=0a0a0a ff003c
+
+[colors]
+alpha=0.95
+background=0a0a0a
+foreground=e0e0e0
+
+# Couleurs normales
+regular0=1a1a1a
+regular1=ff003c
+regular2=4ade80
+regular3=fbbf24
+regular4=00e5ff
+regular5=c084fc
+regular6=22d3ee
+regular7=e0e0e0
+
+# Couleurs vives
+bright0=505050
+bright1=ff4d70
+bright2=86efac
+bright3=fde047
+bright4=67e8f9
+bright5=d8b4fe
+bright6=a5f3fc
+bright7=ffffff
+
+[scrollback]
+lines=10000
+FOOTINI
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LES DECORATIONS DE FENETRES — labwc
+#
+# labwc n'avait AUCUN theme : il affichait ses couleurs d'usine, d'ou la barre
+# de titre gris clair visible sur les captures. On lui en donne un, assorti a la
+# barre des taches : titre noir, liseré rouge sur la fenetre active, gris sur
+# les autres.
+# ─────────────────────────────────────────────────────────────────────────────
+mkdir -p /home/mados/.local/share/themes/MadOS/openbox-3
+
+cat > /home/mados/.local/share/themes/MadOS/openbox-3/themerc <<THEMERC
+# Fenetre active : le rouge ROG la designe sans ambiguite.
+window.active.title.bg.color: #0a0a0a
+window.active.label.text.color: #ffffff
+window.active.border.color: #ff003c
+window.active.button.unpressed.image.color: #e0e0e0
+window.active.button.hover.image.color: #ff003c
+window.active.button.close.hover.image.color: #ff003c
+
+# Fenetres au repos : volontairement effacees.
+window.inactive.title.bg.color: #141414
+window.inactive.label.text.color: #808080
+window.inactive.border.color: #2a2a2a
+window.inactive.button.unpressed.image.color: #707070
+
+border.width: 1
+padding.width: 8
+padding.height: 5
+window.label.text.justify: center
+
+menu.items.bg.color: #0a0a0a
+menu.items.text.color: #e0e0e0
+menu.items.active.bg.color: #ff003c
+menu.items.active.text.color: #ffffff
+menu.border.color: #ff003c
+menu.title.bg.color: #0a0a0a
+menu.title.text.color: #ff003c
+
+osd.bg.color: #0a0a0a
+osd.border.color: #ff003c
+osd.label.text.color: #e0e0e0
+THEMERC
+
+cat > /home/mados/.config/labwc/rc.xml <<RCXML
+<?xml version="1.0"?>
+<labwc_config>
+  <theme>
+    <name>MadOS</name>
+    <cornerRadius>4</cornerRadius>
+    <font place="ActiveWindow">
+      <name>JetBrains Mono</name>
+      <size>10</size>
+    </font>
+  </theme>
+  <core>
+    <gap>0</gap>
+  </core>
+  <keyboard>
+    <keybind key="A-Tab">
+      <action name="NextWindow"/>
+    </keybind>
+    <keybind key="W-Return">
+      <action name="Execute"><command>foot</command></action>
+    </keybind>
+    <keybind key="A-F4">
+      <action name="Close"/>
+    </keybind>
+  </keyboard>
+</labwc_config>
+RCXML
+
+
 
 # Configuration de la session LXQt (Labwc comme WM)
 cat > /home/mados/.config/lxqt/session.conf <<SESSIONCONF
@@ -753,9 +871,13 @@ xrdb -merge /home/mados/.Xresources 2>/dev/null &
 # L'installateur ne se lance plus ici : il tourne sur la console, avant labwc.
 # Le faire passer par Xwayland puis xterm ajoutait deux couches entre le
 # clavier et lui, et les touches n'y arrivaient pas.
-xterm -bg '#0a0a0a' -fg '#e0e0e0' -fa 'DejaVu Sans Mono' -fs 11 &
+foot &
 LABWC
-chown -R mados:mados /home/mados/.config
+# Le repertoire personnel ENTIER, et non le seul .config : le theme de labwc
+# vit dans .local/share/themes, et un fichier appartenant a root n'est pas lu
+# par la session. Cibler chaque sous-dossier oblige a y penser a chaque ajout ;
+# cibler la racine ne l'oublie jamais.
+chown -R mados:mados /home/mados
 
 # Désactiver LightDM — on utilise getty TTY1 + .bash_profile à la place
 systemctl disable lightdm 2>/dev/null || true
