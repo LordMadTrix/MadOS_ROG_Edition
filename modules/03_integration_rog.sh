@@ -88,7 +88,7 @@ if is_dry_run; then
 else
     sudo apt install -y asusctl supergfxctl rog-control-center 2>/dev/null || {
         echo -e "    ${YELLOW}⚠ Échec PPA - Tentative de Compilation de Sauvetage...${NC}"
-        sudo apt install -y libudev-dev libfontconfig-dev libseat-dev libinput-dev libdbus-1-dev libxkbcommon-dev libgtk-3-dev pkg-config cmake clang libclang-dev || true
+        installer_paquets "bibliothèques de développement pour asusctl" libudev-dev libfontconfig-dev libseat-dev libinput-dev libdbus-1-dev libxkbcommon-dev libgtk-3-dev pkg-config cmake clang libclang-dev
         if ! command -v cargo &>/dev/null; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y >/dev/null 2>&1
             source "$HOME/.cargo/env"

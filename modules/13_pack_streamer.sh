@@ -30,7 +30,7 @@ else
     sudo apt update -q >/dev/null 2>&1 || true
 
     # Installation de OBS (stable)
-    sudo apt install -y obs-studio >/dev/null 2>&1 || true
+    installer_paquets "OBS Studio" obs-studio
 fi
 
 echo -e "    ${GRAY}✅ [SUCCÈS] OBS Studio installé.${NC}"

@@ -31,7 +31,7 @@ if ! command -v node >/dev/null 2>&1; then
         log_simu "installerait Node.js 22 (NodeSource) et le paquet nodejs via apt-get"
     else
         curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null 2>&1
-        sudo apt-get install -y nodejs || true
+        installer_paquets "Node.js" nodejs
     fi
 fi
 

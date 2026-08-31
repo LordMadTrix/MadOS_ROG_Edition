@@ -84,7 +84,7 @@ if echo "$GPU_INFO" | grep -iq "nvidia"; then
             echo -e "    ${YELLOW}├─ [CLEAN] Échec initial. Purge des installations NVIDIA cassées, puis nouvelle tentative...${NC}"
             sudo apt-get purge -y 'nvidia*' 2>/dev/null || true
             sudo apt-get autoremove -y >/dev/null 2>&1 || true
-            sudo apt-get install -f -y >/dev/null 2>&1 || true
+            run_action "réparerait les dépendances cassées (apt-get install -f)" sudo apt-get install -f -y
             if installer_nvidia; then
                 NVIDIA_OK=1
             fi

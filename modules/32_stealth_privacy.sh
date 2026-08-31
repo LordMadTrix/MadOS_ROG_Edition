@@ -73,7 +73,7 @@ echo -e "    ${WHITE}├─ [PAR-FEU] Activation du Firewall UFW (Profil Gaming)
 if is_dry_run; then
     log_simu "installerait ufw, refuserait l'entrant, autoriserait le sortant et les ports Steam, puis l'activerait (port SSH ouvert uniquement si un serveur SSH est installe)"
 else
-    sudo apt install -y ufw || true
+    installer_paquets "pare-feu UFW" ufw
     sudo ufw default deny incoming || true
     sudo ufw default allow outgoing || true
 

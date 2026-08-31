@@ -24,8 +24,8 @@ else
     sudo add-apt-repository ppa:obsproject/obs-studio -y 2>/dev/null || true
     sudo apt update -q || true
     # Installation des headers requis pour la compilation du module v4l2loopback (Virtual Cam)
-    sudo apt install -y "linux-headers-$(uname -r)" 2>/dev/null || true
-    sudo apt install -y obs-studio ffmpeg || true
+    installer_paquets "en-têtes du noyau" "linux-headers-$(uname -r)"
+    installer_paquets "OBS Studio et FFmpeg" obs-studio ffmpeg
 
     # v4l2loopback (camera virtuelle) est un module DKMS : il doit se compiler
     # contre CHAQUE noyau installe. Or MadOS pose un noyau XanMod de pointe, et

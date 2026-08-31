@@ -437,6 +437,56 @@ refuser_reglage() {
 # état pire. Mais l'échec est affiché, journalisé, et accompagné de la commande
 # qui le corrige.
 # ==============================================================================
+# ==============================================================================
+# Installer des paquets, et VERIFIER qu'ils sont bien la.
+#
+# Les appels du projet s'ecrivaient « sudo apt install -y X || true » : le code
+# de retour etait avale, et l'utilisateur repartait en croyant disposer d'un
+# logiciel absent. Rien, nulle part, ne le detrompait.
+#
+# Le controle porte sur le RESULTAT, pas sur le code de retour -- meme principe
+# que la verification de GRUB dans l'installateur. apt peut rendre 0 en n'ayant
+# rien installe d'utile (depot injoignable, paquet renomme, conflit resolu en
+# ecartant ce qu'on demandait) ; dpkg -s, lui, dit ce qui est reellement la.
+#
+# On n'interrompt pas l'installation : un paquet manquant prive d'une fonction,
+# il ne casse pas le reste. Mais il est NOMME, et l'utilisateur sait quoi
+# reinstaller.
+#
+# Usage :  installer_paquets "pilotes graphiques Intel" mesa-vulkan-drivers i965-va-driver
+# ==============================================================================
+installer_paquets() {
+    local description="$1"
+    shift
+
+    if [ "$#" -eq 0 ]; then
+        log_warning "installer_paquets appelée sans paquet : « $description »"
+        return 0
+    fi
+
+    if is_dry_run; then
+        log_simu "installerait ($description) : $*"
+        return 0
+    fi
+
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "$@" >/dev/null 2>&1
+
+    local manquants=""
+    local p
+    for p in "$@"; do
+        dpkg -s "$p" >/dev/null 2>&1 || manquants="$manquants $p"
+    done
+
+    if [ -z "$manquants" ]; then
+        return 0
+    fi
+
+    log_warning "PAQUETS NON INSTALLÉS ($description) :$manquants"
+    log_warning "  Les fonctions qui en dépendent ne marcheront pas."
+    log_warning "  À réessayer :  sudo apt-get install -y$manquants"
+    return 0
+}
+
 regenerer_amorcage() {
     local description="$1"
     shift
@@ -905,5 +955,6 @@ export -f user_gsettings user_run detecter_bureau
 # aussi un "source common.sh" par fichier (plus robuste que compter sur l'export),
 # mais cette ligne reste le filet pour tout code qui n'aurait pas encore ce source.
 export -f run_action is_dry_run refuser_reglage log_simu
+export -f installer_paquets regenerer_amorcage
 
 

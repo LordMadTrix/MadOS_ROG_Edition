@@ -209,7 +209,7 @@ if is_dry_run; then
     log_simu "installerait le thème GRUB Cyberpunk (téléchargement, édition de /etc/default/grub, update-grub)"
 else
 # Installation des prérequis de thème
-sudo apt install -y git tar || true
+installer_paquets "outils de récupération du thème" git tar
 
 # Téléchargement de distro-grub-themes
 GRUB_THEME_DIR="/tmp/grub-themes"
@@ -261,7 +261,7 @@ echo -e "\n${RED}>>> ${WHITE}[5/5] ${BOLD}Sculpture du Bureau (ROG Windows-Style
 if is_dry_run; then
     log_simu "installerait Papirus/Plymouth/dconf-cli, appliquerait les dossiers rouges Papirus et sculpterait le bureau ($MADOS_DE)"
 else
-sudo apt install -y papirus-icon-theme plymouth plymouth-theme-spinner dconf-cli 2>/dev/null || true
+installer_paquets "thème et écran de démarrage" papirus-icon-theme plymouth plymouth-theme-spinner dconf-cli
 
 # Application des dossiers rouges Papirus
 wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/install.sh | sh 2>/dev/null || true
@@ -332,7 +332,7 @@ if [ -f "$ASSETS_DIR/logo.png" ]; then
     if is_dry_run; then
         log_simu "construirait et activerait le thème Plymouth MadOS ROG (assets, update-alternatives, update-initramfs)"
     else
-    sudo DEBIAN_FRONTEND=noninteractive apt install -y imagemagick plymouth-label >/dev/null 2>&1 || true
+    installer_paquets "outils graphiques du thème" imagemagick plymouth-label
     
     PLY_DIR="/usr/share/plymouth/themes/mados-rog"
     sudo mkdir -p "$PLY_DIR"

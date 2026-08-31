@@ -542,7 +542,7 @@ APTCONF
         log_simu "lancerait apt-get update et installerait software-properties-common, dirmngr, gpg, curl, wget"
     else
         sudo apt-get update -o Acquire::Retries=3 -qq >/dev/null 2>&1
-        sudo apt-get install -y software-properties-common dirmngr gpg curl wget 2>/dev/null || true
+        installer_paquets "outils de dépôts" software-properties-common dirmngr gpg curl wget
     fi
 
     # Empêcher sudo de réinitialiser les variables cruciales pour l'installation silencieuse
